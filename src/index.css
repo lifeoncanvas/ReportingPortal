@@ -1,13 +1,52 @@
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+/* ── THEME TOKENS ── */
+:root,
+*,
+*::before,
+*::after {
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.15s ease;
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+/* But don't transition transforms/opacity — causes layout flicker */
+*[class*="btn"],
+*[class*="icon"],
+svg {
+  transition: background-color 0.2s ease, color 0.15s ease, opacity 0.15s ease;
+}
+[data-theme="light"] {
+  --bg-primary:     #ffffff;
+  --bg-secondary:   #f0f2f8;
+  --bg-card:        #ffffff;
+  --bg-hover:       #f9fafb;
+  --border-color:   #e5e7eb;
+  --border-light:   #f3f4f6;
+  --text-primary:   #1f2937;
+  --text-secondary: #6b7280;
+  --text-muted:     #9ca3af;
+  --shadow-sm:      0 1px 4px rgba(0, 0, 0, 0.05);
+}
+
+[data-theme="dark"] {
+  --bg-primary:     #1e1e2e;
+  --bg-secondary:   #13131f;
+  --bg-card:        #27273a;
+  --bg-hover:       #2e2e42;
+  --border-color:   #3a3a52;
+  --border-light:   #32324a;
+  --text-primary:   #e2e8f0;
+  --text-secondary: #a0aec0;
+  --text-muted:     #718096;
+  --shadow-sm:      0 1px 4px rgba(0, 0, 0, 0.3);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  transition: background 0.2s, color 0.2s;
 }

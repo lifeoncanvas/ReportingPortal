@@ -1,0 +1,214 @@
+.dash-page {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Welcome */
+.dash-welcome h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+.dash-welcome p {
+  font-size: 0.8rem;
+  color: #9ca3af;
+  margin-top: 3px;
+}
+
+/* KPI Grid */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.kpi-card {
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 16px 18px;
+  border: 1px solid #f3f4f6;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+}
+
+.kpi-card-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.kpi-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.kpi-pct {
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 3px 9px;
+  border-radius: 20px;
+}
+
+.kpi-value {
+  font-size: 1.45rem;
+  font-weight: 700;
+  color: #1f2937;
+  line-height: 1;
+}
+
+.kpi-label {
+  font-size: 0.78rem;
+  color: #6b7280;
+  margin-top: 5px;
+}
+
+.kpi-sub {
+  font-size: 0.7rem;
+  color: #d1d5db;
+  margin-top: 3px;
+}
+
+/* Chart Grid */
+.chart-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.chart-card {
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 18px 20px;
+  border: 1px solid #f3f4f6;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+}
+
+.chart-card h3 {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 4px;
+}
+
+/* Activity */
+.activity-list {
+  display: flex;
+  flex-direction: column;
+  margin-top: 8px;
+}
+
+.activity-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 0;
+  border-bottom: 1px solid #f9fafb;
+}
+
+.activity-item:last-child {
+  border-bottom: none;
+}
+
+.activity-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #ede9fe;
+  color: #5b21b6;
+  font-size: 0.65rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.activity-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.activity-info p {
+  font-size: 0.825rem;
+  font-weight: 500;
+  color: #374151;
+}
+
+.activity-info span {
+  font-size: 0.74rem;
+  color: #9ca3af;
+}
+
+.activity-time {
+  font-size: 0.7rem;
+  color: #9ca3af;
+  white-space: nowrap;
+}
+
+/* Responsive */
+@media (max-width: 1100px) {
+  .kpi-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 700px) {
+  .chart-grid {
+    grid-template-columns: 1fr;
+  }
+  .kpi-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Dark mode for cards — add to Dashboard/styles.css, ZonalMgr/Dashboard/styles.css, Admin/Dashboard/styles.css */
+
+.kpi-card,
+.chart-card,
+.zd-kpi-card,
+.zd-card,
+.ad-kpi-card,
+.ad-card,
+.ad-stat-card {
+  background: var(--bg-card);
+  border-color: var(--border-light);
+}
+
+.kpi-value,
+.zd-kpi-value,
+.ad-kpi-value,
+.ad-stat-value {
+  color: var(--text-primary);
+}
+
+.kpi-label,
+.kpi-sub,
+.zd-kpi-label,
+.zd-kpi-sub,
+.ad-kpi-label,
+.ad-stat-label {
+  color: var(--text-secondary);
+}
+
+.chart-card h3,
+.zd-card h3,
+.ad-card h3 {
+  color: var(--text-primary);
+}
+
+.activity-avatar {
+  background: rgba(79, 70, 229, 0.15);
+  color: #818cf8;
+}
+
+.activity-info p { color: var(--text-primary); }
+.activity-info span,
+.activity-time   { color: var(--text-muted); }
+
+.activity-item { border-color: var(--border-light); }
