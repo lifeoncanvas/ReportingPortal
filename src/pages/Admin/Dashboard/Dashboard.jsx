@@ -1,6 +1,7 @@
 import React from 'react';
 import { Users, FileText, DollarSign, Shield, Download } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../../auth/AuthContext';
 import './styles.css';
 
 const KPI = [
@@ -42,6 +43,7 @@ const ROLE_DIST = [
 
 export default function AdminDashboard() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const today = new Date().toLocaleDateString('en-US', {
     weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
   });
@@ -52,7 +54,7 @@ export default function AdminDashboard() {
       {/* Header */}
       <div className="ad-page-header">
         <div>
-          <h2>Welcome back, System! 🛡️</h2>
+          <h2>Welcome back, {user?.name || 'System'}! 🛡️</h2>
           <p>{today}</p>
         </div>
         <button className="ad-export-btn">

@@ -8,9 +8,9 @@ export default function Signin({ onSwitch }) {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const err = login(email, password);
+    const err = await login(email, password);
     if (err) setError(err);
   };
 

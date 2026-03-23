@@ -1,33 +1,5 @@
 import React, { createContext, useContext, useState } from 'react';
-
 const AuthContext = createContext(undefined);
-
-const DEMO_USERS = [
-  {
-    email:     'global@loveworld.com',
-    password:  'global123',
-    role:      'global',
-    firstName: 'Global',
-    lastName:  'Partnership Manager',
-    name:      'Global Partnership Manager',
-  },
-  {
-    email:     'zonal@loveworld.com',
-    password:  'zonal123',
-    role:      'zonal',
-    firstName: 'Zonal',
-    lastName:  'Partnership Manager',
-    name:      'Zonal Partnership Manager',
-  },
-  {
-    email:     'admin@loveworld.com',
-    password:  'admin123',
-    role:      'admin',
-    firstName: 'System',
-    lastName:  'Administrator',
-    name:      'System Administrator',
-  },
-];
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(() => {
@@ -40,33 +12,59 @@ export function AuthProvider({ children }) {
     }
   });
 
-  const login = (email, password) => {
-    // Trim whitespace — common cause of login failures
-    const cleanEmail    = email.trim().toLowerCase();
+  const login = async (email, password) => {
+    const cleanEmail = email.trim().toLowerCase();
     const cleanPassword = password.trim();
 
-    console.log('Login attempt:', cleanEmail, cleanPassword);
-    console.log('Available users:', DEMO_USERS.map(u => u.email));
+    try {
+      const response = await fetch('http://localhost:8080/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: cleanEmail, password: cleanPassword })
+      });
 
-    const found = DEMO_USERS.find(
-      u => u.email.toLowerCase() === cleanEmail && u.password === cleanPassword
-    );
+      if (!response.ok) {
+        let msg = 'Invalid email or password.';
+        try { const data = await response.text(); msg = data || msg; } catch { }
+        return msg;
+      }
 
-    console.log('Found user:', found);
+      const userData = await response.json();
+      localStorage.setItem('lw_user', JSON.stringify(userData));
+      setUser(userData);
+      return null;
+    } catch (err) {
+      console.error('Login error:', err);
+      return 'Failed to connect to the login server.';
+    }
+  };
 
-    if (!found) return 'Invalid email or password.';
+  const signup = async (name, email, password) => {
+    const cleanName = name.trim();
+    const cleanEmail = email.trim().toLowerCase();
+    const cleanPassword = password.trim();
 
-    const userData = {
-      role:      found.role,
-      firstName: found.firstName,
-      lastName:  found.lastName,
-      name:      found.name,
-      email:     found.email,
-    };
+    try {
+      const response = await fetch('http://localhost:8080/api/auth/signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: cleanName, email: cleanEmail, password: cleanPassword })
+      });
 
-    localStorage.setItem('lw_user', JSON.stringify(userData));
-    setUser(userData);
-    return null;
+      if (!response.ok) {
+        let msg = 'Signup failed.';
+        try { const data = await response.text(); msg = data || msg; } catch { }
+        return msg;
+      }
+
+      const userData = await response.json();
+      localStorage.setItem('lw_user', JSON.stringify(userData));
+      setUser(userData);
+      return null;
+    } catch (err) {
+      console.error('Signup error:', err);
+      return 'Failed to connect to the signup server.';
+    }
   };
 
   const logout = () => {
@@ -75,7 +73,7 @@ export function AuthProvider({ children }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
+    <AuthContext.Provider value={{ user, login, signup, logout }}>
       {children}
     </AuthContext.Provider>
   );

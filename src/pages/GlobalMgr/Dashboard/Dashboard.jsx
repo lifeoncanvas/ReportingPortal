@@ -1,6 +1,7 @@
 import React from 'react';
 import { FileText, DollarSign, Users, TrendingUp } from 'lucide-react';
 import { useSettings } from '../../../context/SettingsContext';
+import { useAuth } from '../../../auth/AuthContext';
 import {
   LineChart, Line, BarChart, Bar, PieChart, Pie, Cell,
   XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
@@ -40,6 +41,7 @@ const activity = [
 
 export default function Dashboard() {
   const { t, formatDate, currSymbol } = useSettings();
+  const { user } = useAuth();
 
   const today = new Date().toLocaleDateString('en-US', {
     weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
@@ -55,7 +57,7 @@ export default function Dashboard() {
   return (
     <div className="dash-page">
       <div className="dash-welcome">
-        <h2>{t.welcomeBack}, Global! 👋</h2>
+        <h2>{t.welcomeBack}, {user?.name || 'Global'}! 👋</h2>
         <p>{today}</p>
       </div>
 

@@ -1,6 +1,7 @@
 import React from 'react';
 import { FileText, DollarSign, Users, TrendingUp } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../../auth/AuthContext';
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid,
   Tooltip, Legend, ResponsiveContainer,
@@ -34,6 +35,7 @@ const KPI = [
 
 export default function ZonalDashboard() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const today = new Date().toLocaleDateString('en-US', {
     weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
   });
@@ -42,7 +44,7 @@ export default function ZonalDashboard() {
     <div className="zd-page">
       {/* Welcome */}
       <div className="zd-welcome">
-        <h2>Welcome back, Zonal! 👋</h2>
+        <h2>Welcome back, {user?.name || 'Zonal'}! 👋</h2>
         <p>{today}</p>
       </div>
 
