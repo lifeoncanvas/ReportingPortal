@@ -59,6 +59,8 @@ export default function RoleRouter() {
           <Route index element={<Navigate to="dashboard" replace />} />
           <Route path="dashboard"     element={<ZonalDashboard />} />
           <Route path="reporting"     element={<ZonalReporting />} />
+          <Route path="finance"       element={<FinancePortal />} />
+          <Route path="analytics"     element={<Analytics />} />
           <Route path="notifications" element={<Notifications />} />
           <Route path="settings"      element={<Settings />} />
         </Route>

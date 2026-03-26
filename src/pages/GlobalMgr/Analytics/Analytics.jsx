@@ -6,6 +6,7 @@ import {
   Tooltip, Legend, ResponsiveContainer,
 } from 'recharts';
 import { useSettings } from '../../../context/SettingsContext';
+import { useAuth } from '../../../auth/AuthContext';
 import './styles.css';
 
 // ── Raw data ───────────────────────────────────────────
@@ -176,10 +177,14 @@ function exportReport(filters, kpi, attendanceData, financeData) {
 // ── Main Component ─────────────────────────────────────
 export default function Analytics() {
   const { t, currSymbol } = useSettings();
+  const { user } = useAuth();
+
+  const isRestrictedRole = user?.role === 'global' || user?.role === 'regional' || user?.role === 'zonal';
+  const initialRegion = isRestrictedRole ? (user?.region || 'North America') : 'All Regions';
 
   const [filters, setFilters] = useState({
     timeRange: 'This Month',
-    region:    'All Regions',
+    region:    initialRegion,
     zone:      'All Zones',
     campaign:  'All Campaigns',
   });
@@ -255,7 +260,7 @@ export default function Analytics() {
       <div className="an-panel an-filters">
         {[
           { key: 'timeRange', label: 'Time Range', opts: ['This Month','Last Month','This Quarter','This Year'] },
-          { key: 'region',    label: 'Region',     opts: ['All Regions','Africa','Europe','Americas','Asia Pacific','South America'] },
+          { key: 'region',    label: 'Region',     opts: isRestrictedRole ? [initialRegion] : ['All Regions','Africa','Europe','North America','Asia Pacific','South America'] },
           { key: 'zone',      label: 'Zone',       opts: ['All Zones','Zone A','Zone B','Zone C','Zone D','Zone E'] },
           { key: 'campaign',  label: 'Campaign',   opts: ['All Campaigns','Spring Outreach 2026','Easter Campaign','Healing Streams'] },
         ].map(f => (

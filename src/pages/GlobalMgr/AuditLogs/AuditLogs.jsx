@@ -2,71 +2,7 @@ import React, { useState } from 'react';
 import { Search, Filter, Download, Eye, X, ChevronDown } from 'lucide-react';
 import './styles.css';
 
-const INITIAL_LOGS = [
-  {
-    id: 1,
-    timestamp: '3/10/2026\n2:00:00 PM',
-    user: 'System Administrator', userId: 1,
-    action: 'Created new user',
-    module: 'User Management',
-    prev: '—', updated: 'user@example.com',
-    details: 'A new user account was created with email user@example.com and assigned the role of Data Entry.',
-  },
-  {
-    id: 2,
-    timestamp: '3/8/2026\n4:00:00 PM',
-    user: 'John Smith', userId: 6,
-    action: 'Submitted weekly report',
-    module: 'Reporting Portal',
-    prev: '—', updated: 'RPT-001',
-    details: 'Weekly activity report RPT-001 was submitted for Zone A covering the Spring Outreach 2026 campaign.',
-  },
-  {
-    id: 3,
-    timestamp: '3/8/2026\n8:50:00 PM',
-    user: 'Regional Manager', userId: 5,
-    action: 'Downloaded report',
-    module: 'Analytics',
-    prev: '—', updated: 'RPT-001.pdf',
-    details: 'Report RPT-001 was exported and downloaded as a PDF file from the Analytics module.',
-  },
-  {
-    id: 4,
-    timestamp: '3/7/2026\n2:45:00 PM',
-    user: 'System Administrator', userId: 1,
-    action: 'Updated user role',
-    module: 'User Management',
-    prev: 'data-entry', updated: 'zonal-manager',
-    details: 'User ID 3 role was changed from data-entry to zonal-manager by System Administrator.',
-  },
-  {
-    id: 5,
-    timestamp: '3/6/2026\n8:15:00 PM',
-    user: 'Finance Manager', userId: 4,
-    action: 'Exported finance data',
-    module: 'Finance Portal',
-    prev: '—', updated: 'finance_report_March_2026.xlsx',
-    details: 'Finance records for March 2026 were exported to an Excel file from the Finance Portal.',
-  },
-  {
-    id: 6,
-    timestamp: '3/5/2026\n10:00:00 AM',
-    user: 'John Smith', userId: 6,
-    action: 'Login',
-    module: 'Auth',
-    prev: '—', updated: 'Success',
-    details: 'User John Smith (ID: 6) successfully logged into the platform from IP 192.168.1.45.',
-  },
-  {
-    id: 7,
-    timestamp: '3/5/2026\n9:30:00 AM',
-    user: 'Unknown', userId: null,
-    action: 'Failed login attempt',
-    module: 'Auth',
-    prev: '—', updated: 'Failed',
-    details: 'A failed login attempt was recorded for email unknown@example.com from IP 203.0.113.42.',
-  },
-];
+const INITIAL_LOGS = [];
 
 const MODULE_COLORS = {
   'User Management':  { bg: '#ede9fe', color: '#5b21b6' },
@@ -77,8 +13,7 @@ const MODULE_COLORS = {
 };
 
 const MODULES  = ['All Modules', 'User Management', 'Reporting Portal', 'Analytics', 'Finance Portal', 'Auth'];
-const USERS    = ['All Users', 'System Administrator', 'John Smith', 'Regional Manager', 'Finance Manager'];
-const ACTIONS  = ['All Actions', 'Created new user', 'Submitted weekly report', 'Downloaded report', 'Updated user role', 'Exported finance data', 'Login', 'Failed login attempt'];
+const ACTIONS  = ['All Actions', 'Created new user', 'Completed Registration', 'Login', 'Failed login attempt'];
 
 const EMPTY_FILTERS = { module: '', user: '', action: '', dateFrom: '', dateTo: '' };
 
@@ -169,9 +104,8 @@ function FilterPanel({ filters, onChange, onApply, onReset, onClose }) {
         </div>
         <div className="al-filter-field">
           <label>User</label>
-          <select value={filters.user} onChange={e => onChange('user', e.target.value)}>
-            {USERS.map(u => <option key={u} value={u === 'All Users' ? '' : u}>{u}</option>)}
-          </select>
+          <input type="text" placeholder="Search user name" value={filters.user} 
+            onChange={e => onChange('user', e.target.value)} />
         </div>
         <div className="al-filter-field">
           <label>Action</label>
@@ -203,14 +137,26 @@ export default function AuditLogs() {
   const [showFilters, setShowFilters]     = useState(false);
   const [filters, setFilters]             = useState(EMPTY_FILTERS);
   const [appliedFilters, setAppliedFilters] = useState(EMPTY_FILTERS);
-  const [logs]                            = useState(INITIAL_LOGS);
+  const [logs, setLogs]                   = useState(INITIAL_LOGS);
+
+  React.useEffect(() => {
+    fetchLogs();
+  }, []);
+
+  const fetchLogs = async () => {
+    try {
+      const res = await fetch('http://localhost:8080/api/audit-logs');
+      const data = await res.json();
+      setLogs(data || []);
+    } catch(err) { console.error("Failed to load audit logs", err); }
+  };
 
   // ── Filter logic ──
   const filtered = logs.filter(l => {
     const matchSearch = [l.user, l.action, l.module, l.updated]
       .some(v => v.toLowerCase().includes(search.toLowerCase()));
     const matchModule = !appliedFilters.module || l.module === appliedFilters.module;
-    const matchUser   = !appliedFilters.user   || l.user   === appliedFilters.user;
+    const matchUser   = !appliedFilters.user   || (l.user && l.user.toLowerCase().includes(appliedFilters.user.toLowerCase()));
     const matchAction = !appliedFilters.action || l.action === appliedFilters.action;
     return matchSearch && matchModule && matchUser && matchAction;
   });

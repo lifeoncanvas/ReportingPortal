@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { Eye, Download, Search, Filter, Upload, X, Check, ChevronDown } from 'lucide-react';
 import { useSettings } from '../../../context/SettingsContext';
+import { useAuth } from '../../../auth/AuthContext';
 import './styles.css';
 
 // ── Icons ──────────────────────────────────────────────
@@ -306,6 +307,7 @@ const EMPTY_FILTERS = { region: '', zone: '', category: '', campaign: '' };
 // ── Main Component ─────────────────────────────────────
 export default function FinancePortal() {
   const { formatDate, currSymbol, t } = useSettings();
+  const { user } = useAuth();
   const [tab, setTab]                       = useState(0);
   const [search, setSearch]                 = useState('');
   const [records, setRecords]               = useState(INITIAL_RECORDS);
@@ -325,13 +327,20 @@ export default function FinancePortal() {
   ];
 
   const filtered = records.filter(r => {
+    let roleAccess = true;
+    if (user?.role === 'global' || user?.role === 'regional') {
+      roleAccess = (r.region === user.region);
+    } else if (user?.role === 'zonal') {
+      roleAccess = (r.submittedBy === (user?.firstName + ' ' + user?.lastName).trim() || r.submittedBy === user?.name);
+    }
+
     const matchSearch   = [r.id, r.region, r.zone, r.category, r.campaign, r.submittedBy]
       .some(v => v.toLowerCase().includes(search.toLowerCase()));
     const matchRegion   = !appliedFilters.region   || r.region   === appliedFilters.region;
     const matchZone     = !appliedFilters.zone     || r.zone     === appliedFilters.zone;
     const matchCategory = !appliedFilters.category || r.category === appliedFilters.category;
     const matchCampaign = !appliedFilters.campaign || r.campaign === appliedFilters.campaign;
-    return matchSearch && matchRegion && matchZone && matchCategory && matchCampaign;
+    return roleAccess && matchSearch && matchRegion && matchZone && matchCategory && matchCampaign;
   });
 
   const activeFilterCount = Object.values(appliedFilters).filter(Boolean).length;

@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { Eye, Download, Search, Filter, Upload, X, Check, ChevronDown } from 'lucide-react';
 import { useSettings } from '../../../context/SettingsContext';
+import { useAuth } from '../../../auth/AuthContext';
 import './styles.css';
 
 const ListIcon = () => (
@@ -308,6 +309,7 @@ const EMPTY_FILTERS = { status: '', region: '', zone: '', campaign: '' };
 // ── Main Component ─────────────────────────────────────
 export default function ReportingPortal() {
   const { t, formatDate } = useSettings();
+  const { user } = useAuth();
   const [tab, setTab]                       = useState(0);
   const [search, setSearch]                 = useState('');
   const [reports, setReports]               = useState(INITIAL_REPORTS);
@@ -327,13 +329,20 @@ export default function ReportingPortal() {
   ];
 
   const filtered = reports.filter(r => {
+    let roleAccess = true;
+    if (user?.role === 'global' || user?.role === 'regional') {
+      roleAccess = (r.region === user.region);
+    } else if (user?.role === 'zonal') {
+      roleAccess = (r.submittedBy === (user?.firstName + ' ' + user?.lastName).trim() || r.submittedBy === user?.name);
+    }
+
     const matchSearch   = Object.values(r).some(v =>
       String(v).toLowerCase().includes(search.toLowerCase()));
     const matchStatus   = !appliedFilters.status   || r.status   === appliedFilters.status;
     const matchRegion   = !appliedFilters.region   || r.region   === appliedFilters.region;
     const matchZone     = !appliedFilters.zone     || r.zone     === appliedFilters.zone;
     const matchCampaign = !appliedFilters.campaign || r.campaign === appliedFilters.campaign;
-    return matchSearch && matchStatus && matchRegion && matchZone && matchCampaign;
+    return roleAccess && matchSearch && matchStatus && matchRegion && matchZone && matchCampaign;
   });
 
   const activeFilterCount = Object.values(appliedFilters).filter(Boolean).length;

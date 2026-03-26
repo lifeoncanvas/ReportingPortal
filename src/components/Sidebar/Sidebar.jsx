@@ -29,6 +29,8 @@ export default function Sidebar() {
     zonal: [
       { label: t.dashboard,       icon: LayoutDashboard, path: '/zonal/dashboard' },
       { label: t.reportingPortal, icon: FileText,         path: '/zonal/reporting' },
+      { label: t.financePortal,   icon: DollarSign,       path: '/zonal/finance'   },
+      { label: t.analytics,       icon: BarChart2,        path: '/zonal/analytics' },
     ],
     admin: [
       { label: t.dashboard,       icon: LayoutDashboard, path: '/admin/dashboard'  },
