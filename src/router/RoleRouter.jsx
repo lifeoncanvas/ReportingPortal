@@ -5,6 +5,7 @@ import { useAuth } from '../auth/AuthContext';
 import GlobalMgrLayout from '../pages/GlobalMgr/GlobalMgrLayout';
 import ZonalMgrLayout  from '../pages/ZonalMgr/ZonalMgrLayout';
 import AdminLayout     from '../pages/Admin/AdminLayout';
+import SubmitReport from '../pages/Report/SubmitReport';
 
 import GlobalDashboard  from '../pages/GlobalMgr/Dashboard/Dashboard';
 import ReportingPortal  from '../pages/GlobalMgr/ReportingPortal/ReportingPortal';
@@ -13,7 +14,8 @@ import Analytics        from '../pages/GlobalMgr/Analytics/Analytics';
 import GlobalAuditLogs  from '../pages/GlobalMgr/AuditLogs/AuditLogs';
 
 import ZonalDashboard   from '../pages/ZonalMgr/Dashboard/Dashboard';
-import ZonalReporting   from '../pages/ZonalMgr/ReportingPortal/ReportingPortal';
+import ZonalReportingTabs   from '../pages/ZonalMgr/ReportingPortal/ZonalReportingTabs';
+
 
 import AdminDashboard   from '../pages/Admin/Dashboard/Dashboard';
 import UserManagement   from '../pages/Admin/UserManagement/UserManagement';
@@ -46,6 +48,7 @@ export default function RoleRouter() {
           <Route path="audit"         element={<GlobalAuditLogs />} />
           <Route path="notifications" element={<Notifications />} />
           <Route path="settings"      element={<Settings />} />
+          <Route path="submit-report" element={<SubmitReport />} />
         </Route>
         <Route path="*" element={<Navigate to="/global/dashboard" replace />} />
       </Routes>
@@ -58,11 +61,12 @@ export default function RoleRouter() {
         <Route path="/zonal" element={<ZonalMgrLayout />}>
           <Route index element={<Navigate to="dashboard" replace />} />
           <Route path="dashboard"     element={<ZonalDashboard />} />
-          <Route path="reporting"     element={<ZonalReporting />} />
+          <Route path="reporting" element={<ZonalReportingTabs />} />
           <Route path="finance"       element={<FinancePortal />} />
           <Route path="analytics"     element={<Analytics />} />
           <Route path="notifications" element={<Notifications />} />
           <Route path="settings"      element={<Settings />} />
+          <Route path="submit-report" element={<SubmitReport />} />
         </Route>
         <Route path="*" element={<Navigate to="/zonal/dashboard" replace />} />
       </Routes>
@@ -82,6 +86,9 @@ export default function RoleRouter() {
           <Route path="audit"          element={<AdminAuditLogs />} />
           <Route path="notifications"  element={<Notifications />} />
           <Route path="settings"       element={<Settings />} />
+          <Route path="submit-report" element={<SubmitReport />} />
+
+
         </Route>
         <Route path="*" element={<Navigate to="/admin/dashboard" replace />} />
       </Routes>
