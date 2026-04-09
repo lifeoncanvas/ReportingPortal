@@ -1,5 +1,5 @@
 import React from 'react';
-import { FileText, DollarSign, Users, TrendingUp } from 'lucide-react';
+import { FileText, DollarSign, Users, TrendingUp, BookOpen } from 'lucide-react';
 import { useSettings } from '../../../context/SettingsContext';
 import { useAuth } from '../../../auth/AuthContext';
 import {
@@ -84,7 +84,7 @@ export default function Dashboard() {
 
       <div className="chart-grid">
         <div className="chart-card">
-          <h3>Monthly Trends</h3>
+          <h3>{t.monthlyTrends}</h3>
           <ResponsiveContainer width="100%" height={220}>
             <LineChart data={monthlyData}>
               <CartesianGrid strokeDasharray="4 3" stroke="#f3f4f6" vertical={false}/>
@@ -99,7 +99,7 @@ export default function Dashboard() {
         </div>
 
         <div className="chart-card">
-          <h3>Campaign Performance</h3>
+          <h3>{t.campaignPerformance}</h3>
           <ResponsiveContainer width="100%" height={220}>
             <BarChart data={campaignData} barSize={40}>
               <CartesianGrid strokeDasharray="4 3" stroke="#f3f4f6" vertical={false}/>
@@ -115,7 +115,7 @@ export default function Dashboard() {
 
       <div className="chart-grid">
         <div className="chart-card">
-          <h3>Region-wise Statistics</h3>
+          <h3>{t.regionStats}</h3>
           <ResponsiveContainer width="100%" height={220}>
             <PieChart>
               <Pie data={regionData} cx="50%" cy="50%" outerRadius={80}
@@ -147,6 +147,30 @@ export default function Dashboard() {
           </div>
         </div>
       </div>
+      {/* Magazine Orders Updates */}
+      {magazineNotifs.length > 0 && (
+        <div className="chart-card">
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
+            <h3 style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <BookOpen size={16} color="#d97706" /> Magazine Order Updates
+            </h3>
+            <span style={{ fontSize: '0.75rem', color: '#9ca3af' }}>{magazineNotifs.length} new</span>
+          </div>
+          <div className="activity-list">
+            {magazineNotifs.map(n => (
+              <div className="activity-item" key={n.id}>
+                <div className="activity-avatar" style={{ background: '#fef3c7', color: '#d97706' }}>📖</div>
+                <div className="activity-info">
+                  <p>{n.title}</p>
+                  <span>{n.message}</span>
+                </div>
+                <div className="activity-time">{n.time}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }

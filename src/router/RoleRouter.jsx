@@ -32,10 +32,6 @@ export default function RoleRouter() {
 
   if (user === null) return <Navigate to="/login" replace />;
 
-    if (user?.role === 'global') { /* ... */ }
-  if (user?.role === 'zonal')  { /* ... */ }
-  if (user?.role === 'admin')  { /* ... */ }
-
   if (user?.role === 'global') {
     return (
       <Routes>

@@ -1,16 +1,46 @@
 import React, { useState } from 'react';
 import { useAuth } from '../AuthContext';
+import { useToast } from '../../context/ToastContext';
+import { useNavigate } from 'react-router-dom';
 import './styles.css';
 
+const ROLE_NOTIF_PATH = {
+  global: '/global/notifications',
+  zonal:  '/zonal/notifications',
+  admin:  '/admin/notifications',
+};
+
 export default function Signin({ onSwitch }) {
-  const { login } = useAuth();
-  const [email, setEmail] = useState('');
+  const { login }    = useAuth();
+  const { showToast } = useToast();
+  const navigate     = useNavigate();
+  const [email,    setEmail]    = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [error,    setError]    = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const err = await login(email, password);
+
+    // Capture the role returned from login via a ref trick —
+    // login sets user synchronously so we read it from the callback
+    let loggedInRole = null;
+
+    const err = login(email, password, (pendingToasts, role) => {
+      loggedInRole = role;
+      const notifPath = ROLE_NOTIF_PATH[role] || '/notifications';
+
+      pendingToasts.forEach((t, i) => {
+        setTimeout(() => {
+          showToast({
+            icon:    t.icon === 'magazine' ? '📖' : t.icon === 'success' ? '✅' : '🔔',
+            title:   t.title,
+            message: t.message,
+            onClick: () => navigate(notifPath),
+          });
+        }, i * 600);
+      });
+    });
+
     if (err) setError(err);
   };
 

@@ -348,9 +348,9 @@ export default function FinancePortal() {
   const avgAmount         = records.length ? Math.round(totalAmount / records.length) : 0;
 
   const SUMMARY = [
-    { label: 'Total Records',  value: records.length.toString()                      },
-    { label: 'Total Amount',   value: `${currSymbol}${totalAmount.toLocaleString()}` },
-    { label: 'Average Amount', value: `${currSymbol}${avgAmount.toLocaleString()}`   },
+    { label: t?.totalRecords || 'Total Records',  value: records.length.toString()                      },
+    { label: t?.totalAmount  || 'Total Amount',   value: `${currSymbol}${totalAmount.toLocaleString()}` },
+    { label: t?.avgAmount    || 'Average Amount', value: `${currSymbol}${avgAmount.toLocaleString()}`   },
   ];
 
   const downloadRow = (row) => {
@@ -543,9 +543,9 @@ export default function FinancePortal() {
           <table className="fp-table">
             <thead>
               <tr>
-                <th>Entry ID</th><th>Date</th><th>Region</th><th>Zone</th>
-                <th>Category</th><th>Amount</th><th>Campaign</th>
-                <th>Submitted By</th><th>Actions</th>
+                <th>{t?.entryId || 'Entry ID'}</th><th>{t?.date || 'Date'}</th><th>{t?.region || 'Region'}</th><th>{t?.zone || 'Zone'}</th>
+                <th>{t?.category || 'Category'}</th><th>{t?.amount || 'Amount'}</th><th>{t?.campaign || 'Campaign'}</th>
+                <th>{t?.submittedBy || 'Submitted By'}</th><th>{t?.actions || 'Actions'}</th>
               </tr>
             </thead>
             <tbody>
