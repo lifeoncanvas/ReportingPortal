@@ -24,16 +24,28 @@ const EMPTY_FORM = {
 };
 
 export default function UserManagement() {
-  const [users, setUsers]     = useState(INITIAL_USERS);
-  const [search, setSearch]   = useState('');
+  const [users, setUsers]         = useState([]);
+  const [search, setSearch]       = useState('');
   const [showModal, setShowModal] = useState(false);
   const [editUser, setEditUser]   = useState(null);
   const [form, setForm]           = useState(EMPTY_FORM);
   const [deleteId, setDeleteId]   = useState(null);
 
+  React.useEffect(() => {
+    fetchUsers();
+  }, []);
+
+  const fetchUsers = async () => {
+    try {
+      const res = await fetch('http://localhost:8080/api/users');
+      const data = await res.json();
+      setUsers(data || []);
+    } catch(err) { console.log("Failed to load users", err); }
+  };
+
   const filtered = users.filter(u =>
     [u.firstName, u.lastName, u.email, u.role, u.region].some(v =>
-      v.toLowerCase().includes(search.toLowerCase())
+      String(v || '').toLowerCase().includes(search.toLowerCase())
     )
   );
 
@@ -49,25 +61,50 @@ export default function UserManagement() {
     setShowModal(true);
   };
 
-  const handleSave = () => {
-    if (!form.firstName || !form.email) return;
+  const handleSave = async () => {
+    if (!form.email) return;
+
     if (editUser) {
-      setUsers(prev => prev.map(u => u.id === editUser.id ? { ...u, ...form } : u));
+      await fetch(`http://localhost:8080/api/users/${editUser.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(form)
+      });
     } else {
-      setUsers(prev => [...prev, { ...form, id: Date.now(), joined: new Date().toLocaleDateString() }]);
+      const res = await fetch('http://localhost:8080/api/users/invite', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: form.email, role: form.role, region: form.region })
+      });
+      if (res.ok) {
+        const data = await res.json();
+        alert('Simulated Email Sent!\n\nGive this invite link to the new ' + form.role + ':\n' + data.link);
+      } else {
+        const err = await res.text();
+        alert('Error: ' + err);
+        return;
+      }
     }
+    
     setShowModal(false);
+    fetchUsers();
   };
 
-  const handleDelete = (id) => {
-    setUsers(prev => prev.filter(u => u.id !== id));
+  const handleDelete = async (id) => {
+    await fetch(`http://localhost:8080/api/users/${id}`, { method: 'DELETE' });
     setDeleteId(null);
+    fetchUsers();
   };
 
-  const toggleStatus = (id) => {
-    setUsers(prev => prev.map(u =>
-      u.id === id ? { ...u, status: u.status === 'active' ? 'inactive' : 'active' } : u
-    ));
+  const toggleStatus = async (id) => {
+    const user = users.find(u => u.id === id);
+    if (!user) return;
+    await fetch(`http://localhost:8080/api/users/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ...user, status: user.status === 'active' ? 'inactive' : 'active' })
+    });
+    fetchUsers();
   };
 
   return (
@@ -134,9 +171,9 @@ export default function UserManagement() {
                   <td>
                     <div className="um-user-cell">
                       <div className="um-av" style={{ background: rc.bg, color: rc.color }}>
-                        {u.firstName[0]}
+                        {(u.firstName?.[0] || u.email?.[0] || '?').toUpperCase()}
                       </div>
-                      <span className="um-name">{u.firstName} {u.lastName}</span>
+                      <span className="um-name">{u.firstName ? `${u.firstName} ${u.lastName || ''}` : 'Pending Invite'}</span>
                     </div>
                   </td>
                   <td>{u.email}</td>
@@ -186,37 +223,41 @@ export default function UserManagement() {
 
             <div className="um-modal-body">
               <div className="um-form-grid">
-                <div className="um-field">
-                  <label>First Name</label>
-                  <input type="text" value={form.firstName}
-                    onChange={e => setForm(p => ({ ...p, firstName: e.target.value }))}
-                    placeholder="First name" />
-                </div>
-                <div className="um-field">
-                  <label>Last Name</label>
-                  <input type="text" value={form.lastName}
-                    onChange={e => setForm(p => ({ ...p, lastName: e.target.value }))}
-                    placeholder="Last name" />
-                </div>
-                <div className="um-field um-field-full">
-                  <label>Email</label>
-                  <input type="email" value={form.email}
+                {editUser && (
+                  <>
+                    <div className="um-field">
+                      <label>First Name</label>
+                      <input type="text" value={form.firstName || ''}
+                        onChange={e => setForm(p => ({ ...p, firstName: e.target.value }))}
+                        placeholder="First name" />
+                    </div>
+                    <div className="um-field">
+                      <label>Last Name</label>
+                      <input type="text" value={form.lastName || ''}
+                        onChange={e => setForm(p => ({ ...p, lastName: e.target.value }))}
+                        placeholder="Last name" />
+                    </div>
+                  </>
+                )}
+                <div className={`um-field ${editUser ? 'um-field-full' : ''}`}>
+                  <label>Email Address</label>
+                  <input type="email" value={form.email || ''} disabled={!!editUser}
                     onChange={e => setForm(p => ({ ...p, email: e.target.value }))}
                     placeholder="email@loveworld.com" />
                 </div>
                 <div className="um-field">
                   <label>Role</label>
-                  <select value={form.role}
+                  <select value={form.role || 'zonal'}
                     onChange={e => setForm(p => ({ ...p, role: e.target.value }))}>
-                    <option value="global">Global Manager</option>
+                    <option value="regional">Regional Manager</option>
                     <option value="zonal">Zonal Manager</option>
-                    <option value="admin">Admin</option>
+                    <option value="admin">System Administrator</option>
                     <option value="finance">Finance Manager</option>
                   </select>
                 </div>
                 <div className="um-field">
                   <label>Region</label>
-                  <select value={form.region}
+                  <select value={form.region || 'Global'}
                     onChange={e => setForm(p => ({ ...p, region: e.target.value }))}>
                     {['Global','North America','South America','Europe','Africa','Asia Pacific'].map(r => (
                       <option key={r}>{r}</option>

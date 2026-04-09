@@ -18,7 +18,7 @@ export default function Signin({ onSwitch }) {
   const [password, setPassword] = useState('');
   const [error,    setError]    = useState('');
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     // Capture the role returned from login via a ref trick —

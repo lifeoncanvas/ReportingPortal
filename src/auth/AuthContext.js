@@ -66,13 +66,11 @@ export function AuthProvider({ children }) {
 
     if (!found) return 'Invalid email or password.';
 
-    const userData = {
-      role:      found.role,
-      firstName: found.firstName,
-      lastName:  found.lastName,
-      name:      found.name,
-      email:     found.email,
-    };
+      if (!response.ok) {
+        let msg = 'Signup failed.';
+        try { const data = await response.text(); msg = data || msg; } catch { }
+        return msg;
+      }
 
     session.set('lw_user', userData);
     setUser(userData);

@@ -1,7 +1,10 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { useSettings } from '../../../context/SettingsContext';
+import { useAuth } from '../../../auth/AuthContext';
+import {
+  BarChart, Bar, XAxis, YAxis, CartesianGrid,
+  Tooltip, Legend, ResponsiveContainer,
+} from 'recharts';
 import './styles.css';
 
 const campaignData = [
@@ -20,8 +23,7 @@ const activity = [
 
 export default function ZonalDashboard() {
   const navigate = useNavigate();
-  const { t } = useSettings();
-
+  const { user } = useAuth();
   const today = new Date().toLocaleDateString('en-US', {
     weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
   });
