@@ -14,6 +14,8 @@ import GlobalAuditLogs  from '../pages/GlobalMgr/AuditLogs/AuditLogs';
 
 import ZonalDashboard   from '../pages/ZonalMgr/Dashboard/Dashboard';
 import ZonalReporting   from '../pages/ZonalMgr/ReportingPortal/ReportingPortal';
+import ZonalAnalytics   from '../pages/ZonalMgr/Analytics/Analytics';
+import Magazine         from '../pages/ZonalMgr/Magazine/Magazine';
 
 import AdminDashboard   from '../pages/Admin/Dashboard/Dashboard';
 import UserManagement   from '../pages/Admin/UserManagement/UserManagement';
@@ -29,10 +31,6 @@ export default function RoleRouter() {
   const { user } = useAuth();
 
   if (user === null) return <Navigate to="/login" replace />;
-
-    if (user?.role === 'global') { /* ... */ }
-  if (user?.role === 'zonal')  { /* ... */ }
-  if (user?.role === 'admin')  { /* ... */ }
 
   if (user?.role === 'global') {
     return (
@@ -59,6 +57,8 @@ export default function RoleRouter() {
           <Route index element={<Navigate to="dashboard" replace />} />
           <Route path="dashboard"     element={<ZonalDashboard />} />
           <Route path="reporting"     element={<ZonalReporting />} />
+          <Route path="analytics"     element={<ZonalAnalytics />} />
+          <Route path="magazine"      element={<Magazine />} />
           <Route path="notifications" element={<Notifications />} />
           <Route path="settings"      element={<Settings />} />
         </Route>

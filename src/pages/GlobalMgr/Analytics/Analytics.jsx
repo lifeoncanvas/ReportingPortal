@@ -76,17 +76,17 @@ const ALL_DATA = {
 
 const REGION_DATA = {
   'All Regions': [
-    { region: 'North America', attendance: 460 },
-    { region: 'Europe',        attendance: 320 },
-    { region: 'Asia Pacific',  attendance: 590 },
-    { region: 'Africa',        attendance: 740 },
-    { region: 'South America', attendance: 390 },
+    { region: 'Zone A — North America', attendance: 460 },
+    { region: 'Zone B — Europe',        attendance: 320 },
+    { region: 'Zone C — Asia Pacific',  attendance: 590 },
+    { region: 'Zone D — Africa',        attendance: 740 },
+    { region: 'Zone E — South America', attendance: 390 },
   ],
-  'Africa':        [{ region: 'Africa',        attendance: 740 }],
-  'Europe':        [{ region: 'Europe',         attendance: 320 }],
-  'Americas':      [{ region: 'North America',  attendance: 460 }, { region: 'South America', attendance: 390 }],
-  'Asia Pacific':  [{ region: 'Asia Pacific',   attendance: 590 }],
-  'South America': [{ region: 'South America',  attendance: 390 }],
+  'Africa':        [{ region: 'Zone D — Africa',        attendance: 740 }],
+  'Europe':        [{ region: 'Zone B — Europe',        attendance: 320 }],
+  'Americas':      [{ region: 'Zone A — North America', attendance: 460 }, { region: 'Zone E — South America', attendance: 390 }],
+  'Asia Pacific':  [{ region: 'Zone C — Asia Pacific',  attendance: 590 }],
+  'South America': [{ region: 'Zone E — South America', attendance: 390 }],
 };
 
 const CAMPAIGN_DATA = {
@@ -198,7 +198,7 @@ export default function Analytics() {
       icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>,
     },
     {
-      label: 'New Members',
+      label: t?.newMembers || 'New Members',
       value: timeData.kpi.members,
       pct:   timeData.pct.members,
       iconBg: '#dcfce7', iconColor: '#16a34a',
@@ -212,7 +212,7 @@ export default function Analytics() {
       icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>,
     },
     {
-      label: 'Avg. Attendance',
+      label: t?.avgAttendance || 'Avg. Attendance',
       value: timeData.kpi.avg,
       pct:   timeData.pct.avg,
       iconBg: '#ffedd5', iconColor: '#c2410c',
@@ -243,21 +243,21 @@ export default function Analytics() {
       {/* Header */}
       <div className="an-page-header">
         <div>
-          <h2>Analytics Dashboard</h2>
-          <p>Performance insights and data visualization</p>
+          <h2>{t?.analyticsDashboard || 'Analytics Dashboard'}</h2>
+          <p>Performance insights across all zones under your management</p>
         </div>
         <button className="an-export-btn" onClick={handleExport}>
-          <Download size={15} /> Export Report
+          <Download size={15} /> {t?.export || 'Export Report'}
         </button>
       </div>
 
       {/* Filters */}
       <div className="an-panel an-filters">
         {[
-          { key: 'timeRange', label: 'Time Range', opts: ['This Month','Last Month','This Quarter','This Year'] },
-          { key: 'region',    label: 'Region',     opts: ['All Regions','Africa','Europe','Americas','Asia Pacific','South America'] },
-          { key: 'zone',      label: 'Zone',       opts: ['All Zones','Zone A','Zone B','Zone C','Zone D','Zone E'] },
-          { key: 'campaign',  label: 'Campaign',   opts: ['All Campaigns','Spring Outreach 2026','Easter Campaign','Healing Streams'] },
+          { key: 'timeRange', label: t?.timeRange  || 'Time Range', opts: ['This Month','Last Month','This Quarter','This Year'] },
+          { key: 'region',    label: t?.region     || 'Region',     opts: ['All Regions','Africa','Europe','Americas','Asia Pacific','South America'] },
+          { key: 'zone',      label: t?.zone       || 'Zone',       opts: ['All Zones','Zone A','Zone B','Zone C','Zone D','Zone E'] },
+          { key: 'campaign',  label: t?.campaign   || 'Campaign',   opts: ['All Campaigns','Spring Outreach 2026','Easter Campaign','Healing Streams'] },
         ].map(f => (
           <div className="an-filter-group" key={f.key}>
             <label>{f.label}</label>
@@ -290,7 +290,7 @@ export default function Analytics() {
       {/* Charts row 1 */}
       <div className="an-chart-grid">
         <div className="an-panel">
-          <h3>Attendance Trend</h3>
+          <h3>{t?.attendanceTrend || 'Attendance Trend'}</h3>
           <ResponsiveContainer width="100%" height={230}>
             <AreaChart data={timeData.attendance}>
               <defs>
@@ -310,7 +310,7 @@ export default function Analytics() {
         </div>
 
         <div className="an-panel">
-          <h3>Finance Trend</h3>
+          <h3>{t?.financeTrend || 'Finance Trend'}</h3>
           <ResponsiveContainer width="100%" height={230}>
             <LineChart data={timeData.finance}>
               <CartesianGrid strokeDasharray="4 3" stroke="var(--border-light)" vertical={false}/>
@@ -330,7 +330,7 @@ export default function Analytics() {
       <div className="an-chart-grid">
         <div className="an-panel">
           <div className="an-panel-header">
-            <h3>Regional Comparison</h3>
+            <h3>{t?.regionalComparison || 'Regional Comparison'}</h3>
             <span className="an-panel-sub">
               {filters.region === 'All Regions' ? 'All regions' : filters.region}
             </span>
@@ -350,7 +350,7 @@ export default function Analytics() {
 
         <div className="an-panel">
           <div className="an-panel-header">
-            <h3>Campaign Distribution</h3>
+            <h3>{t?.campaignDistribution || 'Campaign Distribution'}</h3>
             <span className="an-panel-sub">
               {filters.campaign === 'All Campaigns' ? 'All campaigns' : filters.campaign}
             </span>
@@ -388,12 +388,12 @@ export default function Analytics() {
 
       {/* Summary table */}
       <div className="an-panel">
-        <h3>Attendance Summary by Region</h3>
+        <h3>{t?.attendanceSummary || 'Attendance Summary by Region'}</h3>
         <table className="an-table">
           <thead>
             <tr>
-              <th>Region</th>
-              <th>Attendance</th>
+              <th>{t?.region || 'Region'}</th>
+              <th>{t?.attendance || 'Attendance'}</th>
               <th>Share</th>
               <th>Trend</th>
             </tr>

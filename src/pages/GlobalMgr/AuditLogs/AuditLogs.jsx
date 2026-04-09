@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Search, Filter, Download, Eye, X, ChevronDown } from 'lucide-react';
+import { useSettings } from '../../../context/SettingsContext';
 import './styles.css';
 
 const INITIAL_LOGS = [
@@ -198,6 +199,7 @@ function FilterPanel({ filters, onChange, onApply, onReset, onClose }) {
 
 // ── Main Component ─────────────────────────────────────
 export default function AuditLogs() {
+  const { t } = useSettings();
   const [search, setSearch]               = useState('');
   const [viewLog, setViewLog]             = useState(null);
   const [showFilters, setShowFilters]     = useState(false);
@@ -250,7 +252,7 @@ export default function AuditLogs() {
       {/* Header */}
       <div className="al-page-header">
         <div>
-          <h2>Audit Logs</h2>
+          <h2>{t?.auditLogsTitle || 'Audit Logs'}</h2>
           <p>Track all system activities and changes</p>
         </div>
         <button className="al-export-btn" onClick={handleExport}>
@@ -261,10 +263,10 @@ export default function AuditLogs() {
       {/* Stats */}
       <div className="al-stats">
         {[
-          { label: 'Total Activities', value: logs.length,    color: 'var(--text-primary)' },
-          { label: 'Today',            value: todayCount,     color: '#4f46e5'             },
-          { label: 'Active Users',     value: uniqueUsers,    color: '#16a34a'             },
-          { label: 'Modules',          value: uniqueModules,  color: '#7c3aed'             },
+          { label: t?.totalActivities || 'Total Activities', value: logs.length,   color: 'var(--text-primary)' },
+          { label: t?.today           || 'Today',            value: todayCount,    color: '#4f46e5'             },
+          { label: t?.activeUsers     || 'Active Users',     value: uniqueUsers,   color: '#16a34a'             },
+          { label: t?.modules         || 'Modules',          value: uniqueModules, color: '#7c3aed'             },
         ].map(s => (
           <div className="al-stat-card" key={s.label}>
             <div className="al-stat-label">{s.label}</div>
@@ -279,7 +281,7 @@ export default function AuditLogs() {
           <Search size={14} color="#9ca3af" />
           <input
             type="text"
-            placeholder="Search audit logs..."
+            placeholder={t?.search || 'Search audit logs...'}
             value={search}
             onChange={e => setSearch(e.target.value)}
           />
@@ -327,13 +329,13 @@ export default function AuditLogs() {
         <table className="al-table">
           <thead>
             <tr>
-              <th>Timestamp</th>
-              <th>User</th>
-              <th>Action</th>
-              <th>Module</th>
-              <th>Previous Value</th>
-              <th>Updated Value</th>
-              <th>Actions</th>
+              <th>{t?.timestamp     || 'Timestamp'}</th>
+              <th>{t?.user          || 'User'}</th>
+              <th>{t?.action        || 'Action'}</th>
+              <th>{t?.module        || 'Module'}</th>
+              <th>{t?.previousValue || 'Previous Value'}</th>
+              <th>{t?.updatedValue  || 'Updated Value'}</th>
+              <th>{t?.actions       || 'Actions'}</th>
             </tr>
           </thead>
           <tbody>

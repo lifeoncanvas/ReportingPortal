@@ -1,6 +1,17 @@
 import React, { createContext, useContext, useState } from 'react';
+import { flushPendingToasts } from '../context/NotificationContext';
 
 const AuthContext = createContext(undefined);
+
+// sessionStorage is tab-isolated — each tab has its own login session
+const session = {
+  get:    (key)        => { try { const r = sessionStorage.getItem(key); return r ? JSON.parse(r) : null; } catch { return null; } },
+  set:    (key, value) => { try { sessionStorage.setItem(key, JSON.stringify(value)); } catch {} },
+  remove: (key)        => { try { sessionStorage.removeItem(key); } catch {} },
+  getRaw: (key)        => sessionStorage.getItem(key),
+  setRaw: (key, value) => sessionStorage.setItem(key, value),
+  removeRaw: (key)     => sessionStorage.removeItem(key),
+};
 
 const DEMO_USERS = [
   {
@@ -30,29 +41,28 @@ const DEMO_USERS = [
 ];
 
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(() => {
-    try {
-      const stored = localStorage.getItem('lw_user');
-      if (stored) return JSON.parse(stored);
-      return null;
-    } catch {
-      return null;
-    }
-  });
+  const [user, setUser] = useState(() => session.get('lw_user'));
 
-  const login = (email, password) => {
-    // Trim whitespace — common cause of login failures
+  const [avatar, setAvatar] = useState(
+    () => session.getRaw('lw_avatar') || null
+  );
+
+  const updateAvatar = (dataUrl) => {
+    if (dataUrl) {
+      session.setRaw('lw_avatar', dataUrl);
+    } else {
+      session.removeRaw('lw_avatar');
+    }
+    setAvatar(dataUrl);
+  };
+
+  const login = (email, password, onPendingToasts) => {
     const cleanEmail    = email.trim().toLowerCase();
     const cleanPassword = password.trim();
-
-    console.log('Login attempt:', cleanEmail, cleanPassword);
-    console.log('Available users:', DEMO_USERS.map(u => u.email));
 
     const found = DEMO_USERS.find(
       u => u.email.toLowerCase() === cleanEmail && u.password === cleanPassword
     );
-
-    console.log('Found user:', found);
 
     if (!found) return 'Invalid email or password.';
 
@@ -64,18 +74,25 @@ export function AuthProvider({ children }) {
       email:     found.email,
     };
 
-    localStorage.setItem('lw_user', JSON.stringify(userData));
+    session.set('lw_user', userData);
     setUser(userData);
+
+    // Pending toasts are still in localStorage (cross-tab) — flush for this role
+    const pending = flushPendingToasts(found.role);
+    if (pending.length && onPendingToasts) onPendingToasts(pending, found.role);
+
     return null;
   };
 
   const logout = () => {
-    localStorage.removeItem('lw_user');
+    session.remove('lw_user');
+    session.removeRaw('lw_avatar');
     setUser(null);
+    setAvatar(null);
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
+    <AuthContext.Provider value={{ user, login, logout, avatar, updateAvatar }}>
       {children}
     </AuthContext.Provider>
   );
