@@ -1,10 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../../auth/AuthContext';
-import {
-  BarChart, Bar, XAxis, YAxis, CartesianGrid,
-  Tooltip, Legend, ResponsiveContainer,
-} from 'recharts';
+import { useSettings } from '../../../context/SettingsContext';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import './styles.css';
 
 const campaignData = [
@@ -23,7 +20,8 @@ const activity = [
 
 export default function ZonalDashboard() {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { t } = useSettings();
+
   const today = new Date().toLocaleDateString('en-US', {
     weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
   });
@@ -41,13 +39,11 @@ export default function ZonalDashboard() {
 
   return (
     <div className="zd-page">
-      {/* Welcome */}
       <div className="zd-welcome">
         <h2>{t.welcomeBack}, Zonal! 👋</h2>
         <p>{today}</p>
       </div>
 
-      {/* Reminder banner */}
       <div className="zd-reminder">
         <div className="zd-reminder-left">
           <p className="zd-reminder-title">{t.weeklyReminderTitle}</p>
@@ -70,14 +66,11 @@ export default function ZonalDashboard() {
         </div>
       </div>
 
-      {/* KPI */}
       <div className="zd-kpi-grid">
         {KPI.map(k => (
           <div className="zd-kpi-card" key={k.label}>
             <div className="zd-kpi-top">
-              <div className="zd-kpi-icon" style={{ background: k.iconBg, color: k.iconColor }}>
-                {k.icon}
-              </div>
+              <div className="zd-kpi-icon" style={{ background: k.iconBg, color: k.iconColor }}>{k.icon}</div>
               <span className="zd-kpi-pct">{k.pct}</span>
             </div>
             <div className="zd-kpi-value">{k.value}</div>
@@ -87,7 +80,6 @@ export default function ZonalDashboard() {
         ))}
       </div>
 
-      {/* Chart + Activity */}
       <div className="zd-bottom-grid">
         <div className="zd-card">
           <h3>{t.campaignPerformance}</h3>

@@ -13,8 +13,10 @@ import FinancePortal    from '../pages/GlobalMgr/FinancePortal/FinancePortal';
 import Analytics        from '../pages/GlobalMgr/Analytics/Analytics';
 import GlobalAuditLogs  from '../pages/GlobalMgr/AuditLogs/AuditLogs';
 
-import ZonalDashboard   from '../pages/ZonalMgr/Dashboard/Dashboard';
-import ZonalReportingTabs   from '../pages/ZonalMgr/ReportingPortal/ZonalReportingTabs';
+import ZonalDashboard      from '../pages/ZonalMgr/Dashboard/Dashboard';
+import ZonalReportingTabs  from '../pages/ZonalMgr/ReportingPortal/ZonalReportingTabs';
+import ZonalAnalytics      from '../pages/ZonalMgr/Analytics/Analytics';
+import Magazine            from '../pages/ZonalMgr/Magazine/Magazine';
 
 
 import AdminDashboard   from '../pages/Admin/Dashboard/Dashboard';
@@ -57,9 +59,9 @@ export default function RoleRouter() {
         <Route path="/zonal" element={<ZonalMgrLayout />}>
           <Route index element={<Navigate to="dashboard" replace />} />
           <Route path="dashboard"     element={<ZonalDashboard />} />
-          <Route path="reporting" element={<ZonalReportingTabs />} />
-          <Route path="finance"       element={<FinancePortal />} />
-          <Route path="analytics"     element={<Analytics />} />
+          <Route path="reporting"     element={<ZonalReportingTabs />} />
+          <Route path="analytics"     element={<ZonalAnalytics />} />
+          <Route path="magazine"      element={<Magazine />} />
           <Route path="notifications" element={<Notifications />} />
           <Route path="settings"      element={<Settings />} />
           <Route path="submit-report" element={<SubmitReport />} />

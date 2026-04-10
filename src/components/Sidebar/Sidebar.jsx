@@ -27,10 +27,10 @@ export default function Sidebar() {
       { label: t?.auditLogs       || 'Audit Logs',      icon: ClipboardList,    path: '/global/audit'     },
     ],
     zonal: [
-      { label: t.dashboard,       icon: LayoutDashboard, path: '/zonal/dashboard' },
-      { label: t.reportingPortal, icon: FileText,         path: '/zonal/reporting' },
-      { label: t.financePortal,   icon: DollarSign,       path: '/zonal/finance'   },
-      { label: t.analytics,       icon: BarChart2,        path: '/zonal/analytics' },
+      { label: t?.dashboard       || 'Dashboard',       icon: LayoutDashboard, path: '/zonal/dashboard' },
+      { label: t?.reportingPortal || 'Reporting Portal',icon: FileText,         path: '/zonal/reporting' },
+      { label: t?.analytics       || 'Analytics',       icon: BarChart2,        path: '/zonal/analytics' },
+      { label: t?.magazine        || 'Magazine',        icon: BookOpen,         path: '/zonal/magazine'  },
     ],
     admin: [
       { label: t?.dashboard       || 'Dashboard',       icon: LayoutDashboard, path: '/admin/dashboard'  },
