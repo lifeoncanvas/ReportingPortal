@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-const API_BASE = "http://localhost:8080/api/auth";
+const API_BASE = `${process.env.REACT_APP_API_URL}/api/auth`;
 
 export default function ForgotPassword({ onBack }) {
     const [step, setStep] = useState(1); // 1: Email, 2: OTP, 3: New Password

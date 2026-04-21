@@ -37,7 +37,7 @@ export default function UserManagement() {
 
   const fetchUsers = async () => {
     try {
-      const res = await fetch('http://localhost:8080/api/users');
+      const res = await fetch(`${process.env.REACT_APP_API_URL}/api/users`);
       const data = await res.json();
       setUsers(data || []);
     } catch(err) { console.log("Failed to load users", err); }
@@ -65,13 +65,13 @@ export default function UserManagement() {
     if (!form.email) return;
 
     if (editUser) {
-      await fetch(`http://localhost:8080/api/users/${editUser.id}`, {
+      await fetch(`${process.env.REACT_APP_API_URL}/api/users/${editUser.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(form)
       });
     } else {
-      const res = await fetch('http://localhost:8080/api/users/invite', {
+      const res = await fetch(`${process.env.REACT_APP_API_URL}/api/users/invite`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: form.email, role: form.role, region: form.region })
@@ -90,7 +90,7 @@ export default function UserManagement() {
   };
 
   const handleDelete = async (id) => {
-    await fetch(`http://localhost:8080/api/users/${id}`, { method: 'DELETE' });
+    await fetch(`${process.env.REACT_APP_API_URL}/api/users/${id}`, { method: 'DELETE' });
     setDeleteId(null);
     fetchUsers();
   };
@@ -98,7 +98,7 @@ export default function UserManagement() {
   const toggleStatus = async (id) => {
     const user = users.find(u => u.id === id);
     if (!user) return;
-    await fetch(`http://localhost:8080/api/users/${id}`, {
+    await fetch(`${process.env.REACT_APP_API_URL}/api/users/${id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ ...user, status: user.status === 'active' ? 'inactive' : 'active' })

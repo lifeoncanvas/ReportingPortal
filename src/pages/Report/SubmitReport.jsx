@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { useAuth } from "../../auth/AuthContext";
 
-const API = "http://localhost:8080/api/reports";
+const API = `${process.env.REACT_APP_API_URL}/api/reports`;
 const ATTENDANCE_OPTIONS = ["Yes", "No", "Officially Excused"];
 
 const initialForm = {

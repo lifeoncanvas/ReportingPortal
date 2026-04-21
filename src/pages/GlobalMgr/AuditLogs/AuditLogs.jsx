@@ -147,7 +147,7 @@ export default function AuditLogs() {
 
   const fetchLogs = async () => {
     try {
-      const res = await fetch('http://localhost:8080/api/audit-logs');
+      const res = await fetch(`${process.env.REACT_APP_API_URL}/api/audit-logs`);
       const data = await res.json();
       setLogs(data || []);
     } catch(err) { console.error("Failed to load audit logs", err); }
