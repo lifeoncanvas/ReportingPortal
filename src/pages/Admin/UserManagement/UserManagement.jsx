@@ -77,8 +77,7 @@ export default function UserManagement() {
         body: JSON.stringify({ email: form.email, role: form.role, region: form.region })
       });
       if (res.ok) {
-        const data = await res.json();
-        alert('Simulated Email Sent!\n\nGive this invite link to the new ' + form.role + ':\n' + data.link);
+        alert('Invitation Sent! The user will receive an email from sharonshelke7@gmail.com to set up their account.');
       } else {
         const err = await res.text();
         alert('Error: ' + err);
@@ -195,6 +194,19 @@ export default function UserManagement() {
                   <td>{u.joined}</td>
                   <td>
                     <div className="um-actions">
+                      {u.status === 'pending' && u.inviteToken && (
+                        <button 
+                          className="um-icon-btn copy" 
+                          onClick={() => {
+                            const link = `${window.location.origin}/invite?token=${u.inviteToken}`;
+                            navigator.clipboard.writeText(link);
+                            alert('Invite link copied to clipboard!');
+                          }} 
+                          title="Copy Invite Link"
+                        >
+                          <Plus size={14} style={{ transform: 'rotate(45deg)' }} />
+                        </button>
+                      )}
                       <button className="um-icon-btn edit" onClick={() => openEdit(u)} title="Edit">
                         <Edit2 size={14} />
                       </button>

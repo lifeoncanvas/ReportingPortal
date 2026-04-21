@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useAuth } from '../AuthContext';
 import './styles.css';
 
-export default function Signin({ onSwitch }) {
+export default function Signin({ onSwitch, onForgotPassword }) {
   const { login } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -25,6 +25,9 @@ export default function Signin({ onSwitch }) {
           <input className="auth-input" type="password" placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} required />
           <button className="auth-button" type="submit">Login</button>
         </form>
+        <p className="auth-switch">
+          <span className="auth-link" onClick={onForgotPassword}>Forgot password?</span>
+        </p>
         <p className="auth-switch">
           Don't have an account? <span className="auth-link" onClick={onSwitch}>Sign up</span>
         </p>
