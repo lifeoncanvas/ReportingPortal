@@ -1,18 +1,26 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Bell, Settings, LogOut } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth }     from '../../auth/AuthContext';
-import { useSettings } from '../../context/SettingsContext';
+import { useAuth }          from '../../auth/AuthContext';
+import { useSettings }      from '../../context/SettingsContext';
+import { useNotifications } from '../../context/NotificationContext';
 import './styles.css';
 
 export default function Header({ basePath }) {
   const [showDropdown, setShowDropdown] = useState(false);
   const dropdownRef = useRef(null);
   const navigate    = useNavigate();
-  const { user, logout } = useAuth();
+  const { user, logout, avatar } = useAuth();
 
-  // Derive basePath from user role if not passed as prop
   const base = basePath ?? `/${user?.role === 'global' ? 'global' : user?.role === 'zonal' ? 'zonal' : 'admin'}`;
+
+  const { notifications } = useNotifications();
+  const unread = notifications.filter(n => {
+    if (!n.isNew) return false;
+    if (n.role === 'global_admin') return ['global', 'admin'].includes(user?.role);
+    if (n.role === 'zonal')        return user?.role === 'zonal';
+    return true;
+  }).length;
 
   const settingsCtx = useSettings();
   const profile     = settingsCtx?.settings?.profile;
@@ -53,7 +61,11 @@ export default function Header({ basePath }) {
           onClick={() => navigate(`${base}/notifications`)}
           title="Notifications">
           <Bell size={16} />
-          <span className="notif-dot" />
+          {unread > 0 && (
+            <span className="notif-dot" style={{ minWidth: 16, height: 16, borderRadius: 8, background: '#ef4444', color: '#fff', fontSize: 10, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 3px' }}>
+              {unread > 9 ? '9+' : unread}
+            </span>
+          )}
         </button>
 
         <button className="header-icon-btn"
@@ -65,7 +77,20 @@ export default function Header({ basePath }) {
         <div className="header-user-wrap" ref={dropdownRef}>
           <button className="header-user-btn"
             onClick={() => setShowDropdown(p => !p)}>
-            <div className="header-avatar">{initials}</div>
+            <div className="header-avatar">
+              {avatar
+                ? <img
+                    src={avatar}
+                    alt="avatar"
+                    style={{
+                      width: '100%', height: '100%',
+                      borderRadius: '50%', objectFit: 'cover',
+                      display: 'block',
+                    }}
+                  />
+                : initials
+              }
+            </div>
             <svg className={`header-chevron ${showDropdown ? 'open' : ''}`}
               width="14" height="14" viewBox="0 0 24 24" fill="none"
               stroke="currentColor" strokeWidth="2"
@@ -77,8 +102,18 @@ export default function Header({ basePath }) {
           {showDropdown && (
             <div className="header-dropdown">
               <div className="header-dropdown-user">
-                <p className="hd-name">{firstName} {lastName}</p>
-                <p className="hd-email">{email}</p>
+                {/* Mini avatar in dropdown */}
+                <div className="hd-avatar">
+                  {avatar
+                    ? <img src={avatar} alt="avatar"
+                        style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} />
+                    : initials
+                  }
+                </div>
+                <div>
+                  <p className="hd-name">{firstName} {lastName}</p>
+                  <p className="hd-email">{email}</p>
+                </div>
               </div>
               <div className="header-dropdown-divider" />
               <button className="header-dropdown-signout" onClick={handleSignOut}>

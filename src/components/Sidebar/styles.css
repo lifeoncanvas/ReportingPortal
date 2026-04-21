@@ -135,3 +135,8 @@
   text-overflow: ellipsis;
   display: block;
 }
+
+.sidebar-user-avatar {
+  overflow: hidden;
+  border-radius: 50%;
+}
