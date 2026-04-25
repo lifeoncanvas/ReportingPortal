@@ -884,10 +884,85 @@
   .rp-filter-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
+<<<<<<< Updated upstream
 @media (max-width: 600px) {
   .rp-form-grid { grid-template-columns: 1fr; }
   .rp-field-full { grid-column: 1; }
   .rp-toolbar { flex-direction: column; align-items: stretch; }
   .rp-toolbar-right { flex-wrap: wrap; }
   .rp-download-template-btn { margin-left: 0; }
+=======
+@media (max-width: 768px) {
+  .rp-panel { padding: 14px 12px; }
+  .rp-page-header { flex-direction: column; align-items: flex-start; gap: 10px; }
+  .rp-page-header h2 { font-size: 1.3rem; }
+
+  /* Toolbar wraps */
+  .rp-toolbar { flex-direction: column; align-items: stretch; gap: 8px; }
+  .rp-search { min-width: unset; }
+  .rp-toolbar-right { flex-wrap: wrap; gap: 6px; }
+  .rp-export-btn { padding: 7px 10px; font-size: 0.78rem; }
+
+  /* Filter grid 2 cols */
+  .rp-filter-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+  /* Table — horizontal scroll wrapper */
+  .rp-panel { overflow-x: auto; }
+  .rp-table { min-width: 560px; font-size: 0.78rem; }
+  .rp-table th { padding: 8px 10px; font-size: 0.68rem; }
+  .rp-table td { padding: 10px; }
+
+  /* Modal full width */
+  .rp-modal-overlay { padding: 12px; }
+  .rp-modal { max-width: 100%; border-radius: 12px; }
+  .rp-view-label { min-width: 110px; }
+}
+
+@media (max-width: 480px) {
+  .rp-panel { padding: 12px 10px; }
+  .rp-filter-grid { grid-template-columns: 1fr; }
+  .rp-toolbar-right { gap: 4px; }
+  .rp-export-btn { padding: 6px 8px; font-size: 0.72rem; }
+
+  /* Table becomes card list on very small screens */
+  .rp-table thead { display: none; }
+  .rp-table, .rp-table tbody, .rp-table tr, .rp-table td { display: block; width: 100%; min-width: unset; }
+  .rp-table tr {
+    border: 1px solid var(--border-light);
+    border-radius: 10px;
+    margin-bottom: 10px;
+    padding: 10px 12px;
+    background: var(--bg-card);
+  }
+  .rp-table td {
+    padding: 4px 0;
+    border: none;
+    white-space: normal;
+    font-size: 0.82rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .rp-table td::before {
+    content: attr(data-label);
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    flex-shrink: 0;
+    margin-right: 8px;
+  }
+  .rp-table tbody tr:hover { background: var(--bg-card); }
+
+  /* KF form */
+  .kf-form-card { margin: 8px 0 14px; border-radius: 10px; }
+  .kf-fields-block { padding: 14px 12px; }
+  .kf-title { font-size: 1rem; }
+  .kf-top-bar { flex-direction: column; align-items: flex-start; padding: 12px; }
+  .kf-top-actions { flex-wrap: wrap; gap: 6px; }
+  .kf-submit-btn { width: 100%; justify-content: center; }
+  .kf-clear-btn  { width: 100%; justify-content: center; }
+  .kf-actions { flex-direction: column; }
+>>>>>>> Stashed changes
 }

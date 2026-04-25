@@ -401,6 +401,80 @@
   .mg-stats    { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
+@media (max-width: 768px) {
+  .mg-panel { padding: 14px 12px; }
+  .mg-page-header { flex-direction: column; align-items: flex-start; gap: 10px; }
+  .mg-page-header h2 { font-size: 1.3rem; }
+
+  /* Table — horizontal scroll */
+  .mg-panel { overflow-x: auto; }
+  .mg-table { min-width: 520px; font-size: 0.78rem; }
+  .mg-table th { padding: 8px 10px; font-size: 0.68rem; }
+  .mg-table td { padding: 10px; }
+
+  /* Stepper wraps */
+  .mg-stepper { flex-wrap: wrap; gap: 8px; padding: 12px 16px; }
+  .mg-step-line { display: none; }
+  .mg-step { font-size: 0.78rem; }
+
+  /* Step footer stacks */
+  .mg-step-footer { flex-direction: column; align-items: stretch; gap: 10px; }
+  .mg-order-btn { justify-content: center; }
+
+  /* Invoice full width */
+  .mg-invoice { max-width: 100%; margin-left: 0; }
+
+  /* Modal */
+  .mg-modal-overlay { padding: 12px; }
+  .mg-modal { max-width: 100%; padding: 16px; border-radius: 12px; }
+
+  /* Payment methods stack */
+  .mg-payment-methods { flex-direction: column; }
+  .mg-payment-method-btn { width: 100%; justify-content: center; }
+}
+
+@media (max-width: 480px) {
+  .mg-stats { grid-template-columns: repeat(2, 1fr); }
+  .mg-panel { padding: 12px 10px; }
+
+  /* Table becomes card list */
+  .mg-table thead { display: none; }
+  .mg-table, .mg-table tbody, .mg-table tr, .mg-table td { display: block; width: 100%; min-width: unset; }
+  .mg-table tr {
+    border: 1px solid var(--border-light);
+    border-radius: 10px;
+    margin-bottom: 10px;
+    padding: 10px 12px;
+    background: var(--bg-card);
+  }
+  .mg-table td {
+    padding: 4px 0;
+    border: none;
+    white-space: normal;
+    font-size: 0.82rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  .mg-table td::before {
+    content: attr(data-label);
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    flex-shrink: 0;
+  }
+  .mg-table tbody tr:hover { background: var(--bg-card); }
+
+  /* Qty controls wrap */
+  .mg-qty-ctrl { flex-wrap: wrap; }
+  .mg-step-footer { gap: 8px; }
+  .mg-order-btn, .mg-back-btn { width: 100%; justify-content: center; }
+  .mg-success { padding: 24px 12px; }
+}
+
 /* ── Order Preview Modal ──────────────────────────────── */
 .mg-modal-overlay {
   position: fixed; inset: 0;
@@ -528,3 +602,197 @@
 .mg-timeline-desc {
   font-size: 0.76rem; color: var(--text-muted); margin-top: 2px;
 }
+
+/* ── Language selector (Step 0) ──────────────────────────── */
+.mg-lang-selector {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* "Add language" button + dropdown */
+.mg-lang-add-wrap {
+  position: relative;
+}
+
+.mg-lang-add-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 12px;
+  background: transparent;
+  border: 1px dashed var(--border-color);
+  border-radius: 7px;
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-family: inherit;
+  transition: border-color 0.15s, color 0.15s;
+}
+.mg-lang-add-trigger:hover,
+.mg-lang-add-trigger.open {
+  border-style: solid;
+}
+
+.mg-lang-dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  z-index: 50;
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+  padding: 4px;
+  min-width: 180px;
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+.mg-lang-dropdown-item {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 8px 12px;
+  background: none;
+  border: none;
+  border-radius: 7px;
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.1s;
+}
+.mg-lang-dropdown-item:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+/* Per-language quantity rows */
+.mg-lang-qty-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.mg-lang-qty-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 10px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-light);
+  border-radius: 8px;
+}
+
+.mg-lang-qty-name-wrap {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  flex: 1;
+  min-width: 0;
+}
+
+.mg-lang-qty-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.mg-lang-qty-name {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mg-lang-qty-remove {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  background: none;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  color: var(--text-muted);
+  flex-shrink: 0;
+  transition: background 0.1s, color 0.1s;
+}
+.mg-lang-qty-remove:hover {
+  background: rgba(239,68,68,0.1);
+  color: #ef4444;
+}
+
+.mg-lang-qty-ctrl {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  flex-shrink: 0;
+}
+.mg-lang-qty-ctrl button {
+  padding: 3px 7px;
+  border: 1px solid var(--border-color);
+  border-radius: 5px;
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font-size: 0.72rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.1s;
+  white-space: nowrap;
+}
+.mg-lang-qty-ctrl button:hover { background: var(--bg-hover); }
+.mg-lang-qty-ctrl span {
+  min-width: 36px;
+  text-align: center;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.mg-lang-empty-hint {
+  font-size: 0.76rem;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+/* Badge showing selected count next to label */
+.mg-lang-count-badge {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 1px 8px;
+  border-radius: 20px;
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+
+/* Step 1 review — language × qty pills */
+.mg-lang-qty-review {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.mg-lang-qty-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 9px;
+  background: rgba(79,70,229,0.08);
+  border: 1px solid rgba(79,70,229,0.2);
+  border-radius: 20px;
+  font-size: 0.72rem;
+  color: var(--text-secondary);
+}
+.mg-lang-qty-pill strong {
+  color: #4f46e5;
+  font-weight: 700;
+}
+[data-theme="light"] .mg-lang-qty-pill { background: #ede9fe; border-color: #c4b5fd; }

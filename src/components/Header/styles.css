@@ -153,3 +153,54 @@
 }
 
 .header-dropdown-signout:hover { background: #fff5f5; }
+
+/* ── Hamburger toggle — hidden on desktop, shown on mobile ── */
+.sidebar-toggle {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: none;
+  background: transparent;
+  border-radius: 8px;
+  cursor: pointer;
+  color: var(--text-secondary);
+  transition: background 0.12s;
+  flex-shrink: 0;
+  margin-right: 4px;
+}
+.sidebar-toggle:hover { background: var(--bg-hover); }
+
+@media (max-width: 768px) {
+  .sidebar-toggle { display: flex; }
+  .header { padding: 0 14px; }
+  .header-brand { font-size: 0.9rem; }
+}
+
+@media (max-width: 480px) {
+  .header-brand { display: none; }
+  .header { padding: 0 10px; gap: 6px; }
+}
+
+.hd-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(79, 70, 229, 0.15);
+  color: #818cf8;
+  font-size: 0.85rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.header-dropdown-user {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+}

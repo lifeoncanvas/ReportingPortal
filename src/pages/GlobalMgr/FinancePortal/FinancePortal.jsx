@@ -557,15 +557,15 @@ export default function FinancePortal() {
                 </tr>
               ) : filtered.map(row => (
                 <tr key={row.id}>
-                  <td className="fp-id">{row.id}</td>
-                  <td>{formatDate(row.rawDate)}</td>
-                  <td>{row.region}</td>
-                  <td>{row.zone}</td>
-                  <td>{row.category}</td>
-                  <td className="fp-amount">{currSymbol}{row.rawAmount.toLocaleString()}</td>
-                  <td>{row.campaign}</td>
-                  <td>{row.submittedBy}</td>
-                  <td>
+                  <td className="fp-id" data-label="Entry ID">{row.id}</td>
+                  <td data-label="Date">{formatDate(row.rawDate)}</td>
+                  <td data-label="Region">{row.region}</td>
+                  <td data-label="Zone">{row.zone}</td>
+                  <td data-label="Category">{row.category}</td>
+                  <td className="fp-amount" data-label="Amount">{currSymbol}{row.rawAmount.toLocaleString()}</td>
+                  <td data-label="Campaign">{row.campaign}</td>
+                  <td data-label="Submitted By">{row.submittedBy}</td>
+                  <td data-label="Actions">
                     <div className="fp-actions">
                       <button className="fp-icon-btn view" title="View"
                         onClick={() => setViewRecord(row)}>         {/* ← wired */}

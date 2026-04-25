@@ -8,14 +8,14 @@ import { useAuth }     from '../../auth/AuthContext';
 import { useSettings } from '../../context/SettingsContext';
 import './styles.css';
 
-export default function Sidebar() {
+export default function Sidebar({ open, onClose }) {
   const { user, avatar } = useAuth();
   const { t }            = useSettings();
   const role             = user?.role ?? 'global';
   const initial          = (user?.firstName?.[0] ?? 'U').toUpperCase();
   const name             = user?.name ?? 'User';
-  const roleLabel        = role === 'admin'  ? 'System Administrator'
-                         : role === 'zonal'  ? 'Zonal Manager'
+  const roleLabel        = role === 'admin' ? 'System Administrator'
+                         : role === 'zonal' ? 'Zonal Manager'
                          : 'Global Manager';
 
   const NAV_CONFIG = {
@@ -45,54 +45,54 @@ export default function Sidebar() {
   const navItems = NAV_CONFIG[role] ?? NAV_CONFIG.global;
 
   return (
-    <aside className="sidebar">
-      <div className="sidebar-logo">
-        <div className="sidebar-logo-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="white"
-            strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M12 2L3 7v5c0 5.25 3.75 10.15 9 11.35C17.25 22.15 21 17.25 21 12V7L12 2z"/>
-          </svg>
-        </div>
-        <div>
-          <h1>Loveworld</h1>
-          <p>Reports Platform</p>
-        </div>
-      </div>
+    <>
+      {/* Overlay — closes sidebar on mobile tap outside */}
+      <div
+        className={`sidebar-overlay ${open ? 'open' : ''}`}
+        onClick={onClose}
+      />
 
-      <nav className="sidebar-nav">
-        {navItems.map(({ label, icon: Icon, path }) => (
-          <NavLink
-            key={path}
-            to={path}
-            className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
-          >
-            <Icon size={17} />
-            {label}
-          </NavLink>
-        ))}
-      </nav>
-
-      <div className="sidebar-footer">
-        <div className="sidebar-user">
-          <div className="sidebar-user-avatar">
-            {avatar
-              ? <img
-                  src={avatar}
-                  alt="avatar"
-                  style={{
-                    width: '100%', height: '100%',
-                    objectFit: 'cover', display: 'block',
-                  }}
-                />
-              : initial
-            }
+      <aside className={`sidebar ${open ? 'open' : ''}`}>
+        <div className="sidebar-logo">
+          <div className="sidebar-logo-icon">
+            <img src="/HSLogo.png" alt="HS Logo" style={{ width: '100%', height: '100%', objectFit: 'contain', borderRadius: 6 }} />
           </div>
-          <div className="sidebar-user-info">
-            <p>{name}</p>
-            <span>{roleLabel}</span>
+          <div>
+            <h1>Loveworld</h1>
+            <p>Reports Platform</p>
           </div>
         </div>
-      </div>
-    </aside>
+
+        <nav className="sidebar-nav">
+          {navItems.map(({ label, icon: Icon, path }) => (
+            <NavLink
+              key={path}
+              to={path}
+              onClick={onClose}
+              className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
+            >
+              <Icon size={17} />
+              <span>{label}</span>
+            </NavLink>
+          ))}
+        </nav>
+
+        <div className="sidebar-footer">
+          <div className="sidebar-user">
+            <div className="sidebar-user-avatar">
+              {avatar
+                ? <img src={avatar} alt="avatar"
+                    style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                : initial
+              }
+            </div>
+            <div className="sidebar-user-info">
+              <p>{name}</p>
+              <span>{roleLabel}</span>
+            </div>
+          </div>
+        </div>
+      </aside>
+    </>
   );
 }

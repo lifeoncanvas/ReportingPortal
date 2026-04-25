@@ -9,6 +9,7 @@
   flex-shrink: 0;
   overflow-y: auto;
   overflow-x: hidden;
+  transition: left 0.25s ease, width 0.2s ease;
 }
 
 .sidebar-logo {

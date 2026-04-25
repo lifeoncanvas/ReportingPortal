@@ -186,4 +186,45 @@
 .um-btn-danger:hover { background: #b91c1c; }
 
 @media (max-width: 1000px) { .um-stats { grid-template-columns: repeat(2, minmax(0,1fr)); } }
-@media (max-width: 600px)  { .um-form-grid { grid-template-columns: 1fr; } }
+
+@media (max-width: 768px) {
+  .um-panel { padding: 14px 12px; overflow-x: auto; }
+  .um-page-header { flex-direction: column; align-items: flex-start; gap: 10px; }
+  .um-page-header h2 { font-size: 1.3rem; }
+  .um-toolbar { flex-direction: column; align-items: stretch; gap: 8px; }
+  .um-search { min-width: unset; }
+  .um-table { min-width: 560px; font-size: 0.78rem; }
+  .um-table th { padding: 8px 10px; font-size: 0.68rem; }
+  .um-table td { padding: 10px; }
+  .um-overlay { padding: 12px; }
+  .um-modal { max-width: 100%; }
+  .um-form-grid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 480px) {
+  .um-stats { grid-template-columns: 1fr 1fr; gap: 8px; }
+  .um-stat-value { font-size: 1.4rem; }
+
+  /* Table → card layout */
+  .um-table thead { display: none; }
+  .um-table, .um-table tbody, .um-table tr, .um-table td { display: block; width: 100%; min-width: unset; }
+  .um-table tr {
+    border: 1px solid var(--border-light); border-radius: 10px;
+    margin-bottom: 10px; padding: 10px 12px; background: var(--bg-card);
+  }
+  .um-table td {
+    padding: 5px 0; border: none; white-space: normal; font-size: 0.82rem;
+    display: flex; justify-content: space-between; align-items: center; gap: 8px;
+  }
+  .um-table td::before {
+    content: attr(data-label);
+    font-size: 0.7rem; font-weight: 600; color: var(--text-muted);
+    text-transform: uppercase; letter-spacing: 0.04em; flex-shrink: 0;
+  }
+  .um-table tbody tr:hover { background: var(--bg-card); }
+
+  /* Modal footer stacks */
+  .um-modal-footer { flex-direction: column-reverse; align-items: stretch; }
+  .um-btn-primary, .um-btn-ghost, .um-btn-danger { width: 100%; text-align: center; }
+  .um-add-btn { width: 100%; justify-content: center; }
+}

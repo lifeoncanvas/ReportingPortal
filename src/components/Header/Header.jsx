@@ -6,7 +6,7 @@ import { useSettings }      from '../../context/SettingsContext';
 import { useNotifications } from '../../context/NotificationContext';
 import './styles.css';
 
-export default function Header({ basePath }) {
+export default function Header({ basePath, onMenuToggle }) {
   const [showDropdown, setShowDropdown] = useState(false);
   const dropdownRef = useRef(null);
   const navigate    = useNavigate();
@@ -46,12 +46,16 @@ export default function Header({ basePath }) {
 
   return (
     <header className="header">
-      <div className="header-brand">
-        <svg className="header-brand-icon" viewBox="0 0 24 24" fill="none"
-          stroke="#4f46e5" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M12 2L3 7v5c0 5.25 3.75 10.15 9 11.35C17.25 22.15 21 17.25 21 12V7L12 2z"/>
+      <button className="sidebar-toggle" onClick={onMenuToggle} aria-label="Toggle menu">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <line x1="3" y1="6" x2="21" y2="6"/>
+          <line x1="3" y1="12" x2="21" y2="12"/>
+          <line x1="3" y1="18" x2="21" y2="18"/>
         </svg>
-        Loveworld
+      </button>
+      <div className="header-brand">
+        
+       
       </div>
 
       <div className="header-spacer" />

@@ -650,13 +650,13 @@ export default function ReportingPortal() {
                 </tr>
               ) : filtered.map(row => (
                 <tr key={row.id}>
-                  <td className="rp-id">{row.id}</td>
-                  <td>{formatDate(row.rawDate)}</td>
-                  <td>{row.zone}</td>
-                  <td>{row.submittedBy}</td>
-                  <td>{row.attendance}</td>
-                  <td><span className={`rp-badge ${row.status}`}>{row.status}</span></td>
-                  <td>
+                  <td className="rp-id" data-label="Report ID">{row.id}</td>
+                  <td data-label="Date">{formatDate(row.rawDate)}</td>
+                  <td data-label="Zone">{row.zone}</td>
+                  <td data-label="Submitted By">{row.submittedBy}</td>
+                  <td data-label="New Partners">{row.attendance}</td>
+                  <td data-label="Status"><span className={`rp-badge ${row.status}`}>{row.status}</span></td>
+                  <td data-label="Actions">
                     <div className="rp-actions">
                       <button className="rp-icon-btn view" title="View" onClick={() => setViewReport(row)}>
                         <Eye size={15} />
