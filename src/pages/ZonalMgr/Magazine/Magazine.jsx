@@ -18,7 +18,7 @@ const AVAILABLE_LANGUAGES = [
   'Indonesian', 'Bengali', 'Russian', 'Yoruba', 'Igbo', 'Hausa',
 ];
 
-const STEPS = ['Select Magazines', 'Review Order', 'Payment', 'Order Placed'];
+const STEPS = ['Select Magazines', 'Review Order', 'Shipping Info', 'Payment', 'Order Placed'];
 
 const PAYMENT_METHODS = [
   { id: 'paypal', label: 'PayPal',              icon: '🌐' },
@@ -176,6 +176,10 @@ export default function Magazine() {
   const [proofFile,     setProofFile]     = useState(null);
   const [paymentError,  setPaymentError]  = useState('');
   const [paymentDone,   setPaymentDone]   = useState(false);
+  const [shipping,      setShipping]      = useState({
+    address: '', city: '', state: '', country: '', zip: '', contactEmail: '', contactPhone: ''
+  });
+  const [shippingError, setShippingError] = useState('');
 
   const [selections, setSelections] = useState(
     MAGAZINE_TYPES.reduce((acc, m) => ({ ...acc, [m.id]: { qty: 0, languages: ['English'] } }), {})
@@ -211,39 +215,62 @@ export default function Magazine() {
     if (!paymentRef.trim()) return setPaymentError('Please enter your payment reference / transaction ID.');
     if (!proofFile)         return setPaymentError('Please upload proof of payment.');
 
-    const newOrder = {
-      id:         `ORD-${String(orders.length + 1).padStart(3, '0')}`,
-      date:       new Date().toISOString().split('T')[0],
-      status:     'pending',
-      items:      orderLines.map(l => ({ type: l.subtitle.split(' ')[0], qty: l.qty, lang: l.languages })),
-      total:      Math.round(total * 100) / 100,
-      paymentRef: paymentRef.trim(),
+    const payload = {
+      zone: user?.zone || 'Global',
+      magazineType: orderLines.map(l => l.subtitle).join(', '),
+      quantity: orderLines.reduce((s, l) => s + l.qty, 0),
+      totalAmount: total,
+      orderedBy: user?.email || '',
+      deliveryAddress: `${shipping.address}, ${shipping.city}`,
+      country: shipping.country,
+      stateProvince: shipping.state,
+      postalCode: shipping.zip,
+      contactEmail: shipping.contactEmail,
+      contactPhone: shipping.contactPhone
     };
-    setOrders(prev => [newOrder, ...prev]);
 
-    // Toast popup — fires immediately for all roles
-    showToast({
-      icon:    '📖',
-      title:   'Order Placed Successfully!',
-      message: `Order ${newOrder.id} · ${orderLines.reduce((s, l) => s + l.qty, 0)} magazines · ${currSymbol}${newOrder.total}`,
-      onClick: () => navigate('/zonal/notifications'),
-    });
+    fetch(`${process.env.REACT_APP_API_URL}/api/magazine/orders`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    })
+    .then(res => res.json())
+    .then(data => {
+      const newOrder = {
+        id:         `ORD-${data.id || String(orders.length + 1).padStart(3, '0')}`,
+        date:       new Date().toISOString().split('T')[0],
+        status:     'pending',
+        items:      orderLines.map(l => ({ type: l.subtitle.split(' ')[0], qty: l.qty, lang: l.languages })),
+        total:      Math.round(total * 100) / 100,
+        paymentRef: paymentRef.trim(),
+      };
+      setOrders(prev => [newOrder, ...prev]);
 
-    addNotification({
-      icon:    'magazine',
-      role:    'all',
-      title:   'Magazine Order Placed',
-      message: `Order ${newOrder.id} for ${orderLines.reduce((s, l) => s + l.qty, 0)} magazines (${currSymbol}${newOrder.total}) has been placed successfully and is awaiting review.`,
-    });
+      // Toast popup
+      showToast({
+        icon:    '📖',
+        title:   'Order Placed Successfully!',
+        message: `Order ${newOrder.id} · ${orderLines.reduce((s, l) => s + l.qty, 0)} magazines`,
+      });
 
-    addNotification({
-      icon:    'magazine',
-      role:    'global_admin',
-      title:   'New Magazine Order — Action Required',
-      message: `Zonal Manager placed Order ${newOrder.id} for ${orderLines.reduce((s, l) => s + l.qty, 0)} magazines totalling ${currSymbol}${newOrder.total}. Please review and send invoice.`,
-    });
+      addNotification({
+        icon:    'magazine',
+        role:    'global_admin',
+        title:   'New Magazine Order — Action Required',
+        message: `Zonal Manager placed Order ${newOrder.id} for ${orderLines.reduce((s, l) => s + l.qty, 0)} magazines totalling ${currSymbol}${newOrder.total}. Please review and send invoice.`,
+      });
 
-    setPaymentDone(true);
+      setPaymentDone(true);
+      setStep(4);
+    })
+    .catch(err => setPaymentError('Failed to save order on server.'));
+  };
+
+  const handleNextToPayment = () => {
+    setShippingError('');
+    if (!shipping.address || !shipping.country || !shipping.zip || !shipping.contactEmail) {
+      return setShippingError('Please fill in all required shipping fields.');
+    }
     setStep(3);
   };
 
@@ -272,7 +299,7 @@ export default function Magazine() {
             <ShoppingCart size={16} /> {t?.placeOrder || 'Place Order'}
           </button>
         )}
-        {view === 'order' && step < 3 && (
+        {view === 'order' && step < 4 && (
           <button className="mg-back-btn" onClick={() => { setView('home'); setStep(0); }}>← Back</button>
         )}
       </div>
@@ -348,9 +375,9 @@ export default function Magazine() {
       {/* ── ORDER FLOW ── */}
       {view === 'order' && (
         <div className="mg-order-flow">
-          {step < 3 && (
+          {step < 4 && (
             <div className="mg-stepper">
-              {STEPS.slice(0, 3).map((s, i) => (
+              {STEPS.slice(0, 4).map((s, i) => (
                 <React.Fragment key={s}>
                   <div className={`mg-step ${step === i ? 'active' : ''} ${step > i ? 'done' : ''}`}>
                     <div className="mg-step-circle">
@@ -358,7 +385,7 @@ export default function Magazine() {
                     </div>
                     <span>{s}</span>
                   </div>
-                  {i < 2 && <div className={`mg-step-line ${step > i ? 'done' : ''}`} />}
+                  {i < 3 && <div className={`mg-step-line ${step > i ? 'done' : ''}`} />}
                 </React.Fragment>
               ))}
             </div>
@@ -463,13 +490,57 @@ export default function Magazine() {
               </div>
               <div className="mg-step-footer">
                 <button className="mg-back-btn" onClick={() => setStep(0)}>← Edit Order</button>
-                <button className="mg-order-btn" onClick={() => setStep(2)}>Proceed to Payment <ChevronRight size={15} /></button>
+                <button className="mg-order-btn" onClick={() => setStep(2)}>Enter Shipping Info <ChevronRight size={15} /></button>
               </div>
             </div>
           )}
 
-          {/* STEP 2 */}
+          {/* STEP 2: Shipping Info */}
           {step === 2 && (
+            <div className="mg-review">
+              <div className="mg-panel">
+                <h3><Package size={18} /> Shipping & Contact Details</h3>
+                <div className="mg-form-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginTop: '16px' }}>
+                  <div className="mg-form-group" style={{ gridColumn: 'span 2' }}>
+                    <label className="mg-payment-label">Street Address <span className="mg-required">*</span></label>
+                    <input className="mg-payment-input" value={shipping.address} onChange={e => setShipping({...shipping, address: e.target.value})} />
+                  </div>
+                  <div className="mg-form-group">
+                    <label className="mg-payment-label">City <span className="mg-required">*</span></label>
+                    <input className="mg-payment-input" value={shipping.city} onChange={e => setShipping({...shipping, city: e.target.value})} />
+                  </div>
+                  <div className="mg-form-group">
+                    <label className="mg-payment-label">State / Province</label>
+                    <input className="mg-payment-input" value={shipping.state} onChange={e => setShipping({...shipping, state: e.target.value})} />
+                  </div>
+                  <div className="mg-form-group">
+                    <label className="mg-payment-label">Country <span className="mg-required">*</span></label>
+                    <input className="mg-payment-input" value={shipping.country} onChange={e => setShipping({...shipping, country: e.target.value})} />
+                  </div>
+                  <div className="mg-form-group">
+                    <label className="mg-payment-label">Postal / ZIP Code <span className="mg-required">*</span></label>
+                    <input className="mg-payment-input" value={shipping.zip} onChange={e => setShipping({...shipping, zip: e.target.value})} />
+                  </div>
+                  <div className="mg-form-group">
+                    <label className="mg-payment-label">Contact Email <span className="mg-required">*</span></label>
+                    <input className="mg-payment-input" type="email" value={shipping.contactEmail} onChange={e => setShipping({...shipping, contactEmail: e.target.value})} />
+                  </div>
+                  <div className="mg-form-group">
+                    <label className="mg-payment-label">Contact Phone <span className="mg-required">*</span></label>
+                    <input className="mg-payment-input" type="tel" value={shipping.contactPhone} onChange={e => setShipping({...shipping, contactPhone: e.target.value})} />
+                  </div>
+                </div>
+                {shippingError && <div className="mg-payment-error" style={{marginTop: 16}}><AlertCircle size={15} /> {shippingError}</div>}
+              </div>
+              <div className="mg-step-footer">
+                <button className="mg-back-btn" onClick={() => setStep(1)}>← Back to Review</button>
+                <button className="mg-order-btn" onClick={handleNextToPayment}>Proceed to Payment <ChevronRight size={15} /></button>
+              </div>
+            </div>
+          )}
+
+          {/* STEP 3 */}
+          {step === 3 && (
             <div className="mg-review">
               <div className="mg-panel">
                 <h3 style={{ display: 'flex', alignItems: 'center', gap: 8 }}><CreditCard size={18} /> Payment</h3>
@@ -534,14 +605,14 @@ export default function Magazine() {
                 <div className="mg-notice"><Bell size={14} />Your order will only be placed once payment details are submitted and verified.</div>
               </div>
               <div className="mg-step-footer">
-                <button className="mg-back-btn" onClick={() => setStep(1)}>← Back to Review</button>
+                <button className="mg-back-btn" onClick={() => setStep(2)}>← Back to Shipping</button>
                 <button className="mg-order-btn" onClick={handleConfirmPayment}>Confirm Payment & Place Order <ChevronRight size={15} /></button>
               </div>
             </div>
           )}
 
-          {/* STEP 3 */}
-          {step === 3 && paymentDone && (
+          {/* STEP 4 */}
+          {step === 4 && paymentDone && (
             <div className="mg-success">
               <div className="mg-success-icon">
                 <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#16a34a" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
