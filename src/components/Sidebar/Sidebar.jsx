@@ -8,7 +8,7 @@ import { useAuth }     from '../../auth/AuthContext';
 import { useSettings } from '../../context/SettingsContext';
 import './styles.css';
 
-export default function Sidebar() {
+export default function Sidebar({ isOpen, onClose }) {
   const { user, avatar } = useAuth();
   const { t }            = useSettings();
   const role             = user?.role ?? 'global';
@@ -45,19 +45,16 @@ export default function Sidebar() {
   const navItems = NAV_CONFIG[role] ?? NAV_CONFIG.global;
 
   return (
-    <aside className="sidebar">
-      <div className="sidebar-logo">
-        <div className="sidebar-logo-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="white"
-            strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M12 2L3 7v5c0 5.25 3.75 10.15 9 11.35C17.25 22.15 21 17.25 21 12V7L12 2z"/>
-          </svg>
+    <>
+      {isOpen && <div className="sidebar-overlay" onClick={onClose} />}
+      <aside className={`sidebar ${isOpen ? 'open' : ''}`}>
+        <div className="sidebar-logo">
+          <div className="sb-logo-icon">RP</div>
+          <div className="sb-logo-text-wrap">
+            <h1>Reporting Portal</h1>
+            <p>Management Platform</p>
+          </div>
         </div>
-        <div>
-          <h1>Loveworld</h1>
-          <p>Reports Platform</p>
-        </div>
-      </div>
 
       <nav className="sidebar-nav">
         {navItems.map(({ label, icon: Icon, path }) => (
@@ -94,5 +91,6 @@ export default function Sidebar() {
         </div>
       </div>
     </aside>
+    </>
   );
 }

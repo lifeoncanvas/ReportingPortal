@@ -105,6 +105,11 @@ export default function SubmitReport() {
         httnmOutreaches: parseInt(form.httnmOutreaches) || 0,
         httnmMediaSubmitted: parseInt(form.httnmMediaSubmitted) || 0,
         sponsorshipHealingCrusade: parseFloat(form.sponsorshipHealingCrusade) || 0,
+        submittedBy: user?.displayName || 'User',
+        submitterEmail: user?.email || '',
+        submittedDate: new Date().toISOString().split('T')[0],
+        submittedTime: new Date().toISOString().split('T')[1].split('.')[0],
+        weekStartDate: new Date().toISOString().split('T')[0],
       };
       const res = await fetch(API, {
         method: "POST",

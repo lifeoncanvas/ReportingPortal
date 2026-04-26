@@ -540,47 +540,49 @@ export default function FinancePortal() {
             )}
           </p>
 
-          <table className="fp-table">
-            <thead>
-              <tr>
-                <th>{t?.entryId || 'Entry ID'}</th><th>{t?.date || 'Date'}</th><th>{t?.region || 'Region'}</th><th>{t?.zone || 'Zone'}</th>
-                <th>{t?.category || 'Category'}</th><th>{t?.amount || 'Amount'}</th><th>{t?.campaign || 'Campaign'}</th>
-                <th>{t?.submittedBy || 'Submitted By'}</th><th>{t?.actions || 'Actions'}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filtered.length === 0 ? (
+          <div className="fp-table-wrapper" style={{ overflowX: 'auto', width: '100%', WebkitOverflowScrolling: 'touch' }}>
+            <table className="fp-table">
+              <thead>
                 <tr>
-                  <td colSpan={9} style={{ textAlign: 'center', padding: '32px', color: 'var(--text-muted)' }}>
-                    No records match your filters.
-                  </td>
+                  <th>{t?.entryId || 'Entry ID'}</th><th>{t?.date || 'Date'}</th><th>{t?.region || 'Region'}</th><th>{t?.zone || 'Zone'}</th>
+                  <th>{t?.category || 'Category'}</th><th>{t?.amount || 'Amount'}</th><th>{t?.campaign || 'Campaign'}</th>
+                  <th>{t?.submittedBy || 'Submitted By'}</th><th>{t?.actions || 'Actions'}</th>
                 </tr>
-              ) : filtered.map(row => (
-                <tr key={row.id}>
-                  <td className="fp-id">{row.id}</td>
-                  <td>{formatDate(row.rawDate)}</td>
-                  <td>{row.region}</td>
-                  <td>{row.zone}</td>
-                  <td>{row.category}</td>
-                  <td className="fp-amount">{currSymbol}{row.rawAmount.toLocaleString()}</td>
-                  <td>{row.campaign}</td>
-                  <td>{row.submittedBy}</td>
-                  <td>
-                    <div className="fp-actions">
-                      <button className="fp-icon-btn view" title="View"
-                        onClick={() => setViewRecord(row)}>         {/* ← wired */}
-                        <Eye size={15} />
-                      </button>
-                      <button className="fp-icon-btn dl" title="Download as CSV"
-                        onClick={() => downloadRow(row)}>
-                        <Download size={15} />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {filtered.length === 0 ? (
+                  <tr>
+                    <td colSpan={9} style={{ textAlign: 'center', padding: '32px', color: 'var(--text-muted)' }}>
+                      No records match your filters.
+                    </td>
+                  </tr>
+                ) : filtered.map(row => (
+                  <tr key={row.id}>
+                    <td className="fp-id">{row.id}</td>
+                    <td>{formatDate(row.rawDate)}</td>
+                    <td>{row.region}</td>
+                    <td>{row.zone}</td>
+                    <td>{row.category}</td>
+                    <td className="fp-amount">{currSymbol}{row.rawAmount.toLocaleString()}</td>
+                    <td>{row.campaign}</td>
+                    <td>{row.submittedBy}</td>
+                    <td>
+                      <div className="fp-actions">
+                        <button className="fp-icon-btn view" title="View"
+                          onClick={() => setViewRecord(row)}>         {/* ← wired */}
+                          <Eye size={15} />
+                        </button>
+                        <button className="fp-icon-btn dl" title="Download as CSV"
+                          onClick={() => downloadRow(row)}>
+                          <Download size={15} />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
 

@@ -150,76 +150,78 @@ export default function UserManagement() {
 
         <p className="um-count">Showing {filtered.length} users</p>
 
-        <table className="um-table">
-          <thead>
-            <tr>
-              <th>User</th>
-              <th>Email</th>
-              <th>Role</th>
-              <th>Region</th>
-              <th>Status</th>
-              <th>Joined</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filtered.map(u => {
-              const rc = ROLE_COLORS[u.role] ?? { bg: '#f3f4f6', color: '#374151' };
-              return (
-                <tr key={u.id}>
-                  <td>
-                    <div className="um-user-cell">
-                      <div className="um-av" style={{ background: rc.bg, color: rc.color }}>
-                        {(u.firstName?.[0] || u.email?.[0] || '?').toUpperCase()}
+        <div className="um-table-wrapper" style={{ overflowX: 'auto', width: '100%', WebkitOverflowScrolling: 'touch' }}>
+          <table className="um-table">
+            <thead>
+              <tr>
+                <th>User</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Region</th>
+                <th>Status</th>
+                <th>Joined</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filtered.map(u => {
+                const rc = ROLE_COLORS[u.role] ?? { bg: '#f3f4f6', color: '#374151' };
+                return (
+                  <tr key={u.id}>
+                    <td>
+                      <div className="um-user-cell">
+                        <div className="um-av" style={{ background: rc.bg, color: rc.color }}>
+                          {(u.firstName?.[0] || u.email?.[0] || '?').toUpperCase()}
+                        </div>
+                        <span className="um-name">{u.firstName ? `${u.firstName} ${u.lastName || ''}` : 'Pending Invite'}</span>
                       </div>
-                      <span className="um-name">{u.firstName ? `${u.firstName} ${u.lastName || ''}` : 'Pending Invite'}</span>
-                    </div>
-                  </td>
-                  <td>{u.email}</td>
-                  <td>
-                    <span className="um-role-badge" style={{ background: rc.bg, color: rc.color }}>
-                      {u.role}
-                    </span>
-                  </td>
-                  <td>{u.region}</td>
-                  <td>
-                    <button
-                      className={`um-status-badge ${u.status}`}
-                      onClick={() => toggleStatus(u.id)}
-                      title="Click to toggle"
-                    >
-                      {u.status}
-                    </button>
-                  </td>
-                  <td>{u.joined}</td>
-                  <td>
-                    <div className="um-actions">
-                      {u.status === 'pending' && u.inviteToken && (
-                        <button 
-                          className="um-icon-btn copy" 
-                          onClick={() => {
-                            const link = `${window.location.origin}/invite?token=${u.inviteToken}`;
-                            navigator.clipboard.writeText(link);
-                            alert('Invite link copied to clipboard!');
-                          }} 
-                          title="Copy Invite Link"
-                        >
-                          <Plus size={14} style={{ transform: 'rotate(45deg)' }} />
+                    </td>
+                    <td>{u.email}</td>
+                    <td>
+                      <span className="um-role-badge" style={{ background: rc.bg, color: rc.color }}>
+                        {u.role}
+                      </span>
+                    </td>
+                    <td>{u.region}</td>
+                    <td>
+                      <button
+                        className={`um-status-badge ${u.status}`}
+                        onClick={() => toggleStatus(u.id)}
+                        title="Click to toggle"
+                      >
+                        {u.status}
+                      </button>
+                    </td>
+                    <td>{u.joined}</td>
+                    <td>
+                      <div className="um-actions">
+                        {u.status === 'pending' && u.inviteToken && (
+                          <button 
+                            className="um-icon-btn copy" 
+                            onClick={() => {
+                              const link = `${window.location.origin}/invite?token=${u.inviteToken}`;
+                              navigator.clipboard.writeText(link);
+                              alert('Invite link copied to clipboard!');
+                            }} 
+                            title="Copy Invite Link"
+                          >
+                            <Plus size={14} style={{ transform: 'rotate(45deg)' }} />
+                          </button>
+                        )}
+                        <button className="um-icon-btn edit" onClick={() => openEdit(u)} title="Edit">
+                          <Edit2 size={14} />
                         </button>
-                      )}
-                      <button className="um-icon-btn edit" onClick={() => openEdit(u)} title="Edit">
-                        <Edit2 size={14} />
-                      </button>
-                      <button className="um-icon-btn del" onClick={() => setDeleteId(u.id)} title="Delete">
-                        <Trash2 size={14} />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
+                        <button className="um-icon-btn del" onClick={() => setDeleteId(u.id)} title="Delete">
+                          <Trash2 size={14} />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       {/* Add/Edit Modal */}

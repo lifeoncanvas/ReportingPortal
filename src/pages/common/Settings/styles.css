@@ -522,7 +522,17 @@
 /* Responsive */
 @media (max-width: 900px) {
   .st-layout { grid-template-columns: 1fr; }
-  .st-sidenav { flex-direction: row; flex-wrap: wrap; }
+  .st-sidenav { 
+    flex-direction: row; 
+    flex-wrap: nowrap; 
+    overflow-x: auto; 
+    -webkit-overflow-scrolling: touch; 
+    padding-bottom: 8px; /* space for scrollbar */
+  }
+  .st-sidenav-item { 
+    width: auto; 
+    flex-shrink: 0; 
+  }
 }
 
 @media (max-width: 600px) {

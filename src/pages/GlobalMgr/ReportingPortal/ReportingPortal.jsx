@@ -3,6 +3,7 @@ import { Eye, Download, Search, Filter, Upload, X, Check, ChevronDown } from 'lu
 import { useSettings } from '../../../context/SettingsContext';
 import { useNotifications } from '../../../context/NotificationContext';
 import { downloadReportPDF } from '../../../utils/generateReportPDF';
+import { useAuth } from '../../../auth/AuthContext';
 import './styles.css';
 
 // ── Icons ──────────────────────────────────────────────
@@ -59,7 +60,7 @@ function KFField({ label, required, hint, error, children }) {
 }
 
 // ── View Modal ─────────────────────────────────────────
-function ViewModal({ report, onClose, onDownload }) {
+function ViewModal({ report, onClose, onDownload, onApprove, userRole }) {
   const { formatDate, t } = useSettings();
 
   const formFields = report.formData ? [
@@ -145,6 +146,11 @@ function ViewModal({ report, onClose, onDownload }) {
           )}
         </div>
         <div className="rp-modal-footer">
+          {(userRole === 'admin' || userRole === 'global') && report.status === 'PENDING' && (
+            <button className="rp-submit-btn" style={{ background: '#4f46e5' }} onClick={() => onApprove(report.id)}>
+              <Check size={14} /> Approve Report
+            </button>
+          )}
           <button className="rp-submit-btn" style={{ background: '#16a34a' }} onClick={() => onDownload(report)}>
             <Download size={14} /> Download PDF
           </button>
@@ -311,19 +317,21 @@ const EMPTY_FILTERS = { status: '', zone: '' };
 
 const ATTENDANCE_OPTIONS = [
   { value: '',             label: 'Please select' },
-  { value: 'present',     label: 'Present'        },
-  { value: 'absent',      label: 'Absent'         },
-  { value: 'represented', label: 'Represented'    },
+  { value: 'Yes',          label: 'Yes'        },
+  { value: 'No',           label: 'No'         },
+  { value: 'Officially Excused', label: 'Officially Excused' },
 ];
 
 // ── Main Component ─────────────────────────────────────
 export default function ReportingPortal() {
   const { t, formatDate } = useSettings();
   const { addNotification } = useNotifications();
+  const { user } = useAuth();
 
   const [tab, setTab]                       = useState(0);
   const [search, setSearch]                 = useState('');
-  const [reports, setReports]               = useState(INITIAL_REPORTS);
+  const [reports, setReports]               = useState([]);
+  const [loading, setLoading]               = useState(true);
   const [form, setForm]                     = useState(EMPTY_FORM);
   const [formErrors, setFormErrors]         = useState({});
   const [submitting, setSubmitting]         = useState(false);
@@ -333,6 +341,46 @@ export default function ReportingPortal() {
   const [filters, setFilters]               = useState(EMPTY_FILTERS);
   const [appliedFilters, setAppliedFilters] = useState(EMPTY_FILTERS);
   const [exportModal, setExportModal]       = useState(null);
+
+  React.useEffect(() => {
+    fetchReports();
+  }, [user?.email]);
+
+  const fetchReports = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch(`${process.env.REACT_APP_API_URL}/api/reports?email=${user?.email || ''}`);
+      if (res.ok) {
+        const data = await res.json();
+        setReports(data.map(r => ({
+          ...r,
+          rawDate: r.createdAt?.split(' ')[0] || '',
+          zone: r.zoneName,
+          attendance: r.newPartnersRecruited,
+          status: r.status?.toLowerCase() || 'submitted'
+        })));
+      }
+    } catch (err) {
+      console.error("Fetch error:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleApprove = async (id) => {
+    try {
+      const res = await fetch(`${process.env.REACT_APP_API_URL}/api/reports/${id}/approve`, {
+        method: 'PUT'
+      });
+      if (res.ok) {
+        setToast("Report approved successfully");
+        fetchReports();
+        setViewReport(null);
+      }
+    } catch (err) {
+      setToast("Approval failed");
+    }
+  };
 
   const setField = (key, val) => setForm(p => ({ ...p, [key]: val }));
 
@@ -379,30 +427,35 @@ export default function ReportingPortal() {
 
     setSubmitting(true);
     try {
-      const payload = new FormData();
-      payload.append('zoneName',                      form.zoneName);
-      payload.append('zonalManager',                  form.zonalManager);
-      payload.append('partnershipRemittance',         form.partnershipRemittance);
-      payload.append('newPartners',                   form.newPartners);
-      payload.append('testimonies',                   form.testimonies);
-      payload.append('httnmTranslations',             form.httnmTranslations);
-      payload.append('httnmOutreaches',               form.httnmOutreaches);
-      payload.append('httnmPicturesVideos',           form.httnmPicturesVideos);
-      payload.append('pastoralAttendanceDirector',    form.pastoralAttendanceDirector);
-      payload.append('managerAttendanceDirector',     form.managerAttendanceDirector);
-      payload.append('managerAttendanceStrategy',     form.managerAttendanceStrategy);
-      payload.append('healingCrusadeSponsorship',     form.healingCrusadeSponsorship);
-      payload.append('testimonyClarificationConcern', form.testimonyClarificationConcern);
-      payload.append('submittedAt',                   new Date().toISOString());
-
-      // Each file appended separately under key 'media'
-      form.mediaFiles.forEach(file => payload.append('media', file));
+      const payload = {
+        submittedBy: user?.displayName || 'User',
+        submitterEmail: user?.email || '',
+        submittedDate: new Date().toISOString().split('T')[0],
+        submittedTime: new Date().toISOString().split('T')[1].split('.')[0],
+        weekStartDate: new Date().toISOString().split('T')[0],
+        zoneName: form.zoneName,
+        zonalManager: form.zonalManager,
+        totalPartnershipRemittance: Number(form.partnershipRemittance) || 0,
+        newPartnersRecruited: Number(form.newPartners) || 0,
+        testimoniesSubmitted: Number(form.testimonies) || 0,
+        httnmTranslations: Number(form.httnmTranslations) || 0,
+        httnmOutreachesHeld: Number(form.httnmOutreaches) || 0,
+        httnmMediaSubmitted: Number(form.httnmPicturesVideos) || 0,
+        zonalPastorDirectorsMeeting: form.pastoralAttendanceDirector,
+        zonalManagerDirectorsMeeting: form.managerAttendanceDirector,
+        zonalManagerStrategyMeeting: form.managerAttendanceStrategy,
+        healingCrusadeSponsorship: Number(form.healingCrusadeSponsorship) || 0,
+        testimonyClarificationConcern: form.testimonyClarificationConcern,
+        regionName: user?.region || 'Global'
+      };
 
       // ── POST ─────────────────────────────────────────
-      const res = await fetch('/api/reports', {
+      const res = await fetch(`${process.env.REACT_APP_API_URL}/api/reports`, {
         method: 'POST',
-        body: payload,
-        // Do NOT set Content-Type — browser sets the multipart boundary automatically
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload),
       });
 
       if (!res.ok) throw new Error(`Server error ${res.status}`);
@@ -431,6 +484,7 @@ export default function ReportingPortal() {
       setForm(EMPTY_FORM);
       setFormErrors({});
       setToast(`Report ${newId} submitted successfully`);
+      fetchReports();
       setTab(0);
 
     } catch (err) {
@@ -513,7 +567,7 @@ export default function ReportingPortal() {
   return (
     <div className="rp-page">
       {toast      && <SuccessToast message={toast} onDone={() => setToast('')} />}
-      {viewReport && <ViewModal report={viewReport} onClose={() => setViewReport(null)} onDownload={downloadRow} />}
+      {viewReport && <ViewModal report={viewReport} onClose={() => setViewReport(null)} onDownload={downloadRow} onApprove={handleApprove} userRole={user?.role} />}
       {exportModal && (
         <ExportModal format={exportModal} count={filtered.length}
           onConfirm={() => handleExport(exportModal)}
@@ -575,34 +629,39 @@ export default function ReportingPortal() {
             )}
           </p>
 
-          <table className="rp-table">
-            <thead>
-              <tr>
-                <th>Report ID</th><th>Date</th><th>Zone</th>
-                <th>Submitted By</th><th>New Partners</th><th>Status</th><th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filtered.length === 0 ? (
-                <tr><td colSpan={7} style={{ textAlign: 'center', padding: '32px', color: 'var(--text-muted)' }}>No reports match your filters.</td></tr>
-              ) : filtered.map(row => (
-                <tr key={row.id}>
-                  <td className="rp-id">{row.id}</td>
-                  <td>{formatDate(row.rawDate)}</td>
-                  <td>{row.zone}</td>
-                  <td>{row.submittedBy}</td>
-                  <td>{row.attendance}</td>
-                  <td><span className={`rp-badge ${row.status}`}>{row.status}</span></td>
-                  <td>
-                    <div className="rp-actions">
-                      <button className="rp-icon-btn view" title="View" onClick={() => setViewReport(row)}><Eye size={15} /></button>
-                      <button className="rp-icon-btn dl"   title="Download" onClick={() => downloadRow(row)}><Download size={15} /></button>
-                    </div>
-                  </td>
+          <div className="rp-table-wrapper" style={{ overflowX: 'auto', width: '100%', WebkitOverflowScrolling: 'touch' }}>
+            <table className="rp-table">
+              <thead>
+                <tr>
+                  <th>Report ID</th><th>Date</th><th>Region</th><th>Zone</th>
+                  <th>Submitted By</th><th>New Partners</th><th>Status</th><th>Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {loading ? (
+                  <tr><td colSpan={8} style={{ textAlign: 'center', padding: '32px' }}>Loading reports...</td></tr>
+                ) : filtered.length === 0 ? (
+                  <tr><td colSpan={8} style={{ textAlign: 'center', padding: '32px', color: 'var(--text-muted)' }}>No reports match your filters.</td></tr>
+                ) : filtered.map(row => (
+                  <tr key={row.id}>
+                    <td className="rp-id">{row.id}</td>
+                    <td>{formatDate(row.rawDate)}</td>
+                    <td>{row.regionName || 'Global'}</td>
+                    <td>{row.zone}</td>
+                    <td>{row.submittedBy}</td>
+                    <td>{row.attendance}</td>
+                    <td><span className={`rp-badge ${row.status}`}>{row.status}</span></td>
+                    <td>
+                      <div className="rp-actions">
+                        <button className="rp-icon-btn view" title="View" onClick={() => setViewReport(row)}><Eye size={15} /></button>
+                        <button className="rp-icon-btn dl"   title="Download" onClick={() => downloadRow(row)}><Download size={15} /></button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
 

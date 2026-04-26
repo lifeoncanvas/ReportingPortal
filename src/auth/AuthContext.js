@@ -29,11 +29,20 @@ export function AuthProvider({ children }) {
   };
 
   const login = async (email, password, onPendingToasts) => {
+    return await baseLogin({ email, password, loginMethod: 'password' }, onPendingToasts);
+  };
+
+  const loginWithKingChat = async (email, password, onPendingToasts) => {
+    return await baseLogin({ email, password, loginMethod: 'kingchat' }, onPendingToasts);
+  };
+
+  const baseLogin = async (payload, onPendingToasts) => {
+    const { email, password } = payload;
     try {
       const res = await fetch(`${process.env.REACT_APP_API_URL}/api/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password })
+        body: JSON.stringify(payload)
       });
 
       if (!res.ok) {
@@ -88,7 +97,7 @@ export function AuthProvider({ children }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, avatar, updateAvatar }}>
+    <AuthContext.Provider value={{ user, login, loginWithKingChat, logout, avatar, updateAvatar }}>
       {children}
     </AuthContext.Provider>
   );

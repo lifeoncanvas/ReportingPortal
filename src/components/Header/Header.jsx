@@ -1,12 +1,12 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Bell, Settings, LogOut } from 'lucide-react';
+import { Bell, Settings, LogOut, Menu } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth }          from '../../auth/AuthContext';
 import { useSettings }      from '../../context/SettingsContext';
 import { useNotifications } from '../../context/NotificationContext';
 import './styles.css';
 
-export default function Header({ basePath }) {
+export default function Header({ basePath, onMenuClick }) {
   const [showDropdown, setShowDropdown] = useState(false);
   const dropdownRef = useRef(null);
   const navigate    = useNavigate();
@@ -46,12 +46,12 @@ export default function Header({ basePath }) {
 
   return (
     <header className="header">
+      <button className="header-icon-btn mobile-menu-btn" onClick={onMenuClick} title="Menu">
+        <Menu size={20} />
+      </button>
       <div className="header-brand">
-        <svg className="header-brand-icon" viewBox="0 0 24 24" fill="none"
-          stroke="#4f46e5" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M12 2L3 7v5c0 5.25 3.75 10.15 9 11.35C17.25 22.15 21 17.25 21 12V7L12 2z"/>
-        </svg>
-        Loveworld
+        <div className="header-brand-logo">RP</div>
+        <span className="header-brand-text">Reporting Portal</span>
       </div>
 
       <div className="header-spacer" />

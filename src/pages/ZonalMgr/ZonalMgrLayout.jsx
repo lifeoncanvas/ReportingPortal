@@ -1,15 +1,16 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import Sidebar from '../../components/Sidebar/Sidebar';
 import Header  from '../../components/Header/Header';
 import '../GlobalMgr/layout.css'; // reuse same layout CSS
 
 export default function ZonalMgrLayout() {
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   return (
     <div className="app-layout">
-      <Sidebar />
+      <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
       <div className="app-main">
-        <Header basePath="/zonal" />
+        <Header basePath="/zonal" onMenuClick={() => setSidebarOpen(true)} />
         <main className="app-content">
           <Outlet />
         </main>

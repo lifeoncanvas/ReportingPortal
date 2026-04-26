@@ -91,24 +91,26 @@ function OrderModal({ order, onClose, currSymbol }) {
         {/* Items */}
         <div className="mg-modal-section">
           <div className="mg-modal-section-title">Order Items</div>
-          <table className="mg-review-table">
-            <thead>
-              <tr><th>Type</th><th>Languages</th><th>Qty</th></tr>
-            </thead>
-            <tbody>
-              {order.items.map((item, i) => (
-                <tr key={i}>
-                  <td>{item.type} Edition</td>
-                  <td>
-                    <div className="mg-lang-tags">
-                      {item.lang.map(l => <span className="mg-lang-tag" key={l}>{l}</span>)}
-                    </div>
-                  </td>
-                  <td><strong>{item.qty}</strong></td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          <div className="mg-table-wrapper" style={{ overflowX: 'auto', width: '100%', WebkitOverflowScrolling: 'touch' }}>
+            <table className="mg-review-table">
+              <thead>
+                <tr><th>Type</th><th>Languages</th><th>Qty</th></tr>
+              </thead>
+              <tbody>
+                {order.items.map((item, i) => (
+                  <tr key={i}>
+                    <td>{item.type} Edition</td>
+                    <td>
+                      <div className="mg-lang-tags">
+                        {item.lang.map(l => <span className="mg-lang-tag" key={l}>{l}</span>)}
+                      </div>
+                    </td>
+                    <td><strong>{item.qty}</strong></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
 
         {/* Total + Payment ref */}
@@ -301,41 +303,43 @@ export default function Magazine() {
                 <button className="mg-order-btn" onClick={() => setView('order')}>Place Order</button>
               </div>
             ) : (
-              <table className="mg-table">
-                <thead>
-                  <tr>
-                    <th>Order ID</th><th>Date</th><th>Items</th>
-                    <th>Total</th><th>Status</th><th>Action</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {orders.map(o => {
-                    const sc = STATUS_COLORS[o.status] || STATUS_COLORS.pending;
-                    return (
-                      <tr key={o.id}>
-                        <td className="mg-id">{o.id}</td>
-                        <td>{o.date}</td>
-                        <td>
-                          {o.items.map((item, i) => (
-                            <div key={i} style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
-                              {item.qty}× {item.type} ({item.lang.join(', ')})
-                            </div>
-                          ))}
-                        </td>
-                        <td className="mg-amount">{currSymbol}{o.total}</td>
-                        <td>
-                          <span className="mg-status-badge" style={{ background: sc.bg, color: sc.color }}>
-                            {o.status.charAt(0).toUpperCase() + o.status.slice(1)}
-                          </span>
-                        </td>
-                        <td>
-                          <button className="mg-view-btn" onClick={() => setViewOrder(o)}>View</button>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
+              <div className="mg-table-wrapper" style={{ overflowX: 'auto', width: '100%', WebkitOverflowScrolling: 'touch' }}>
+                <table className="mg-table">
+                  <thead>
+                    <tr>
+                      <th>Order ID</th><th>Date</th><th>Items</th>
+                      <th>Total</th><th>Status</th><th>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {orders.map(o => {
+                      const sc = STATUS_COLORS[o.status] || STATUS_COLORS.pending;
+                      return (
+                        <tr key={o.id}>
+                          <td className="mg-id">{o.id}</td>
+                          <td>{o.date}</td>
+                          <td>
+                            {o.items.map((item, i) => (
+                              <div key={i} style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
+                                {item.qty}× {item.type} ({item.lang.join(', ')})
+                              </div>
+                            ))}
+                          </td>
+                          <td className="mg-amount">{currSymbol}{o.total}</td>
+                          <td>
+                            <span className="mg-status-badge" style={{ background: sc.bg, color: sc.color }}>
+                              {o.status.charAt(0).toUpperCase() + o.status.slice(1)}
+                            </span>
+                          </td>
+                          <td>
+                            <button className="mg-view-btn" onClick={() => setViewOrder(o)}>View</button>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
             )}
           </div>
         </>
@@ -427,22 +431,24 @@ export default function Magazine() {
             <div className="mg-review">
               <div className="mg-panel">
                 <h3>Order Summary</h3>
-                <table className="mg-review-table">
-                  <thead>
-                    <tr><th>Magazine</th><th>Languages</th><th>Qty</th><th>Price/copy</th><th>Subtotal</th></tr>
-                  </thead>
-                  <tbody>
-                    {orderLines.map(l => (
-                      <tr key={l.id}>
-                        <td><span className="mg-mag-emoji-sm">{l.icon}</span>{l.subtitle}</td>
-                        <td><div className="mg-lang-tags">{l.languages.map(lang => <span className="mg-lang-tag" key={lang}>{lang}</span>)}</div></td>
-                        <td>{l.qty}</td>
-                        <td>{currSymbol}{l.price.toFixed(2)}</td>
-                        <td><strong>{currSymbol}{l.subtotal.toFixed(2)}</strong></td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+                <div className="mg-table-wrapper" style={{ overflowX: 'auto', width: '100%', WebkitOverflowScrolling: 'touch' }}>
+                  <table className="mg-review-table">
+                    <thead>
+                      <tr><th>Magazine</th><th>Languages</th><th>Qty</th><th>Price/copy</th><th>Subtotal</th></tr>
+                    </thead>
+                    <tbody>
+                      {orderLines.map(l => (
+                        <tr key={l.id}>
+                          <td><span className="mg-mag-emoji-sm">{l.icon}</span>{l.subtitle}</td>
+                          <td><div className="mg-lang-tags">{l.languages.map(lang => <span className="mg-lang-tag" key={lang}>{lang}</span>)}</div></td>
+                          <td>{l.qty}</td>
+                          <td>{currSymbol}{l.price.toFixed(2)}</td>
+                          <td><strong>{currSymbol}{l.subtotal.toFixed(2)}</strong></td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
                 <div className="mg-invoice">
                   <div className="mg-invoice-row"><span>Subtotal</span><span>{currSymbol}{subtotal.toFixed(2)}</span></div>
                   <div className="mg-invoice-row"><span>Delivery</span><span>{deliveryCharge === 0 ? 'Free' : `${currSymbol}${deliveryCharge.toFixed(2)}`}</span></div>

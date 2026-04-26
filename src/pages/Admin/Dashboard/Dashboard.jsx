@@ -47,9 +47,25 @@ export default function AdminDashboard() {
   const { notifications } = useNotifications();
   const magazineNotifs = notifications.filter(n => n.icon === 'magazine').slice(0, 5);
   const { user } = useAuth();
+  const [stats, setStats] = React.useState(null);
+
+  React.useEffect(() => {
+    fetch(`${process.env.REACT_APP_API_URL}/api/dashboard/stats`)
+      .then(res => res.json())
+      .then(data => setStats(data))
+      .catch(err => console.error(err));
+  }, []);
+
   const today = new Date().toLocaleDateString('en-US', {
     weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
   });
+
+  const KPI_DATA = [
+    { label: 'Total Users',   value: '248',    pct: '+5%',  iconBg: '#ede9fe', iconColor: '#5b21b6', icon: Users      },
+    { label: 'Total Reports', value: stats?.totalReports || '0',  pct: '+12%', iconBg: '#dcfce7', iconColor: '#16a34a', icon: FileText   },
+    { label: 'Total Finance', value: `$${stats?.totalFinance?.toLocaleString() || '0'}`, pct: '+8%',  iconBg: '#e0f2fe', iconColor: '#0284c7', icon: DollarSign },
+    { label: 'Active Roles',  value: '3',      pct: '',     iconBg: '#fff7ed', iconColor: '#ea580c', icon: Shield     },
+  ];
 
   return (
     <div className="ad-page">
@@ -67,7 +83,7 @@ export default function AdminDashboard() {
 
       {/* KPI */}
       <div className="ad-kpi-grid">
-        {KPI.map(k => {
+        {KPI_DATA.map(k => {
           const Icon = k.icon;
           return (
             <div className="ad-kpi-card" key={k.label}>
@@ -112,22 +128,22 @@ export default function AdminDashboard() {
 
         <div className="ad-card">
           <div className="ad-card-header">
-            <h3>Recent Audit Logs</h3>
+            <h3>Recent Activity</h3>
             <button className="ad-link-btn" onClick={() => navigate('/admin/audit')}>
               View all →
             </button>
           </div>
-          {LOGS.map((l, i) => (
+          {(stats?.recentActivity || []).map((l, i) => (
             <div className="ad-log-row" key={i}>
-              <div className="ad-log-dot" style={{ background: l.dot }} />
+              <div className="ad-log-dot" style={{ background: '#16a34a' }} />
               <div className="ad-log-info">
                 <p>
-                  {l.action}
-                  <span className="ad-mod-badge" style={{ background: l.moduleBg, color: l.moduleColor }}>
-                    {l.module}
+                  Submitted report for {l.zone}
+                  <span className="ad-mod-badge" style={{ background: '#dcfce7', color: '#16a34a' }}>
+                    Reporting
                   </span>
                 </p>
-                <span>{l.user} · {l.time}</span>
+                <span>{l.user} · {l.date}</span>
               </div>
             </div>
           ))}

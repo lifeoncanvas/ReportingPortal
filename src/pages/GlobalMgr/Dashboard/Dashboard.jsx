@@ -9,6 +9,8 @@ import {
 } from 'recharts';
 import './styles.css';
 
+const REGION_COLORS = ['#4f46e5', '#818cf8', '#a5b4fc', '#c7d2fe'];
+
 const monthlyData = [
   { month: 'Jan', reports: 40, finance: 24 },
   { month: 'Feb', reports: 55, finance: 38 },
@@ -18,12 +20,6 @@ const monthlyData = [
   { month: 'Jun', reports: 75, finance: 60 },
 ];
 
-const campaignData = [
-  { name: 'Spring Outreach', value: 1500 },
-  { name: 'Easter Campaign', value: 350  },
-  { name: 'Healing Streams', value: 750  },
-];
-
 const regionData = [
   { name: 'Africa',   value: 40 },
   { name: 'Europe',   value: 25 },
@@ -31,30 +27,29 @@ const regionData = [
   { name: 'Asia',     value: 15 },
 ];
 
-const REGION_COLORS = ['#4f46e5', '#818cf8', '#a5b4fc', '#c7d2fe'];
-
-const activity = [
-  { initials: 'JD', name: 'John Doe',   action: 'Submitted report',     time: '2 mins ago'  },
-  { initials: 'JS', name: 'Jane Smith', action: 'Uploaded finance CSV',  time: '15 mins ago' },
-  { initials: 'ML', name: 'Mark Lee',   action: 'Updated campaign data', time: '1 hr ago'    },
-  { initials: 'SK', name: 'Sarah K.',   action: 'Added new entry',       time: '3 hrs ago'   },
-];
-
 export default function Dashboard() {
   const { t, formatDate, currSymbol } = useSettings();
   const { user } = useAuth();
   const { notifications } = useNotifications();
   const magazineNotifs = notifications.filter(n => n.icon === 'magazine').slice(0, 5);
+  const [stats, setStats] = React.useState(null);
+
+  React.useEffect(() => {
+    fetch(`${process.env.REACT_APP_API_URL}/api/dashboard/stats`)
+      .then(res => res.json())
+      .then(data => setStats(data))
+      .catch(err => console.error(err));
+  }, []);
 
   const today = new Date().toLocaleDateString('en-US', {
     weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
   });
 
   const KPI_CARDS = [
-    { icon: FileText,   iconBg: '#ede9fe', iconColor: '#5b21b6', pct: '+12%', pctBg: '#ede9fe', pctColor: '#5b21b6', value: '1,284',              label: t.totalReports,    sub: '5 this week'         },
-    { icon: DollarSign, iconBg: '#dcfce7', iconColor: '#16a34a', pct: '+8%',  pctBg: '#dcfce7', pctColor: '#16a34a', value: `${currSymbol}84,200`, label: t.totalFinance,    sub: '5 entries'           },
-    { icon: Users,      iconBg: '#e0f2fe', iconColor: '#0284c7', pct: '+24%', pctBg: '#e0f2fe', pctColor: '#0284c7', value: '32,540',              label: t.totalAttendance, sub: 'Across all regions'  },
-    { icon: TrendingUp, iconBg: '#fff7ed', iconColor: '#ea580c', pct: '+18%', pctBg: '#fff7ed', pctColor: '#ea580c', value: '92%',                 label: t.completionRate,  sub: 'This week'           },
+    { icon: FileText,   iconBg: '#ede9fe', iconColor: '#5b21b6', pct: '+12%', pctBg: '#ede9fe', pctColor: '#5b21b6', value: stats?.totalReports || '0',              label: t.totalReports,    sub: `${stats?.reportsThisWeek || 0} this week`         },
+    { icon: DollarSign, iconBg: '#dcfce7', iconColor: '#16a34a', pct: '+8%',  pctBg: '#dcfce7', pctColor: '#16a34a', value: `${currSymbol}${stats?.totalFinance?.toLocaleString() || '0'}`, label: t.totalFinance,    sub: `${stats?.financeEntries || 0} entries`           },
+    { icon: Users,      iconBg: '#e0f2fe', iconColor: '#0284c7', pct: '+24%', pctBg: '#e0f2fe', pctColor: '#0284c7', value: stats?.totalAttendance?.toLocaleString() || '0',              label: t.totalAttendance, sub: 'Across all regions'  },
+    { icon: TrendingUp, iconBg: '#fff7ed', iconColor: '#ea580c', pct: '+18%', pctBg: '#fff7ed', pctColor: '#ea580c', value: `${stats?.completionRate?.toFixed(0) || 0}%`,                 label: t.completionRate,  sub: 'This week'           },
   ];
 
   return (
@@ -104,13 +99,13 @@ export default function Dashboard() {
         <div className="chart-card">
           <h3>{t.campaignPerformance}</h3>
           <ResponsiveContainer width="100%" height={220}>
-            <BarChart data={campaignData} barSize={40}>
+            <BarChart data={stats?.campaignPerformance || []} barSize={40}>
               <CartesianGrid strokeDasharray="4 3" stroke="#f3f4f6" vertical={false}/>
               <XAxis dataKey="name" tick={{ fontSize: 11, fill: '#9ca3af' }} axisLine={false} tickLine={false}/>
               <YAxis tick={{ fontSize: 11, fill: '#9ca3af' }} axisLine={false} tickLine={false}/>
               <Tooltip contentStyle={{ borderRadius: 8, border: '1px solid #e5e7eb', fontSize: 12 }}/>
               <Legend iconType="square" iconSize={10} wrapperStyle={{ fontSize: 12 }}/>
-              <Bar dataKey="value" name="Attendance" fill="#4f46e5" radius={[6,6,0,0]}/>
+              <Bar dataKey="attendance" name="Attendance" fill="#4f46e5" radius={[6,6,0,0]}/>
             </BarChart>
           </ResponsiveContainer>
         </div>
@@ -137,14 +132,14 @@ export default function Dashboard() {
         <div className="chart-card">
           <h3>{t.recentActivity}</h3>
           <div className="activity-list">
-            {activity.map((item) => (
-              <div className="activity-item" key={item.name}>
-                <div className="activity-avatar">{item.initials}</div>
+            {(stats?.recentActivity || []).map((item, idx) => (
+              <div className="activity-item" key={idx}>
+                <div className="activity-avatar">{item.user?.substring(0, 2).toUpperCase()}</div>
                 <div className="activity-info">
-                  <p>{item.name}</p>
-                  <span>{item.action}</span>
+                  <p>{item.user}</p>
+                  <span>Submitted report for {item.zone}</span>
                 </div>
-                <div className="activity-time">{item.time}</div>
+                <div className="activity-time">{item.date}</div>
               </div>
             ))}
           </div>

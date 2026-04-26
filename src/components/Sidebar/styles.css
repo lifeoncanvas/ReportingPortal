@@ -9,6 +9,8 @@
   flex-shrink: 0;
   overflow-y: auto;
   overflow-x: hidden;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 1000;
 }
 
 .sidebar-logo {
@@ -139,4 +141,69 @@
 .sidebar-user-avatar {
   overflow: hidden;
   border-radius: 50%;
+}
+
+@keyframes fadeInOverlay {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.sidebar-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+  animation: fadeInOverlay 0.2s ease-out forwards;
+}
+
+.sb-logo-icon {
+  width: 32px;
+  height: 32px;
+  background: #4f46e5;
+  color: #fff;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 0.8rem;
+  flex-shrink: 0;
+}
+
+.sb-logo-text-wrap {
+  display: flex;
+  flex-direction: column;
+}
+
+.sb-logo-text-wrap h1 {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.1;
+  margin: 0;
+}
+
+.sb-logo-text-wrap p {
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    transform: translateX(-100%);
+  }
+  .sidebar.open {
+    transform: translateX(0);
+    box-shadow: 4px 0 24px rgba(0,0,0,0.2);
+  }
+  /* Hide sidebar overlay on desktop if someone renders it */
+  @media (min-width: 769px) {
+    .sidebar-overlay {
+      display: none;
+    }
+  }
 }
