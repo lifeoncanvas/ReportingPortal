@@ -61,7 +61,7 @@ export default function AdminDashboard() {
   });
 
   const KPI_DATA = [
-    { label: 'Total Users',   value: '248',    pct: '+5%',  iconBg: '#ede9fe', iconColor: '#5b21b6', icon: Users      },
+    { label: 'Total Users',   value: stats?.totalUsers || '0',    pct: '+5%',  iconBg: '#ede9fe', iconColor: '#5b21b6', icon: Users      },
     { label: 'Total Reports', value: stats?.totalReports || '0',  pct: '+12%', iconBg: '#dcfce7', iconColor: '#16a34a', icon: FileText   },
     { label: 'Total Finance', value: `$${stats?.totalFinance?.toLocaleString() || '0'}`, pct: '+8%',  iconBg: '#e0f2fe', iconColor: '#0284c7', icon: DollarSign },
     { label: 'Active Roles',  value: '3',      pct: '',     iconBg: '#fff7ed', iconColor: '#ea580c', icon: Shield     },
