@@ -63,10 +63,15 @@ const STATUS_TIMELINE = [
 ];
 
 // ── Order Preview Modal ────────────────────────────────────────
-function OrderModal({ order, onClose, currSymbol }) {
+function OrderModal({ order, onClose, currSymbol, onAction, userRole }) {
+  const [showDelayForm, setShowDelayForm] = useState(false);
+  const [delayReason, setDelayReason] = useState('');
+  const [feedback, setFeedback] = useState({ text: '', photos: null });
+
   if (!order) return null;
-  const sc          = STATUS_COLORS[order.status] || STATUS_COLORS.pending;
-  const currentStep = STATUS_TIMELINE.findIndex(s => s.key === order.status);
+  const status = order.status.toLowerCase();
+  const sc          = STATUS_COLORS[status] || STATUS_COLORS.pending;
+  const currentStep = STATUS_TIMELINE.findIndex(s => s.key === status);
 
   return (
     <div className="mg-modal-overlay" onClick={onClose}>
@@ -75,8 +80,8 @@ function OrderModal({ order, onClose, currSymbol }) {
         {/* Header */}
         <div className="mg-modal-header">
           <div>
-            <h3>{order.id}</h3>
-            <p>Placed on {order.date}</p>
+            <h3>ORDER #{order.id}</h3>
+            <p>Placed by {order.orderedBy} on {new Date(order.orderedAt).toLocaleDateString()}</p>
           </div>
           <button className="mg-modal-close" onClick={onClose}><X size={18} /></button>
         </div>
@@ -89,43 +94,111 @@ function OrderModal({ order, onClose, currSymbol }) {
           </span>
         </div>
 
-        {/* Items */}
+        {/* Admin Actions */}
+        {(userRole === 'admin' || userRole === 'global') && (
+          <div className="mg-modal-section">
+            <div className="mg-modal-section-title">Admin Actions</div>
+            <div className="mg-admin-actions" style={{ display: 'flex', gap: 10, marginTop: 10, flexWrap: 'wrap' }}>
+              {order.status === 'ORDERED' && (
+                <button className="mg-order-btn" onClick={() => onAction(order.id, 'invoice')}>Generate Invoice</button>
+              )}
+              {order.status === 'PAID' && (
+                <button className="mg-order-btn" onClick={() => onAction(order.id, 'print')}>Mark as Printed</button>
+              )}
+              {order.status === 'PRINTED' && (
+                <button className="mg-order-btn" onClick={() => onAction(order.id, 'ship')}>Mark as Shipped</button>
+              )}
+              {order.status === 'SHIPPED' && (
+                <button className="mg-order-btn" onClick={() => onAction(order.id, 'status?status=DELIVERED')}>Mark as Delivered</button>
+              )}
+              {order.status !== 'CANCELLED' && order.status !== 'DELIVERED' && (
+                <button className="mg-view-btn" style={{borderColor: '#ef4444', color: '#ef4444'}} onClick={() => onAction(order.id, 'cancel')}>Cancel Order</button>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Zonal Delay Report */}
+        {userRole === 'zonal' && (order.status === 'PAID' || order.status === 'PRINTED') && (
+          <div className="mg-modal-section">
+            {!showDelayForm ? (
+              <button className="mg-view-btn" onClick={() => setShowDelayForm(true)}>Report Production Delay</button>
+            ) : (
+              <div className="mg-delay-form" style={{ marginTop: 10 }}>
+                <textarea 
+                  placeholder="Enter reason for delay..." 
+                  className="mg-payment-input" 
+                  value={delayReason} 
+                  onChange={e => setDelayReason(e.target.value)}
+                  style={{ height: 80, marginBottom: 8 }}
+                />
+                <div style={{ display: 'flex', gap: 10 }}>
+                  <button className="mg-order-btn" onClick={() => onAction(order.id, `delay?reason=${encodeURIComponent(delayReason)}`)}>Submit Report</button>
+                  <button className="mg-back-btn" onClick={() => setShowDelayForm(false)}>Cancel</button>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Feedback Section for Delivered Orders */}
+        {order.status === 'DELIVERED' && (
+          <div className="mg-modal-section">
+            <div className="mg-modal-section-title">Pictures & Testimonies</div>
+            {order.feedbackReceived ? (
+              <div className="mg-notice" style={{ background: 'rgba(22,163,74,0.1)', color: '#16a34a' }}>
+                <CheckCircle size={14} /> Feedback submitted successfully! Thank you.
+              </div>
+            ) : (
+              <div className="mg-feedback-form" style={{ marginTop: 10 }}>
+                <textarea 
+                  placeholder="Share your testimonies..." 
+                  className="mg-payment-input" 
+                  value={feedback.text}
+                  onChange={e => setFeedback({...feedback, text: e.target.value})}
+                  style={{ height: 80, marginBottom: 8 }}
+                />
+                <label className="mg-upload-zone" style={{ padding: '10px' }}>
+                  <input type="file" multiple style={{ display: 'none' }} />
+                  <div className="mg-upload-prompt"><Upload size={16} /> <span>Upload Pictures</span></div>
+                </label>
+                <button 
+                  className="mg-order-btn" 
+                  style={{ width: '100%', marginTop: 10 }}
+                  onClick={() => onAction(order.id, 'status?status=DELIVERED&feedback=true')} // Mocking feedback submission
+                >
+                  Submit Feedback
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Details */}
         <div className="mg-modal-section">
-          <div className="mg-modal-section-title">Order Items</div>
-          <div className="mg-table-wrapper" style={{ overflowX: 'auto', width: '100%', WebkitOverflowScrolling: 'touch' }}>
-            <table className="mg-review-table">
-              <thead>
-                <tr><th>Type</th><th>Languages</th><th>Qty</th></tr>
-              </thead>
-              <tbody>
-                {order.items.map((item, i) => (
-                  <tr key={i}>
-                    <td>{item.type} Edition</td>
-                    <td>
-                      <div className="mg-lang-tags">
-                        {item.lang.map(l => <span className="mg-lang-tag" key={l}>{l}</span>)}
-                      </div>
-                    </td>
-                    <td><strong>{item.qty}</strong></td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          <div className="mg-modal-section-title">Shipping Details</div>
+          <div style={{ fontSize: '0.85rem', color: '#666', lineHeight: 1.5 }}>
+            <p><strong>Address:</strong> {order.deliveryAddress}</p>
+            <p><strong>Country:</strong> {order.country}, {order.stateProvince}</p>
+            <p><strong>Postal Code:</strong> {order.postalCode}</p>
+            <p><strong>Contact:</strong> {order.contactEmail} ({order.contactPhone})</p>
           </div>
         </div>
 
-        {/* Total + Payment ref */}
+        {/* Items */}
+        <div className="mg-modal-section">
+          <div className="mg-modal-section-title">Order Items</div>
+          <div style={{ fontSize: '0.9rem' }}>
+            {order.magazineType} × {order.quantity} copies
+          </div>
+        </div>
+
+        {/* Total */}
         <div className="mg-modal-meta">
           <div className="mg-modal-meta-row">
             <span>Order Total</span>
-            <strong>{currSymbol}{order.total}</strong>
+            <strong>{currSymbol}{order.totalAmount}</strong>
           </div>
-          {order.paymentRef && (
-            <div className="mg-modal-meta-row">
-              <span>Payment Reference</span>
-              <strong>{order.paymentRef}</strong>
-            </div>
-          )}
         </div>
 
         {/* Timeline */}
@@ -170,8 +243,21 @@ export default function Magazine() {
   const navigate = useNavigate();
   const [view, setView]           = useState('home');
   const [step, setStep]           = useState(0);
-  const [orders, setOrders]       = useState(MOCK_ORDERS);
+  const [orders, setOrders]       = useState([]);
   const [viewOrder, setViewOrder] = useState(null);
+
+  React.useEffect(() => {
+    fetchOrders();
+  }, [user]);
+
+  const fetchOrders = () => {
+    if (!user) return;
+    const url = `${process.env.REACT_APP_API_URL}/api/magazine/orders?role=${user.role}&zone=${user.zone || ''}`;
+    fetch(url)
+      .then(res => res.json())
+      .then(data => setOrders(data))
+      .catch(err => console.error(err));
+  };
 
   const [paymentMethod, setPaymentMethod] = useState('');
   const [paymentRef,    setPaymentRef]    = useState('');
@@ -276,6 +362,17 @@ export default function Magazine() {
     setStep(3);
   };
 
+  const handleOrderAction = (orderId, action) => {
+    fetch(`${process.env.REACT_APP_API_URL}/api/magazine/orders/${orderId}/${action}`, { method: 'POST' })
+      .then(res => {
+        if (!res.ok) throw new Error();
+        showToast({ title: 'Success', message: `Order status updated to ${action}.` });
+        fetchOrders();
+        setViewOrder(null);
+      })
+      .catch(() => showToast({ title: 'Error', message: 'Failed to update order status.' }));
+  };
+
   const resetOrder = () => {
     setSelections(MAGAZINE_TYPES.reduce((acc, m) => ({ ...acc, [m.id]: { qty: 0, languages: ['English'] } }), {}));
     setStep(0);
@@ -285,6 +382,7 @@ export default function Magazine() {
     setPaymentError('');
     setPaymentDone(false);
     setView('home');
+    fetchOrders();
   };
 
   return (
@@ -324,37 +422,32 @@ export default function Magazine() {
           </div>
 
           <div className="mg-panel">
-            <h3>My Orders</h3>
+            <h3>{user?.role === 'admin' ? 'All Magazine Orders' : 'My Orders'}</h3>
             {orders.length === 0 ? (
               <div className="mg-empty">
                 <Package size={32} color="var(--text-muted)" />
-                <p>No orders yet. Place your first order!</p>
-                <button className="mg-order-btn" onClick={() => setView('order')}>Place Order</button>
+                <p>No orders found.</p>
+                {user?.role === 'zonal' && <button className="mg-order-btn" onClick={() => setView('order')}>Place Order</button>}
               </div>
             ) : (
               <div className="mg-table-wrapper" style={{ overflowX: 'auto', width: '100%', WebkitOverflowScrolling: 'touch' }}>
                 <table className="mg-table">
                   <thead>
                     <tr>
-                      <th>Order ID</th><th>Date</th><th>Items</th>
+                      <th>Order ID</th><th>Date</th><th>By</th><th>Qty</th>
                       <th>Total</th><th>Status</th><th>Action</th>
                     </tr>
                   </thead>
                   <tbody>
                     {orders.map(o => {
-                      const sc = STATUS_COLORS[o.status] || STATUS_COLORS.pending;
+                      const sc = STATUS_COLORS[o.status.toLowerCase()] || STATUS_COLORS.pending;
                       return (
                         <tr key={o.id}>
-                          <td className="mg-id">{o.id}</td>
-                          <td>{o.date}</td>
-                          <td>
-                            {o.items.map((item, i) => (
-                              <div key={i} style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
-                                {item.qty}× {item.type} ({item.lang.join(', ')})
-                              </div>
-                            ))}
-                          </td>
-                          <td className="mg-amount">{currSymbol}{o.total}</td>
+                          <td className="mg-id">#{o.id}</td>
+                          <td>{new Date(o.orderedAt).toLocaleDateString()}</td>
+                          <td>{o.orderedBy}</td>
+                          <td>{o.quantity}</td>
+                          <td className="mg-amount">{currSymbol}{o.totalAmount}</td>
                           <td>
                             <span className="mg-status-badge" style={{ background: sc.bg, color: sc.color }}>
                               {o.status.charAt(0).toUpperCase() + o.status.slice(1)}
@@ -654,7 +747,13 @@ export default function Magazine() {
       )}
 
       {/* Order Preview Modal */}
-      <OrderModal order={viewOrder} onClose={() => setViewOrder(null)} currSymbol={currSymbol} />
+      <OrderModal 
+        order={viewOrder} 
+        onClose={() => setViewOrder(null)} 
+        currSymbol={currSymbol} 
+        onAction={handleOrderAction}
+        userRole={user?.role}
+      />
     </div>
   );
 }
