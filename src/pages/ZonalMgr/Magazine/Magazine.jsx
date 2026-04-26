@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { ShoppingCart, Package, Bell, CheckCircle, ChevronRight, CreditCard, Upload, AlertCircle, X } from 'lucide-react';
 import { useSettings } from '../../../context/SettingsContext';
+import { useAuth } from '../../../auth/AuthContext';
 import { useNotifications } from '../../../context/NotificationContext';
 import { useToast } from '../../../context/ToastContext';
 import { useNavigate } from 'react-router-dom';
@@ -163,6 +164,7 @@ function OrderModal({ order, onClose, currSymbol }) {
 // ── Main Component ─────────────────────────────────────────────
 export default function Magazine() {
   const { t, currSymbol } = useSettings();
+  const { user } = useAuth();
   const { addNotification } = useNotifications();
   const { showToast } = useToast();
   const navigate = useNavigate();
