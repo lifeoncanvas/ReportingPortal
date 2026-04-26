@@ -43,6 +43,7 @@ export default function RoleRouter() {
           <Route path="reporting"     element={<ReportingPortal />} />
           <Route path="finance"       element={<FinancePortal />} />
           <Route path="analytics"     element={<Analytics />} />
+          <Route path="magazine"      element={<Magazine />} />
           <Route path="audit"         element={<GlobalAuditLogs />} />
           <Route path="notifications" element={<Notifications />} />
           <Route path="settings"      element={<Settings />} />
@@ -81,6 +82,7 @@ export default function RoleRouter() {
           <Route path="reporting"      element={<AdminReporting />} />
           <Route path="finance"        element={<AdminFinance />} />
           <Route path="analytics"      element={<AdminAnalytics />} />
+          <Route path="magazine"       element={<Magazine />} />
           <Route path="audit"          element={<AdminAuditLogs />} />
           <Route path="notifications"  element={<Notifications />} />
           <Route path="settings"       element={<Settings />} />

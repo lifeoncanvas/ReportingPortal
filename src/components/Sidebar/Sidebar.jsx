@@ -24,6 +24,7 @@ export default function Sidebar({ isOpen, onClose }) {
       { label: t?.reportingPortal || 'Reporting Portal',icon: FileText,         path: '/global/reporting' },
       { label: t?.financePortal   || 'Finance Portal',  icon: DollarSign,       path: '/global/finance'   },
       { label: t?.analytics       || 'Analytics',       icon: BarChart2,        path: '/global/analytics' },
+      { label: t?.magazine        || 'Magazine',        icon: BookOpen,         path: '/global/magazine'  },
       { label: t?.auditLogs       || 'Audit Logs',      icon: ClipboardList,    path: '/global/audit'     },
     ],
     zonal: [
@@ -38,6 +39,7 @@ export default function Sidebar({ isOpen, onClose }) {
       { label: t?.reportingPortal || 'Reporting Portal',icon: FileText,         path: '/admin/reporting'  },
       { label: t?.financePortal   || 'Finance Portal',  icon: DollarSign,       path: '/admin/finance'    },
       { label: t?.analytics       || 'Analytics',       icon: BarChart2,        path: '/admin/analytics'  },
+      { label: t?.magazine        || 'Magazine',        icon: BookOpen,         path: '/admin/magazine'  },
       { label: t?.auditLogs       || 'Audit Logs',      icon: ClipboardList,    path: '/admin/audit'      },
     ],
   };
