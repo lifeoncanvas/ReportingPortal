@@ -12,13 +12,6 @@ const KPI = [
   { label: 'Active Roles',  value: '3',      pct: '',     iconBg: '#fff7ed', iconColor: '#ea580c', icon: Shield     },
 ];
 
-const USERS = [
-  { initials: 'G', bg: '#e0e7ff', color: '#4f46e5', name: 'Global Partnership Manager', email: 'global@loveworld.com', role: 'Global',  roleBg: '#ede9fe', roleColor: '#5b21b6', status: 'active'   },
-  { initials: 'Z', bg: '#dbeafe', color: '#1d4ed8', name: 'Zonal Partnership Manager',  email: 'zonal@loveworld.com',  role: 'Zonal',   roleBg: '#dbeafe', roleColor: '#1d4ed8', status: 'active'   },
-  { initials: 'S', bg: '#fef9c3', color: '#a16207', name: 'System Administrator',        email: 'admin@loveworld.com',  role: 'Admin',   roleBg: '#fef9c3', roleColor: '#a16207', status: 'active'   },
-  { initials: 'F', bg: '#fce7f3', color: '#9d174d', name: 'Finance Manager',             email: 'finance@loveworld.com',role: 'Finance', roleBg: '#fce7f3', roleColor: '#9d174d', status: 'inactive' },
-];
-
 const LOGS = [
   { dot: '#4f46e5', action: 'Created new user',       module: 'User Mgmt',  moduleBg: '#ede9fe', moduleColor: '#5b21b6', user: 'System Administrator', time: '3/10/2026 2:00 PM'  },
   { dot: '#16a34a', action: 'Submitted weekly report', module: 'Reporting',  moduleBg: '#dcfce7', moduleColor: '#16a34a', user: 'John Smith',           time: '3/8/2026 4:00 PM'   },
@@ -48,12 +41,21 @@ export default function AdminDashboard() {
   const magazineNotifs = notifications.filter(n => n.icon === 'magazine').slice(0, 5);
   const { user } = useAuth();
   const [stats, setStats] = React.useState(null);
+  const [users, setUsers] = React.useState([]);
 
   React.useEffect(() => {
     fetch(`${process.env.REACT_APP_API_URL}/api/dashboard/stats`)
-      .then(res => res.json())
+      .then(res => {
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        return res.json();
+      })
       .then(data => setStats(data))
-      .catch(err => console.error(err));
+      .catch(err => console.error("Stats API error:", err));
+
+    fetch(`${process.env.REACT_APP_API_URL}/api/users`)
+      .then(res => res.json())
+      .then(data => setUsers(data.slice(0, 4)))
+      .catch(err => console.error("Users API error:", err));
   }, []);
 
   const today = new Date().toLocaleDateString('en-US', {
@@ -109,19 +111,19 @@ export default function AdminDashboard() {
               View all →
             </button>
           </div>
-          {USERS.map((u, i) => (
+          {users.map((u, i) => (
             <div className="ad-user-row" key={i}>
-              <div className="ad-user-av" style={{ background: u.bg, color: u.color }}>
-                {u.initials}
+              <div className="ad-user-av" style={{ background: '#ede9fe', color: '#5b21b6' }}>
+                {u.firstName?.charAt(0) || u.name?.charAt(0) || 'U'}
               </div>
               <div className="ad-user-info">
-                <p>{u.name}</p>
+                <p>{u.firstName} {u.lastName}</p>
                 <span>{u.email}</span>
               </div>
-              <span className="ad-badge" style={{ background: u.roleBg, color: u.roleColor }}>
+              <span className="ad-badge" style={{ background: '#ede9fe', color: '#5b21b6' }}>
                 {u.role}
               </span>
-              <span className={`ad-status ${u.status}`}>{u.status}</span>
+              <span className={`ad-status ${u.status || 'active'}`}>{u.status || 'active'}</span>
             </div>
           ))}
         </div>
