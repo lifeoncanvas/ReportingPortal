@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSettings } from '../../../context/SettingsContext';
+import { useAuth } from '../../../auth/AuthContext';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import './styles.css';
 
@@ -20,20 +21,31 @@ const activity = [
 
 export default function ZonalDashboard() {
   const navigate = useNavigate();
-  const { t } = useSettings();
+  const { t, currSymbol } = useSettings();
+  const { user } = useAuth();
+  const [stats, setStats] = React.useState(null);
+
+  React.useEffect(() => {
+    if (user?.email) {
+      fetch(`${process.env.REACT_APP_API_URL}/api/dashboard/stats?email=${user.email}`)
+        .then(res => res.json())
+        .then(data => setStats(data))
+        .catch(err => console.error(err));
+    }
+  }, [user]);
 
   const today = new Date().toLocaleDateString('en-US', {
     weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
   });
 
   const KPI = [
-    { label: t.totalReports,    value: '5',      sub: '5 this week',        pct: '+12%', iconBg: '#ede9fe', iconColor: '#5b21b6',
+    { label: t.totalReports,    value: stats?.totalReports || '0',      sub: `${stats?.reportsThisWeek || 0} this week`,        pct: '+12%', iconBg: '#ede9fe', iconColor: '#5b21b6',
       icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> },
-    { label: t.totalFinance,    value: '$24.9K', sub: '5 entries',          pct: '+8%',  iconBg: '#dcfce7', iconColor: '#16a34a',
+    { label: t.totalFinance,    value: `${currSymbol}${stats?.totalFinance?.toLocaleString() || '0'}`, sub: `${stats?.financeEntries || 0} entries`,          pct: '+8%',  iconBg: '#dcfce7', iconColor: '#16a34a',
       icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg> },
-    { label: t.totalAttendance, value: '2460',   sub: 'Across all regions', pct: '+24%', iconBg: '#e0f2fe', iconColor: '#0284c7',
+    { label: t.totalAttendance, value: stats?.totalAttendance?.toLocaleString() || '0',   sub: 'For your zone', pct: '+24%', iconBg: '#e0f2fe', iconColor: '#0284c7',
       icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg> },
-    { label: t.completionRate,  value: '92%',    sub: 'This week',          pct: '+18%', iconBg: '#fff7ed', iconColor: '#ea580c',
+    { label: t.completionRate,  value: `${stats?.completionRate?.toFixed(0) || 0}%`,    sub: 'This week',          pct: '+18%', iconBg: '#fff7ed', iconColor: '#ea580c',
       icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg> },
   ];
 
@@ -84,13 +96,13 @@ export default function ZonalDashboard() {
         <div className="zd-card">
           <h3>{t.campaignPerformance}</h3>
           <ResponsiveContainer width="100%" height={260}>
-            <BarChart data={campaignData} barSize={44}>
+            <BarChart data={stats?.campaignPerformance || []} barSize={44}>
               <CartesianGrid strokeDasharray="4 3" stroke="#f3f4f6" vertical={false}/>
               <XAxis dataKey="name" tick={{ fontSize: 11, fill: '#9ca3af' }} axisLine={false} tickLine={false}/>
               <YAxis tick={{ fontSize: 11, fill: '#9ca3af' }} axisLine={false} tickLine={false}/>
               <Tooltip contentStyle={{ borderRadius: 8, border: '1px solid #e5e7eb', fontSize: 12 }}/>
               <Legend iconType="square" iconSize={10} wrapperStyle={{ fontSize: 12 }}/>
-              <Bar dataKey="Attendance" name={t.attendance} fill="#4f46e5" radius={[6,6,0,0]}/>
+              <Bar dataKey="attendance" name={t.attendance} fill="#4f46e5" radius={[6,6,0,0]}/>
             </BarChart>
           </ResponsiveContainer>
         </div>
@@ -98,7 +110,7 @@ export default function ZonalDashboard() {
         <div className="zd-card">
           <h3>{t.recentActivity}</h3>
           <div className="zd-activity">
-            {activity.map((a, i) => (
+            {(stats?.recentActivity || []).map((a, i) => (
               <div className="zd-act-item" key={i}>
                 <div className="zd-act-icon">
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#16a34a" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -107,8 +119,8 @@ export default function ZonalDashboard() {
                   </svg>
                 </div>
                 <div className="zd-act-info">
-                  <p>{a.name}</p>
-                  <span>{a.action}</span>
+                  <p>{a.user}</p>
+                  <span>Submitted report for {a.zone}</span>
                   <span className="zd-act-date">{a.date}</span>
                 </div>
               </div>
