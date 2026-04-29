@@ -176,6 +176,12 @@
 
 .header-dropdown-signout:hover { background: #fff5f5; }
 
+.mobile-menu-btn {
+  display: none;
+}
+
+
+
 @media (max-width: 768px) {
   .mobile-menu-btn {
     display: flex;
