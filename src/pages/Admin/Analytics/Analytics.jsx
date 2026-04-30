@@ -1,268 +1,707 @@
 import React, { useState } from 'react';
-import { Download } from 'lucide-react';
 import {
-  AreaChart, Area, BarChart, Bar, LineChart, Line,
-  PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid,
-  Tooltip, Legend, ResponsiveContainer,
+  LineChart, Line, BarChart, Bar, PieChart, Pie, Cell,
+  XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend
 } from 'recharts';
+import './styles.css';
 
-// ── All Global Managers data ───────────────────────────────────
-const GLOBAL_MANAGERS = [
-  { name: 'Global Mgr — Africa',        zones: 8,  attendance: 18400, finance: 284000, reports: 96,  completion: '94%', color: '#4f46e5' },
-  { name: 'Global Mgr — Europe',        zones: 6,  attendance: 12200, finance: 198000, reports: 72,  completion: '88%', color: '#22d3ee' },
-  { name: 'Global Mgr — Americas',      zones: 7,  attendance: 15800, finance: 241000, reports: 84,  completion: '91%', color: '#22c55e' },
-  { name: 'Global Mgr — Asia Pacific',  zones: 5,  attendance: 9600,  finance: 152000, reports: 60,  completion: '85%', color: '#f97316' },
-  { name: 'Global Mgr — South America', zones: 4,  attendance: 7200,  finance: 118000, reports: 48,  completion: '82%', color: '#a855f7' },
+// ── Icons ────────────────────────────────────────────
+const TrendUpIcon = ({ color = '#22c55e' }) => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+    <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+);
+
+const FilterIcon = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
+  </svg>
+);
+
+const ChevronIcon = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+    <polyline points="6 9 12 15 18 9" />
+  </svg>
+);
+
+const BellIcon = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+    <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+  </svg>
+);
+
+const SettingsIcon = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="12" cy="12" r="3" />
+    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+  </svg>
+);
+
+// ── Data ─────────────────────────────────────────────
+const DATA = {
+  overview: {
+    kpis: [
+      { label: 'Total Reports', value: '247', trend: '+18%', icon: '📊', color: 'purple' },
+      { label: 'New Partners',  value: '318',  trend: '+9%',  icon: '🤝', color: 'green' },
+      { label: 'Total Remittance', value: '₦2.4M', trend: '+12%', icon: '💰', color: 'amber' },
+      { label: 'Testimonies',  value: '524',  trend: '+34%', icon: '✍️', color: 'blue' },
+      { label: 'Outreach Events', value: '82', trend: '+6%', icon: '📍', color: 'teal' },
+      { label: 'Completion Rate', value: '87%', trend: '+3%', icon: '✅', color: 'green' },
+    ],
+    trend: [
+      { week: 'Week 1', submissions: 24 },
+      { week: 'Week 2', submissions: 31 },
+      { week: 'Week 3', submissions: 38 },
+      { week: 'Week 4', submissions: 52 },
+    ],
+    categoryDist: [
+      { name: 'Zonal',         value: 68,  color: '#818cf8' },
+      { name: 'Partnership',   value: 54,  color: '#22c55e' },
+      { name: 'Testimonials',  value: 71,  color: '#f59e0b' },
+      { name: 'Magazine',      value: 32,  color: '#ef4444' },
+      { name: 'Outreach',      value: 22,  color: '#2dd4bf' },
+    ],
+    targets: [
+      { label: 'Partnership Remittance', pct: 78, color: '#f59e0b', target: '10,000 espees', achieved: '7,800' },
+      { label: 'New Partners Recruited', pct: 92, color: '#22c55e', target: '10 / week',     achieved: '9.2 avg' },
+      { label: 'Testimonies Submitted',  pct: 61, color: '#818cf8', target: '50 / week',     achieved: '30.5 avg' },
+      { label: 'HTTNM Outreaches',       pct: 84, color: '#2dd4bf', target: '10 / week',     achieved: '8.4 avg' },
+    ],
+  },
+  zonal: {
+    kpis: [
+      { label: 'Active Zones',       value: '24',    trend: '+2',   icon: '🏛️', color: 'purple' },
+      { label: 'Reports Submitted',  value: '68',    trend: '+18%', icon: '📋', color: 'blue' },
+      { label: 'Avg New Partners',   value: '9.2',   trend: '+9%',  icon: '🤝', color: 'green' },
+      { label: 'Total Remittance',   value: '₦1.87M', trend: '+12%', icon: '💰', color: 'amber' },
+    ],
+    remittance: [
+      { zone: 'Zone A', amount: 124 }, { zone: 'Zone B', amount: 98 },
+      { zone: 'Zone C', amount: 145 }, { zone: 'Zone D', amount: 76 },
+      { zone: 'Zone E', amount: 110 }, { zone: 'Zone F', amount: 92 },
+      { zone: 'Zone G', amount: 133 },
+    ],
+    attendance: { pastor: { yes: 18, no: 4, excused: 2 }, manager: { yes: 21, no: 2, excused: 1 } },
+    httnm: [
+      { label: 'Translations completed', value: '11' },
+      { label: 'Outreaches held',        value: '67' },
+      { label: 'Pictures / Videos',      value: '48' },
+      { label: 'Avg outreaches per zone', value: '2.8' },
+      { label: 'Zones hitting target',   value: '16 / 24' },
+    ],
+    zones: [
+      { id: 'ZR-001', name: 'Zone A', manager: 'Bro. Emmanuel', remit: '₦124K', partners: 12, outreaches: 8, status: 'On track' },
+      { id: 'ZR-002', name: 'Zone B', manager: 'Sis. Chisom',   remit: '₦98K',  partners: 9,  outreaches: 6, status: 'Submitted' },
+      { id: 'ZR-003', name: 'Zone C', manager: 'Bro. Femi',     remit: '₦145K', partners: 14, outreaches: 11, status: 'On track' },
+      { id: 'ZR-004', name: 'Zone D', manager: 'Sis. Adaobi',   remit: '₦76K',  partners: 7,  outreaches: 5,  status: 'Partial' },
+      { id: 'ZR-005', name: 'Zone E', manager: 'Bro. Kehinde',  remit: '₦110K', partners: 11, outreaches: 9,  status: 'Submitted' },
+    ],
+  },
+  partnership: {
+    kpis: [
+      { label: 'Total Remittance', value: '₦2.4M',  trend: '+12%', icon: '💰', color: 'green' },
+      { label: 'Reports Filed',    value: '54',      trend: '+8%',  icon: '📋', color: 'blue' },
+      { label: 'New Partners',     value: '318',     trend: '+9%',  icon: '🤝', color: 'amber' },
+      { label: 'Arms Active',      value: '4',       trend: '—',    icon: '📡', color: 'purple' },
+    ],
+    arms: [
+      { key: 'healingSchool', icon: '🏥', label: 'Healing School',      amount: '₦840K', zones: 18, color: '#ef4444' },
+      { key: 'rhapsody',      icon: '📖', label: 'Rhapsody of Realities', amount: '₦720K', zones: 24, color: '#f59e0b' },
+      { key: 'innercity',     icon: '🏙️', label: 'Inner City Mission',    amount: '₦510K', zones: 15, color: '#22c55e' },
+      { key: 'lbn',           icon: '📡', label: 'LBN',                   amount: '₦330K', zones: 11, color: '#4a9eff' },
+    ],
+    dist: [
+      { name: 'Healing School', value: 840, color: '#ef4444' },
+      { name: 'Rhapsody',       value: 720, color: '#f59e0b' },
+      { name: 'Inner City',     value: 510, color: '#22c55e' },
+      { name: 'LBN',            value: 330, color: '#4a9eff' },
+    ],
+    trend: [
+      { month: 'Nov', healingSchool: 620, rhapsody: 520, innerCity: 380, lbn: 240 },
+      { month: 'Dec', healingSchool: 780, rhapsody: 640, innerCity: 420, lbn: 280 },
+      { month: 'Jan', healingSchool: 710, rhapsody: 580, innerCity: 450, lbn: 290 },
+      { month: 'Feb', healingSchool: 840, rhapsody: 690, innerCity: 490, lbn: 320 },
+      { month: 'Mar', healingSchool: 760, rhapsody: 680, innerCity: 500, lbn: 310 },
+      { month: 'Apr', healingSchool: 840, rhapsody: 720, innerCity: 510, lbn: 330 },
+    ],
+  },
+  testimonials: {
+    kpis: [
+      { label: 'Total Testimonies',   value: '524', trend: '+34%', icon: '✍️', color: 'amber' },
+      { label: 'With Before/After',   value: '213', trend: '+21%', icon: '🖼️', color: 'blue' },
+      { label: 'With Documents',      value: '87',  trend: '+15%', icon: '📄', color: 'green' },
+      { label: 'Avg per Zone',        value: '21.8', trend: '+9%', icon: '📊', color: 'purple' },
+    ],
+    weekly: [
+      { week: 'W1', target: 50, actual: 30 }, { week: 'W2', target: 50, actual: 38 },
+      { week: 'W3', target: 50, actual: 44 }, { week: 'W4', target: 50, actual: 41 },
+      { week: 'W5', target: 50, actual: 52 }, { week: 'W6', target: 50, actual: 48 },
+      { week: 'W7', target: 50, actual: 58 }, { week: 'W8', target: 50, actual: 62 },
+    ],
+    zones: [
+      { id: 'TS-C', zone: 'Zone C', count: 48, pct: '96%', media: 32, docs: 12, status: 'On track' },
+      { id: 'TS-A', zone: 'Zone A', count: 44, pct: '88%', media: 28, docs: 9,  status: 'On track' },
+      { id: 'TS-E', zone: 'Zone E', count: 37, pct: '74%', media: 19, docs: 7,  status: 'Submitted' },
+      { id: 'TS-B', zone: 'Zone B', count: 29, pct: '58%', media: 14, docs: 4,  status: 'Submitted' },
+      { id: 'TS-D', zone: 'Zone D', count: 18, pct: '36%', media: 8,  docs: 1,  status: 'Below' },
+    ],
+  },
+  magazine: {
+    kpis: [
+      { label: 'Reports Filed',    value: '32',    trend: '+5%',  icon: '📋', color: 'blue' },
+      { label: 'Copies Ordered',   value: '14.2K', trend: '-3%',  icon: '📚', color: 'amber' },
+      { label: 'Copies Received',  value: '11.8K', trend: '+2%',  icon: '📬', color: 'green' },
+      { label: 'Languages Active', value: '7',     trend: '—',    icon: '🌍', color: 'purple' },
+    ],
+    languages: [
+      { lang: 'English',    ordered: 5200, received: 5200, pct: 100 },
+      { lang: 'French',     ordered: 2800, received: 2350, pct: 84 },
+      { lang: 'Yoruba',     ordered: 2100, received: 0,    pct: 0 },
+      { lang: 'Hausa',      ordered: 1500, received: 1500, pct: 100 },
+      { lang: 'Igbo',       ordered: 1200, received: 980,  pct: 82 },
+      { lang: 'Portuguese', ordered: 900,  received: 900,  pct: 100 },
+      { lang: 'Spanish',    ordered: 500,  received: 420,  pct: 84 },
+    ],
+    receipt: [
+      { name: 'Received', value: 22, color: '#22c55e' },
+      { name: 'Partial',  value: 7,  color: '#f59e0b' },
+      { name: 'Not Yet',  value: 3,  color: '#ef4444' },
+    ],
+    orders: [
+      { id: 'MG-001', lang: 'English',  ordered: 500, received: 500, status: 'Yes',     reason: '—' },
+      { id: 'MG-002', lang: 'French',   ordered: 300, received: 250, status: 'Partial', reason: 'Logistics delay' },
+      { id: 'MG-003', lang: 'Yoruba',   ordered: 400, received: 0,   status: 'No',      reason: 'Not dispatched' },
+      { id: 'MG-004', lang: 'Hausa',    ordered: 200, received: 200, status: 'Yes',     reason: '—' },
+    ],
+  },
+  outreach: {
+    kpis: [
+      { label: 'Outreach Reports',   value: '22',  trend: '+6%',  icon: '📍', color: 'teal' },
+      { label: 'Locations Covered',  value: '82',  trend: '+11%', icon: '🗺️', color: 'blue' },
+      { label: 'Photos Submitted',   value: '347', trend: '+24%', icon: '📸', color: 'green' },
+      { label: 'Avg Locations/Event',value: '3.7', trend: '+5%',  icon: '📊', color: 'amber' },
+    ],
+    weekly: [
+      { week: 'W1', events: 8 }, { week: 'W2', events: 11 }, { week: 'W3', events: 9 },
+      { week: 'W4', events: 14 }, { week: 'W5', events: 12 }, { week: 'W6', events: 16 },
+      { week: 'W7', events: 10 }, { week: 'W8', events: 18 },
+    ],
+    reports: [
+      { id: 'OR-001', date: '25 Apr 2026', locations: 'Lagos Island, Surulere', photos: 24, status: 'Reviewed' },
+      { id: 'OR-002', date: '24 Apr 2026', locations: 'Ikeja Market',           photos: 18, status: 'Submitted' },
+      { id: 'OR-003', date: '22 Apr 2026', locations: 'Oshodi, Agege, Mushin',  photos: 31, status: 'Reviewed' },
+      { id: 'OR-004', date: '20 Apr 2026', locations: 'Victoria Island',         photos: 12, status: 'Submitted' },
+      { id: 'OR-005', date: '18 Apr 2026', locations: 'Lekki Phase 1',           photos: 0,  status: 'No Media' },
+    ],
+  },
+};
+
+const TABS = [
+  { id: 'overview',      label: 'Overview',     dot: '#c9a84c' },
+  { id: 'zonal',         label: 'Zonal',        dot: '#818cf8' },
+  { id: 'partnership',   label: 'Partnership',  dot: '#22c55e' },
+  { id: 'testimonials',  label: 'Testimonials', dot: '#f59e0b' },
+  { id: 'magazine',      label: 'Magazine',     dot: '#ef4444' },
+  { id: 'outreach',      label: 'Outreach',     dot: '#2dd4bf' },
 ];
 
-const TREND_DATA = [
-  { month: 'Jan', africa: 14000, europe: 9200,  americas: 11800, asia: 7100,  sa: 5400  },
-  { month: 'Feb', africa: 15200, europe: 10100, americas: 12600, asia: 7800,  sa: 5900  },
-  { month: 'Mar', africa: 16800, europe: 10900, americas: 13900, asia: 8400,  sa: 6300  },
-  { month: 'Apr', africa: 17200, europe: 11400, americas: 14600, asia: 8900,  sa: 6700  },
-  { month: 'May', africa: 17900, europe: 11800, americas: 15200, asia: 9200,  sa: 6900  },
-  { month: 'Jun', africa: 18400, europe: 12200, americas: 15800, asia: 9600,  sa: 7200  },
-];
+const COLOR_MAP = {
+  purple: { bg: '#f0effe', icon: '#818cf8' },
+  green:  { bg: '#f0fdf4', icon: '#22c55e' },
+  amber:  { bg: '#fffbeb', icon: '#f59e0b' },
+  blue:   { bg: '#eff6ff', icon: '#4a9eff' },
+  teal:   { bg: '#f0fdfa', icon: '#2dd4bf' },
+  red:    { bg: '#fef2f2', icon: '#ef4444' },
+};
 
-const FINANCE_TREND = [
-  { month: 'Jan', total: 820000  },
-  { month: 'Feb', total: 890000  },
-  { month: 'Mar', total: 940000  },
-  { month: 'Apr', total: 970000  },
-  { month: 'May', total: 1010000 },
-  { month: 'Jun', total: 1090000 },
-];
+const STATUS_CLASS = {
+  'On track': 'badge-green', 'Reviewed': 'badge-green',
+  'Submitted': 'badge-blue', 'Partial': 'badge-amber',
+  'Below': 'badge-red', 'No Media': 'badge-red',
+  'Yes': 'badge-green', 'No': 'badge-red',
+};
 
-const ZONE_BREAKDOWN = [
-  { zone: 'Zone A', mgr: 'Africa',   attendance: 2400, finance: 38000, status: 'Active'   },
-  { zone: 'Zone B', mgr: 'Europe',   attendance: 1800, finance: 29000, status: 'Active'   },
-  { zone: 'Zone C', mgr: 'Americas', attendance: 2100, finance: 34000, status: 'Active'   },
-  { zone: 'Zone D', mgr: 'Africa',   attendance: 1600, finance: 26000, status: 'Active'   },
-  { zone: 'Zone E', mgr: 'Asia',     attendance: 1200, finance: 19000, status: 'Inactive' },
-  { zone: 'Zone F', mgr: 'Americas', attendance: 2800, finance: 44000, status: 'Active'   },
-];
+// ── Sub-components ────────────────────────────────────
+function KpiCard({ label, value, trend, icon, color }) {
+  const c = COLOR_MAP[color] || COLOR_MAP.blue;
+  const isNeg = trend.startsWith('-');
+  const isNeutral = trend === '—';
+  return (
+    <div className="kpi-card">
+      <div className="kpi-card-top">
+        <div className="kpi-icon" style={{ background: c.bg }}>
+          <span style={{ fontSize: 18 }}>{icon}</span>
+        </div>
+        {!isNeutral && (
+          <span className={`kpi-trend ${isNeg ? 'neg' : 'pos'}`}>
+            <TrendUpIcon color={isNeg ? '#ef4444' : '#22c55e'} />
+            {trend}
+          </span>
+        )}
+      </div>
+      <div className="kpi-value">{value}</div>
+      <div className="kpi-label">{label}</div>
+    </div>
+  );
+}
 
-const CAMPAIGN_DIST = [
-  { name: 'Spring Outreach', value: 35, color: '#4f46e5' },
-  { name: 'Easter Campaign', value: 22, color: '#22d3ee' },
-  { name: 'Healing Streams', value: 43, color: '#22c55e' },
-];
+function SectionCard({ title, icon, children, noPad }) {
+  return (
+    <div className="section-card">
+      <div className="section-card-header">
+        <span className="section-card-icon">{icon}</span>
+        <span className="section-card-title">{title}</span>
+      </div>
+      <div className={noPad ? 'section-card-body no-pad' : 'section-card-body'}>
+        {children}
+      </div>
+    </div>
+  );
+}
 
-const TOTAL_KPI = [
-  { label: 'Total Attendance',    value: '63,200',  pct: '+28%', bg: '#ede9fe', color: '#5b21b6' },
-  { label: 'Total Finance',       value: '$993K',   pct: '+33%', bg: '#fef9c3', color: '#a16207' },
-  { label: 'Global Managers',     value: '5',       pct: '',     bg: '#e0f2fe', color: '#0284c7' },
-  { label: 'Total Zones',         value: '30',      pct: '+2',   bg: '#dcfce7', color: '#16a34a' },
-  { label: 'Reports Submitted',   value: '360',     pct: '+18%', bg: '#ffedd5', color: '#c2410c' },
-  { label: 'Avg Completion Rate', value: '88%',     pct: '+4%',  bg: '#f0fdf4', color: '#16a34a' },
-];
+function ProgressRow({ label, pct, color, target, achieved }) {
+  return (
+    <div className="prog-row">
+      <div className="prog-header">
+        <span className="prog-label">{label}</span>
+        <span className="prog-val" style={{ color }}>{pct}%</span>
+      </div>
+      <div className="prog-track">
+        <div className="prog-fill" style={{ width: `${pct}%`, background: color }} />
+      </div>
+      <div className="prog-meta">Target: {target} · Achieved: {achieved}</div>
+    </div>
+  );
+}
 
-export default function AdminAnalytics() {
-  const [selectedMgr, setSelectedMgr] = useState('All');
+function Badge({ status }) {
+  const cls = STATUS_CLASS[status] || 'badge-blue';
+  return <span className={`badge ${cls}`}>{status}</span>;
+}
 
-  const tooltipStyle = {
-    borderRadius: 8, border: '1px solid var(--border-color)',
-    background: 'var(--bg-card)', color: 'var(--text-primary)', fontSize: 12,
-  };
+function DataTable({ headers, rows }) {
+  return (
+    <div style={{ overflowX: 'auto' }}>
+      <table className="data-table">
+        <thead>
+          <tr>{headers.map(h => <th key={h}>{h}</th>)}</tr>
+        </thead>
+        <tbody>
+          {rows.map((row, i) => (
+            <tr key={i}>
+              {row.map((cell, j) => (
+                <td key={j} className={j === 0 ? 'td-id' : ''}>
+                  {cell}
+                </td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
 
-  const handleExport = () => {
-    const html = `<html><head><title>Admin Analytics</title>
-    <style>body{font-family:Arial,sans-serif;font-size:12px;padding:24px}
-    h1{font-size:20px}table{width:100%;border-collapse:collapse;margin:16px 0}
-    th,td{border:1px solid #ddd;padding:8px;text-align:left}th{background:#f3f4f6}</style></head>
-    <body><h1>Admin — Global Analytics Report</h1>
-    <p>Generated: ${new Date().toLocaleDateString()}</p>
-    <h2>Global Managers Performance</h2>
-    <table><thead><tr><th>Manager</th><th>Zones</th><th>Attendance</th><th>Finance</th><th>Reports</th><th>Completion</th></tr></thead>
-    <tbody>${GLOBAL_MANAGERS.map(m => `<tr><td>${m.name}</td><td>${m.zones}</td><td>${m.attendance.toLocaleString()}</td><td>$${m.finance.toLocaleString()}</td><td>${m.reports}</td><td>${m.completion}</td></tr>`).join('')}
-    </tbody></table></body></html>`;
-    const win = window.open('', '_blank');
-    win.document.write(html); win.document.close(); win.print();
-  };
+function AttPill({ val, label, color }) {
+  return (
+    <div className="att-pill">
+      <div className="att-pill-val" style={{ color }}>{val}</div>
+      <div className="att-pill-lbl">{label}</div>
+    </div>
+  );
+}
+
+// ── Custom Tooltip ────────────────────────────────────
+const CustomTooltip = ({ active, payload, label }) => {
+  if (!active || !payload?.length) return null;
+  return (
+    <div className="chart-tooltip">
+      <p className="tooltip-label">{label}</p>
+      {payload.map((p, i) => (
+        <p key={i} style={{ color: p.color, margin: '2px 0', fontSize: 12 }}>
+          {p.name}: <strong>{typeof p.value === 'number' ? p.value.toLocaleString() : p.value}</strong>
+        </p>
+      ))}
+    </div>
+  );
+};
+
+// ── Tab Panels ────────────────────────────────────────
+function OverviewPanel() {
+  const d = DATA.overview;
+  return (
+    <div className="panel">
+      <div className="kpi-grid">
+        {d.kpis.map(k => <KpiCard key={k.label} {...k} />)}
+      </div>
+
+      <div className="two-col">
+        <SectionCard title="Weekly Submission Trend" icon="📈">
+          <ResponsiveContainer width="100%" height={220}>
+            <LineChart data={d.trend}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+              <XAxis dataKey="week" tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
+              <YAxis tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
+              <Tooltip content={<CustomTooltip />} />
+              <Line type="monotone" dataKey="submissions" stroke="#818cf8" strokeWidth={2.5} dot={{ r: 4, fill: '#818cf8' }} name="Submissions" />
+            </LineChart>
+          </ResponsiveContainer>
+        </SectionCard>
+
+        <SectionCard title="Reports by Category" icon="📊">
+          <ResponsiveContainer width="100%" height={220}>
+            <BarChart data={d.categoryDist}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+              <XAxis dataKey="name" tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
+              <YAxis tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
+              <Tooltip content={<CustomTooltip />} />
+              <Bar dataKey="value" radius={[6, 6, 0, 0]} name="Reports">
+                {d.categoryDist.map((entry, i) => (
+                  <Cell key={i} fill={entry.color} />
+                ))}
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
+        </SectionCard>
+      </div>
+
+      <SectionCard title="Weekly Target Attainment" icon="🎯">
+        <div className="targets-grid">
+          {d.targets.map(t => <ProgressRow key={t.label} {...t} />)}
+        </div>
+      </SectionCard>
+    </div>
+  );
+}
+
+function ZonalPanel() {
+  const d = DATA.zonal;
+  return (
+    <div className="panel">
+      <div className="kpi-grid">
+        {d.kpis.map(k => <KpiCard key={k.label} {...k} />)}
+      </div>
+
+      <div className="two-col">
+        <SectionCard title="Remittance per Zone (₦K)" icon="🏛️">
+          <ResponsiveContainer width="100%" height={220}>
+            <BarChart data={d.remittance} layout="vertical">
+              <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" horizontal={false} />
+              <XAxis type="number" tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
+              <YAxis dataKey="zone" type="category" tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false} width={55} />
+              <Tooltip content={<CustomTooltip />} />
+              <Bar dataKey="amount" fill="#c9a84c" radius={[0, 6, 6, 0]} name="₦K" />
+            </BarChart>
+          </ResponsiveContainer>
+        </SectionCard>
+
+        <div className="flex-col-gap">
+          <SectionCard title="Director's Meeting — Pastors" icon="📅">
+            <div className="att-grid">
+              <AttPill val={d.attendance.pastor.yes} label="Present" color="#22c55e" />
+              <AttPill val={d.attendance.pastor.no} label="Absent" color="#ef4444" />
+              <AttPill val={d.attendance.pastor.excused} label="Excused" color="#f59e0b" />
+            </div>
+          </SectionCard>
+          <SectionCard title="Strategy Meeting — Managers" icon="📅">
+            <div className="att-grid">
+              <AttPill val={d.attendance.manager.yes} label="Present" color="#22c55e" />
+              <AttPill val={d.attendance.manager.no} label="Absent" color="#ef4444" />
+              <AttPill val={d.attendance.manager.excused} label="Excused" color="#f59e0b" />
+            </div>
+          </SectionCard>
+        </div>
+      </div>
+
+      <div className="two-col">
+        <SectionCard title="HTTNM Outreach Metrics" icon="📖">
+          {d.httnm.map(s => (
+            <div key={s.label} className="stat-pair">
+              <span className="stat-key">{s.label}</span>
+              <span className="stat-val">{s.value}</span>
+            </div>
+          ))}
+        </SectionCard>
+
+        <SectionCard title="Zone-by-Zone Breakdown" icon="📋" noPad>
+          <DataTable
+            headers={['Zone', 'Manager', 'Remittance', 'Partners', 'Outreaches', 'Status']}
+            rows={d.zones.map(z => [z.name, z.manager, z.remit, z.partners, z.outreaches, <Badge key={z.id} status={z.status} />])}
+          />
+        </SectionCard>
+      </div>
+    </div>
+  );
+}
+
+function PartnershipPanel() {
+  const d = DATA.partnership;
+  return (
+    <div className="panel">
+      <div className="kpi-grid">
+        {d.kpis.map(k => <KpiCard key={k.label} {...k} />)}
+      </div>
+
+      <div className="two-col">
+        <SectionCard title="Remittance by Partnership Arm" icon="💼">
+          <div className="arm-grid">
+            {d.arms.map(a => (
+              <div key={a.key} className="arm-card">
+                <div className="arm-card-top">
+                  <span style={{ fontSize: 20 }}>{a.icon}</span>
+                  <span className="arm-name">{a.label}</span>
+                </div>
+                <div className="arm-amount" style={{ color: a.color }}>{a.amount}</div>
+                <div className="arm-zones">{a.zones} zones reporting</div>
+              </div>
+            ))}
+          </div>
+        </SectionCard>
+
+        <SectionCard title="Arm Distribution" icon="📊">
+          <div className="legend-row">
+            {d.dist.map(x => (
+              <div key={x.name} className="legend-item">
+                <div className="legend-dot" style={{ background: x.color }} />
+                <span>{x.name}</span>
+              </div>
+            ))}
+          </div>
+          <ResponsiveContainer width="100%" height={180}>
+            <PieChart>
+              <Pie data={d.dist} cx="50%" cy="50%" innerRadius={50} outerRadius={80} paddingAngle={3} dataKey="value">
+                {d.dist.map((e, i) => <Cell key={i} fill={e.color} />)}
+              </Pie>
+              <Tooltip content={<CustomTooltip />} />
+            </PieChart>
+          </ResponsiveContainer>
+        </SectionCard>
+      </div>
+
+      <SectionCard title="Monthly Remittance Trend (₦K)" icon="📈">
+        <ResponsiveContainer width="100%" height={240}>
+          <LineChart data={d.trend}>
+            <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+            <XAxis dataKey="month" tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
+            <YAxis tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
+            <Tooltip content={<CustomTooltip />} />
+            <Legend wrapperStyle={{ fontSize: 12, paddingTop: 8 }} />
+            <Line type="monotone" dataKey="healingSchool" stroke="#ef4444" strokeWidth={2} dot={false} name="Healing School" />
+            <Line type="monotone" dataKey="rhapsody"      stroke="#f59e0b" strokeWidth={2} dot={false} name="Rhapsody" />
+            <Line type="monotone" dataKey="innerCity"     stroke="#22c55e" strokeWidth={2} dot={false} name="Inner City" />
+            <Line type="monotone" dataKey="lbn"           stroke="#4a9eff" strokeWidth={2} dot={false} name="LBN" />
+          </LineChart>
+        </ResponsiveContainer>
+      </SectionCard>
+    </div>
+  );
+}
+
+function TestimonialsPanel() {
+  const d = DATA.testimonials;
+  return (
+    <div className="panel">
+      <div className="kpi-grid">
+        {d.kpis.map(k => <KpiCard key={k.label} {...k} />)}
+      </div>
+
+      <div className="two-col">
+        <SectionCard title="Testimonies vs Target (Weekly)" icon="📊">
+          <ResponsiveContainer width="100%" height={220}>
+            <BarChart data={d.weekly}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+              <XAxis dataKey="week" tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
+              <YAxis tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
+              <Tooltip content={<CustomTooltip />} />
+              <Legend wrapperStyle={{ fontSize: 12 }} />
+              <Bar dataKey="target" fill="#e2e8f0" radius={[4, 4, 0, 0]} name="Target" />
+              <Bar dataKey="actual" fill="#f59e0b" radius={[4, 4, 0, 0]} name="Actual" />
+            </BarChart>
+          </ResponsiveContainer>
+        </SectionCard>
+
+        <SectionCard title="Top Zones by Testimonies" icon="🏆" noPad>
+          <DataTable
+            headers={['Zone', 'Count', 'vs Target', 'Media', 'Docs', 'Status']}
+            rows={d.zones.map(z => [z.zone, z.count, z.pct, z.media, z.docs, <Badge key={z.id} status={z.status} />])}
+          />
+        </SectionCard>
+      </div>
+    </div>
+  );
+}
+
+function MagazinePanel() {
+  const d = DATA.magazine;
+  return (
+    <div className="panel">
+      <div className="kpi-grid">
+        {d.kpis.map(k => <KpiCard key={k.label} {...k} />)}
+      </div>
+
+      <div className="two-col">
+        <SectionCard title="Orders by Language" icon="🌍">
+          {d.languages.map(l => (
+            <div key={l.lang} className="prog-row">
+              <div className="prog-header">
+                <span className="prog-label">{l.lang}</span>
+                <span className="prog-val-sm">{l.ordered.toLocaleString()} ordered</span>
+              </div>
+              <div className="prog-track">
+                <div className="prog-fill" style={{ width: `${l.pct}%`, background: l.pct === 100 ? '#22c55e' : l.pct === 0 ? '#ef4444' : '#f59e0b' }} />
+              </div>
+              <div className="prog-meta">{l.received.toLocaleString()} received · {l.pct}% receipt rate</div>
+            </div>
+          ))}
+        </SectionCard>
+
+        <div className="flex-col-gap">
+          <SectionCard title="Receipt Status" icon="📬">
+            <div className="legend-row">
+              {d.receipt.map(r => (
+                <div key={r.name} className="legend-item">
+                  <div className="legend-dot" style={{ background: r.color }} />
+                  <span>{r.name}: <strong>{r.value}</strong></span>
+                </div>
+              ))}
+            </div>
+            <ResponsiveContainer width="100%" height={140}>
+              <PieChart>
+                <Pie data={d.receipt} cx="50%" cy="50%" innerRadius={38} outerRadius={60} paddingAngle={4} dataKey="value">
+                  {d.receipt.map((e, i) => <Cell key={i} fill={e.color} />)}
+                </Pie>
+                <Tooltip content={<CustomTooltip />} />
+              </PieChart>
+            </ResponsiveContainer>
+          </SectionCard>
+
+          <SectionCard title="Magazine Order Details" icon="📋" noPad>
+            <DataTable
+              headers={['ID', 'Language', 'Ordered', 'Received', 'Status']}
+              rows={d.orders.map(o => [o.id, o.lang, o.ordered, o.received, <Badge key={o.id} status={o.status} />])}
+            />
+          </SectionCard>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function OutreachPanel() {
+  const d = DATA.outreach;
+  return (
+    <div className="panel">
+      <div className="kpi-grid">
+        {d.kpis.map(k => <KpiCard key={k.label} {...k} />)}
+      </div>
+
+      <div className="two-col">
+        <SectionCard title="Outreach Events by Week" icon="📈">
+          <ResponsiveContainer width="100%" height={220}>
+            <BarChart data={d.weekly}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+              <XAxis dataKey="week" tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
+              <YAxis tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
+              <Tooltip content={<CustomTooltip />} />
+              <Bar dataKey="events" fill="#2dd4bf" radius={[6, 6, 0, 0]} name="Events" />
+            </BarChart>
+          </ResponsiveContainer>
+        </SectionCard>
+
+        <SectionCard title="Recent Outreach Reports" icon="📋" noPad>
+          <DataTable
+            headers={['ID', 'Date', 'Locations', 'Photos', 'Status']}
+            rows={d.reports.map(r => [r.id, r.date, r.locations, r.photos, <Badge key={r.id} status={r.status} />])}
+          />
+        </SectionCard>
+      </div>
+    </div>
+  );
+}
+
+const PANEL_MAP = {
+  overview: OverviewPanel,
+  zonal: ZonalPanel,
+  partnership: PartnershipPanel,
+  testimonials: TestimonialsPanel,
+  magazine: MagazinePanel,
+  outreach: OutreachPanel,
+};
+
+// ── Main Component ────────────────────────────────────
+export default function AnalyticsDashboard() {
+  const [activeTab, setActiveTab] = useState('overview');
+  const [timeRange, setTimeRange] = useState('This Month');
+  const [zone, setZone] = useState('All Zones');
+  const [campaign, setCampaign] = useState('All Campaigns');
+
+  const ActivePanel = PANEL_MAP[activeTab];
 
   return (
-    <div className="an-page">
-
-      <div className="an-page-header">
-        <div>
-          <h2>Admin Analytics</h2>
-          <p>All global managers and their zones performance overview</p>
+    <div className="dashboard">
+      {/* Top bar */}
+      <div className="topbar">
+        <div className="topbar-left">
+          <span className="topbar-crown">👑</span>
+          <span className="topbar-brand">KingsForms Analytics</span>
         </div>
-        <button className="an-export-btn" onClick={handleExport}>
-          <Download size={15} /> Export Report
-        </button>
+        <div className="topbar-right">
+          <button className="icon-btn notif"><BellIcon /><span className="notif-dot" /></button>
+          <button className="icon-btn"><SettingsIcon /></button>
+          <div className="avatar">ZP</div>
+        </div>
       </div>
 
       {/* Filters */}
-      <div className="an-panel an-filters">
-        <div className="an-filter-group">
-          <label>Global Manager</label>
-          <select value={selectedMgr} onChange={e => setSelectedMgr(e.target.value)}>
-            <option value="All">All Managers</option>
-            {GLOBAL_MANAGERS.map(m => <option key={m.name}>{m.name}</option>)}
-          </select>
+      <div className="filters-bar">
+        <div className="filter-group">
+          <label className="filter-label">Time Range</label>
+          <div className="select-wrap">
+            <select className="filter-select" value={timeRange} onChange={e => setTimeRange(e.target.value)}>
+              {['This Week', 'This Month', 'This Quarter', 'This Year'].map(o => <option key={o}>{o}</option>)}
+            </select>
+            <ChevronIcon />
+          </div>
         </div>
-        <div className="an-filter-group">
-          <label>Time Range</label>
-          <select><option>This Month</option><option>Last Month</option><option>This Quarter</option><option>This Year</option></select>
+        <div className="filter-group">
+          <label className="filter-label">Zone</label>
+          <div className="select-wrap">
+            <select className="filter-select" value={zone} onChange={e => setZone(e.target.value)}>
+              {['All Zones', 'Zone A (Your Zone)', 'Zone B', 'Zone C', 'Zone D', 'Zone E'].map(o => <option key={o}>{o}</option>)}
+            </select>
+            <ChevronIcon />
+          </div>
         </div>
-        <div className="an-filter-group">
-          <label>Campaign</label>
-          <select><option>All Campaigns</option><option>Spring Outreach 2026</option><option>Easter Campaign</option><option>Healing Streams</option></select>
+        <div className="filter-group">
+          <label className="filter-label">Campaign</label>
+          <div className="select-wrap">
+            <select className="filter-select" value={campaign} onChange={e => setCampaign(e.target.value)}>
+              {['All Campaigns', 'Healing School', 'Rhapsody', 'Inner City Mission', 'LBN'].map(o => <option key={o}>{o}</option>)}
+            </select>
+            <ChevronIcon />
+          </div>
         </div>
       </div>
 
-      {/* KPI grid */}
-      <div className="an-kpi-grid" style={{ gridTemplateColumns: 'repeat(3, 1fr)' }}>
-        {TOTAL_KPI.map(k => (
-          <div className="an-kpi-card" key={k.label}>
-            <div className="an-kpi-top">
-              <div className="an-kpi-icon" style={{ background: k.bg, color: k.color }}>
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
-              </div>
-              {k.pct && <span className="an-kpi-pct">↗ {k.pct}</span>}
-            </div>
-            <div className="an-kpi-value">{k.value}</div>
-            <div className="an-kpi-label">{k.label}</div>
-          </div>
+      {/* Tabs */}
+      <div className="tabs-bar">
+        {TABS.map(t => (
+          <button
+            key={t.id}
+            className={`tab-btn ${activeTab === t.id ? 'active' : ''}`}
+            onClick={() => setActiveTab(t.id)}
+          >
+            <span className="tab-dot" style={{ background: activeTab === t.id ? t.dot : '#cbd5e1' }} />
+            {t.label}
+          </button>
         ))}
       </div>
 
-      {/* Global Managers comparison bar chart */}
-      <div className="an-panel">
-        <h3>Global Managers — Attendance Comparison</h3>
-        <ResponsiveContainer width="100%" height={240}>
-          <BarChart data={GLOBAL_MANAGERS} barSize={36}>
-            <CartesianGrid strokeDasharray="4 3" stroke="var(--border-light)" vertical={false}/>
-            <XAxis dataKey="name" tick={{ fontSize: 10, fill: 'var(--text-muted)' }} axisLine={false} tickLine={false}/>
-            <YAxis tick={{ fontSize: 11, fill: 'var(--text-muted)' }} axisLine={false} tickLine={false}/>
-            <Tooltip contentStyle={tooltipStyle}/>
-            <Bar dataKey="attendance" name="Attendance" radius={[6,6,0,0]}>
-              {GLOBAL_MANAGERS.map((e, i) => <Cell key={i} fill={e.color}/>)}
-            </Bar>
-          </BarChart>
-        </ResponsiveContainer>
+      {/* Content */}
+      <div className="content">
+        <ActivePanel />
       </div>
-
-      {/* Trend + Finance */}
-      <div className="an-chart-grid">
-        <div className="an-panel">
-          <h3>Attendance Trend by Region</h3>
-          <ResponsiveContainer width="100%" height={230}>
-            <LineChart data={TREND_DATA}>
-              <CartesianGrid strokeDasharray="4 3" stroke="var(--border-light)" vertical={false}/>
-              <XAxis dataKey="month" tick={{ fontSize: 11, fill: 'var(--text-muted)' }} axisLine={false} tickLine={false}/>
-              <YAxis tick={{ fontSize: 11, fill: 'var(--text-muted)' }} axisLine={false} tickLine={false}/>
-              <Tooltip contentStyle={tooltipStyle}/>
-              <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: 11 }}/>
-              <Line type="monotone" dataKey="africa"   name="Africa"   stroke="#4f46e5" strokeWidth={2} dot={false}/>
-              <Line type="monotone" dataKey="europe"   name="Europe"   stroke="#22d3ee" strokeWidth={2} dot={false}/>
-              <Line type="monotone" dataKey="americas" name="Americas" stroke="#22c55e" strokeWidth={2} dot={false}/>
-              <Line type="monotone" dataKey="asia"     name="Asia"     stroke="#f97316" strokeWidth={2} dot={false}/>
-              <Line type="monotone" dataKey="sa"       name="S. America" stroke="#a855f7" strokeWidth={2} dot={false}/>
-            </LineChart>
-          </ResponsiveContainer>
-        </div>
-
-        <div className="an-panel">
-          <h3>Total Finance Trend</h3>
-          <ResponsiveContainer width="100%" height={230}>
-            <AreaChart data={FINANCE_TREND}>
-              <defs>
-                <linearGradient id="adminFinGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%"  stopColor="#22c55e" stopOpacity={0.3}/>
-                  <stop offset="95%" stopColor="#22c55e" stopOpacity={0}/>
-                </linearGradient>
-              </defs>
-              <CartesianGrid strokeDasharray="4 3" stroke="var(--border-light)" vertical={false}/>
-              <XAxis dataKey="month" tick={{ fontSize: 11, fill: 'var(--text-muted)' }} axisLine={false} tickLine={false}/>
-              <YAxis tick={{ fontSize: 11, fill: 'var(--text-muted)' }} axisLine={false} tickLine={false}/>
-              <Tooltip contentStyle={tooltipStyle} formatter={v => [`$${(v/1000).toFixed(0)}K`, 'Finance']}/>
-              <Area type="monotone" dataKey="total" stroke="#22c55e" strokeWidth={2.5} fill="url(#adminFinGrad)" dot={{ fill: '#22c55e', r: 3 }}/>
-            </AreaChart>
-          </ResponsiveContainer>
-        </div>
-      </div>
-
-      {/* Campaign dist + Global Mgr table */}
-      <div className="an-chart-grid">
-        <div className="an-panel">
-          <h3>Campaign Distribution</h3>
-          <ResponsiveContainer width="100%" height={160}>
-            <PieChart>
-              <Pie data={CAMPAIGN_DIST} cx="50%" cy="50%" outerRadius={70} dataKey="value"
-                label={({ name, value }) => `${name} ${value}%`} labelLine={false}>
-                {CAMPAIGN_DIST.map((e, i) => <Cell key={i} fill={e.color}/>)}
-              </Pie>
-              <Tooltip contentStyle={tooltipStyle} formatter={v => [`${v}%`, 'Share']}/>
-            </PieChart>
-          </ResponsiveContainer>
-          <div className="an-legend">
-            {CAMPAIGN_DIST.map(d => (
-              <div className="an-legend-row" key={d.name}>
-                <span className="an-legend-dot" style={{ background: d.color }}/>
-                <span>{d.name}</span>
-                <span className="an-legend-pct">{d.value}%</span>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div className="an-panel">
-          <h3>Global Managers Summary</h3>
-          <table className="an-table">
-            <thead>
-              <tr><th>Manager</th><th>Zones</th><th>Attendance</th><th>Completion</th></tr>
-            </thead>
-            <tbody>
-              {GLOBAL_MANAGERS.map(m => (
-                <tr key={m.name}>
-                  <td style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <span style={{ width: 10, height: 10, borderRadius: '50%', background: m.color, display: 'inline-block', flexShrink: 0 }}/>
-                    {m.name.replace('Global Mgr — ', '')}
-                  </td>
-                  <td>{m.zones}</td>
-                  <td>{m.attendance.toLocaleString()}</td>
-                  <td>
-                    <div className="an-bar-wrap">
-                      <div className="an-bar-fill" style={{ width: m.completion, background: m.color }}/>
-                      <span>{m.completion}</span>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      {/* Zone breakdown table */}
-      <div className="an-panel">
-        <h3>Zone-level Breakdown</h3>
-        <table className="an-table">
-          <thead>
-            <tr><th>Zone</th><th>Global Manager</th><th>Attendance</th><th>Finance</th><th>Status</th></tr>
-          </thead>
-          <tbody>
-            {ZONE_BREAKDOWN.map(z => (
-              <tr key={z.zone}>
-                <td className="an-table-region">{z.zone}</td>
-                <td>{z.mgr}</td>
-                <td>{z.attendance.toLocaleString()}</td>
-                <td>${z.finance.toLocaleString()}</td>
-                <td>
-                  <span style={{
-                    padding: '2px 10px', borderRadius: 20, fontSize: '0.75rem', fontWeight: 600,
-                    background: z.status === 'Active' ? '#dcfce7' : '#fee2e2',
-                    color: z.status === 'Active' ? '#16a34a' : '#dc2626',
-                  }}>{z.status}</span>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
     </div>
   );
 }

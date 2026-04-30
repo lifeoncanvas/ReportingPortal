@@ -42,7 +42,7 @@ export default function RoleRouter() {
           <Route path="dashboard"     element={<GlobalDashboard />} />
           <Route path="reporting"     element={<ReportingPortal />} />
           <Route path="finance"       element={<FinancePortal />} />
-          <Route path="analytics"     element={<Analytics />} />
+          {/* <Route path="analytics"     element={<Analytics />} /> */}
           <Route path="magazine"      element={<Magazine />} />
           <Route path="audit"         element={<GlobalAuditLogs />} />
           <Route path="notifications" element={<Notifications />} />
@@ -61,7 +61,7 @@ export default function RoleRouter() {
           <Route index element={<Navigate to="dashboard" replace />} />
           <Route path="dashboard"     element={<ZonalDashboard />} />
           <Route path="reporting"     element={<ZonalReportingTabs />} />
-          <Route path="analytics"     element={<ZonalAnalytics />} />
+          {/* <Route path="analytics"     element={<ZonalAnalytics />} /> */}
           <Route path="magazine"      element={<Magazine />} />
           <Route path="notifications" element={<Notifications />} />
           <Route path="settings"      element={<Settings />} />

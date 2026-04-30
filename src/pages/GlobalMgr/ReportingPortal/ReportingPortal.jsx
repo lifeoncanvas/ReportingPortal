@@ -32,7 +32,7 @@ function Field({ label, required, hint, error, children }) {
   return (
     <div className="kf-field">
       <label className="kf-label">
-        {label}{required && <span style={{ color: '#4f46e5' }}> *</span>}
+        {label}{required && <span style={{ color: '#ef4444' }}> *</span>}
         {hint && <em className="kf-hint"> {hint}</em>}
       </label>
       {children}
@@ -61,7 +61,7 @@ function MediaUploader({ files, onAdd, onRemove, label = "Upload Images / Files"
             <div className="rp-media-thumb" key={i}>
               {f.url && f.type?.startsWith('video') ? <video src={f.url} className="rp-media-img" muted />
                 : f.url ? <img src={f.url} alt={f.name} className="rp-media-img" />
-                : <div className="rp-media-img rp-media-pdf-thumb">PDF</div>}
+                : <div className="rp-media-img rp-media-pdf-thumb">{f.name?.endsWith('.pdf') ? 'PDF' : 'DOC'}</div>}
               <button className="rp-media-remove" onClick={() => onRemove(i)}>✕</button>
             </div>
           ))}
@@ -162,8 +162,6 @@ function FormPopup({ title, eyebrow, icon, onClose, onSubmit, submitting, submit
   return (
     <div className="popup-overlay" onClick={onClose}>
       <div className="popup-modal" onClick={e => e.stopPropagation()}>
-
-        {/* ── Header ── */}
         <div className="popup-header">
           <div className="popup-title-wrap">
             <span className="popup-eyebrow">{eyebrow}</span>
@@ -174,13 +172,9 @@ function FormPopup({ title, eyebrow, icon, onClose, onSubmit, submitting, submit
           </div>
           <button className="popup-close-btn" onClick={onClose}><X size={16} /></button>
         </div>
-
-        {/* ── Scrollable fields ── */}
         <div className="popup-scroll">
           {children}
         </div>
-
-        {/* ── Sticky footer with submit ── */}
         <div className="popup-footer">
           <button className="popup-cancel-btn" onClick={onClose} disabled={submitting}>Cancel</button>
           <button className="popup-submit-btn" onClick={onSubmit} disabled={submitting}>
@@ -201,23 +195,31 @@ function FormPopup({ title, eyebrow, icon, onClose, onSubmit, submitting, submit
   );
 }
 
-// spin keyframe injected once
 const spinStyle = document.createElement('style');
 spinStyle.textContent = '@keyframes spin { to { transform: rotate(360deg); } }';
 document.head.appendChild(spinStyle);
 
 
 // ══════════════════════════════════════════════════════
-// FORMS
+// ZONAL REPORT FORM — matched to kingsforms.online fields
 // ══════════════════════════════════════════════════════
-
-// ── Zonal Report Form ──────────────────────────────────
 function ZonalReportForm({ onClose, onSubmit: parentSubmit }) {
   const EMPTY = {
-    zoneName: '', zonalManager: '', partnershipRemittance: '', newPartners: '',
-    testimonies: '', httnmTranslations: '', httnmOutreaches: '', httnmPicturesVideos: '',
-    pastoralAttendanceDirector: '', managerAttendanceDirector: '', managerAttendanceStrategy: '',
-    healingCrusadeSponsorship: '', testimonyClarificationConcern: '', media: [], mediaFiles: [],
+    zoneName: '',
+    zonalManager: '',
+    partnershipRemittance: '',
+    newPartners: '',
+    testimoniesSubmitted: '',
+    httnmTranslations: '',
+    httnmOutreaches: '',
+    httnmPicturesVideos: '',
+    // pastoralAttendanceDirector: '',
+    // managerAttendanceDirector: '',
+    // managerAttendanceStrategy: '',
+    // healingCrusadeSponsorship: '',
+    // testimonyClarificationConcern: '',
+    media: [],
+    mediaFiles: [],
   };
   const [form, setForm] = useState(EMPTY);
   const [errors, setErrors] = useState({});
@@ -231,7 +233,10 @@ function ZonalReportForm({ onClose, onSubmit: parentSubmit }) {
     if (!form.zonalManager.trim()) e.zonalManager = 'Required';
     if (!String(form.partnershipRemittance).trim()) e.partnershipRemittance = 'Required';
     if (!String(form.newPartners).trim()) e.newPartners = 'Required';
-    if (!form.testimonies.trim()) e.testimonies = 'Required';
+    if (!String(form.testimoniesSubmitted).trim()) e.testimoniesSubmitted = 'Required';
+    if (!String(form.httnmTranslations).trim()) e.httnmTranslations = 'Required';
+    if (!String(form.httnmOutreaches).trim()) e.httnmOutreaches = 'Required';
+    if (!String(form.httnmPicturesVideos).trim()) e.httnmPicturesVideos = 'Required';
     return e;
   };
 
@@ -241,9 +246,12 @@ function ZonalReportForm({ onClose, onSubmit: parentSubmit }) {
     setSubmitting(true);
     await new Promise(r => setTimeout(r, 500));
     parentSubmit({
-      zone: form.zoneName, submittedBy: form.zonalManager,
-      partners: form.newPartners, remittance: form.partnershipRemittance,
-      status: 'submitted', media: form.media,
+      zone: form.zoneName,
+      submittedBy: form.zonalManager,
+      partners: form.newPartners,
+      remittance: form.partnershipRemittance,
+      status: 'submitted',
+      media: form.media,
       rawDate: new Date().toISOString().split('T')[0],
     });
     setSubmitting(false);
@@ -253,9 +261,10 @@ function ZonalReportForm({ onClose, onSubmit: parentSubmit }) {
     <FormPopup title="Zonal Weekly Report" eyebrow="KingsForms · Zonal Report" icon="🏛️"
       onClose={onClose} onSubmit={handleSubmit} submitting={submitting} submitLabel="Submit Zonal Report">
 
+      {/* Zone Info */}
       <div className="popup-section-head">🏛️ Zone Information</div>
       <div className="popup-fields">
-        <Field label="Zone Name" required error={errors.zoneName}>
+        <Field label="Name of Zone" required error={errors.zoneName}>
           <input className={`kf-input${errors.zoneName ? ' kf-input-err' : ''}`} placeholder="e.g. Zone A"
             value={form.zoneName} onChange={e => set('zoneName', e.target.value)} />
         </Field>
@@ -265,68 +274,43 @@ function ZonalReportForm({ onClose, onSubmit: parentSubmit }) {
         </Field>
       </div>
 
+      {/* Partnership */}
       <div className="popup-section-head">🤝 Partnership & Recruitment</div>
       <div className="popup-fields">
-        <Field label="Total Partnership Remittance (Espees)" required hint="Target: 10,000 weekly" error={errors.partnershipRemittance}>
+        <Field label="Total Partnership Remittance for this week" required hint="Weekly Target: 10,000 Espees" error={errors.partnershipRemittance}>
           <input className={`kf-input${errors.partnershipRemittance ? ' kf-input-err' : ''}`} type="number" min="0" placeholder="0"
             value={form.partnershipRemittance} onChange={e => set('partnershipRemittance', e.target.value)} />
         </Field>
-        <Field label="New Partners Recruited" required hint="Target: 10 weekly" error={errors.newPartners}>
+        <Field label="How many new partners were recruited?" required hint="Target: 10 new partners weekly" error={errors.newPartners}>
           <input className={`kf-input${errors.newPartners ? ' kf-input-err' : ''}`} type="number" min="0" placeholder="0"
             value={form.newPartners} onChange={e => set('newPartners', e.target.value)} />
         </Field>
-        <Field label="Testimonies Submitted" required hint="Target: 50 weekly" error={errors.testimonies}>
-          <textarea className={`kf-textarea${errors.testimonies ? ' kf-input-err' : ''}`} rows={3} placeholder="Describe testimonies…"
-            value={form.testimonies} onChange={e => set('testimonies', e.target.value)} />
+        <Field label="How many Testimonies were submitted to the Department?" required hint="Target: 50 weekly" error={errors.testimoniesSubmitted}>
+          <input className={`kf-input${errors.testimoniesSubmitted ? ' kf-input-err' : ''}`} type="number" min="0" placeholder="0"
+            value={form.testimoniesSubmitted} onChange={e => set('testimoniesSubmitted', e.target.value)} />
         </Field>
       </div>
 
+      {/* HTTNM Outreach */}
       <div className="popup-section-head">📖 HTTNM Outreach</div>
       <div className="popup-fields">
-        <Field label="HTTNM Translations" hint="Target: 2 weekly">
-          <input className="kf-input" type="number" min="0" placeholder="0"
+        <Field label="Total number of HTTNM translations achieved?" required hint="Target: 2 weekly" error={errors.httnmTranslations}>
+          <input className={`kf-input${errors.httnmTranslations ? ' kf-input-err' : ''}`} type="number" min="0" placeholder="0"
             value={form.httnmTranslations} onChange={e => set('httnmTranslations', e.target.value)} />
         </Field>
-        <Field label="HTTNM Outreaches Held" hint="Target: 10 weekly">
-          <input className="kf-input" type="number" min="0" placeholder="0"
+        <Field label="How many HTTNM outreaches were held this week?" required hint="Target: 10 weekly" error={errors.httnmOutreaches}>
+          <input className={`kf-input${errors.httnmOutreaches ? ' kf-input-err' : ''}`} type="number" min="0" placeholder="0"
             value={form.httnmOutreaches} onChange={e => set('httnmOutreaches', e.target.value)} />
         </Field>
-        <Field label="Pictures / Videos Submitted" hint="Target: 10 weekly">
-          <input className="kf-input" type="number" min="0" placeholder="0"
+        <Field label="How many pictures or videos from the HTTNM outreaches were submitted?" required hint="Target: 10 weekly" error={errors.httnmPicturesVideos}>
+          <input className={`kf-input${errors.httnmPicturesVideos ? ' kf-input-err' : ''}`} type="number" min="0" placeholder="0"
             value={form.httnmPicturesVideos} onChange={e => set('httnmPicturesVideos', e.target.value)} />
         </Field>
       </div>
 
-      <div className="popup-section-head">📅 Attendance</div>
-      <div className="popup-fields">
-        {[
-          { k: 'pastoralAttendanceDirector', label: "Zonal Pastor — Director's Meeting" },
-          { k: 'managerAttendanceDirector',  label: "Zonal Manager — Director's Meeting" },
-          { k: 'managerAttendanceStrategy',  label: "Zonal Manager — Strategy Meeting" },
-        ].map(f => (
-          <Field key={f.k} label={f.label}>
-            <div className="kf-select-wrap">
-              <select className="kf-select" value={form[f.k]} onChange={e => set(f.k, e.target.value)}>
-                {ATTENDANCE.map(o => <option key={o} value={o}>{o || 'Please select'}</option>)}
-              </select>
-              <ChevronDown size={13} className="kf-select-chevron" />
-            </div>
-          </Field>
-        ))}
-      </div>
+    
 
-      <div className="popup-section-head">✝️ Healing Crusade</div>
-      <div className="popup-fields">
-        <Field label="Healing Crusade Sponsorship">
-          <textarea className="kf-textarea" rows={2} placeholder="Amount / details…"
-            value={form.healingCrusadeSponsorship} onChange={e => set('healingCrusadeSponsorship', e.target.value)} />
-        </Field>
-        <Field label="Testimony / Clarification / Concern">
-          <textarea className="kf-textarea" rows={3} placeholder="Any additional notes…"
-            value={form.testimonyClarificationConcern} onChange={e => set('testimonyClarificationConcern', e.target.value)} />
-        </Field>
-      </div>
-
+      {/* Media */}
       <div className="popup-section-head">📎 Supporting Media</div>
       <div className="popup-fields">
         <MediaUploader files={form.media}
@@ -341,22 +325,54 @@ function ZonalReportForm({ onClose, onSubmit: parentSubmit }) {
   );
 }
 
-// ── Partnership Report Form ────────────────────────────
+
+// ══════════════════════════════════════════════════════
+// PARTNERSHIP REPORT FORM
+// ══════════════════════════════════════════════════════
 const PARTNERSHIP_ARMS = [
-  { key: 'healingSchool', label: 'Healing School',       icon: '🏥' },
-  { key: 'rhapsody',      label: 'Rhapsody of Realities', icon: '📖' },
-  { key: 'innercity',     label: 'Inner City Mission',    icon: '🏙️' },
-  { key: 'lbn',           label: 'LBN',                   icon: '📡' },
+  { key: 'rhapsody',       label: 'Rhapsody of Realities', icon: '📖' },
+  { key: 'healingSchool',  label: 'The Healing School',    icon: '🏥' },
+  { key: 'lbn',            label: 'LBN',                   icon: '📡' },
+  { key: 'loveworldTV',    label: 'Loveworld TV Ministry', icon: '📺' },
+  { key: 'bibleSponsorship', label: 'Bible Sponsorship',   icon: '✝️' },
+  { key: 'innercity',      label: 'Innercity Mission',     icon: '🏙️' },
+  { key: 'internetMultimedia', label: 'Internet Multimedia', icon: '🌐' },
+];
+
+const BLAAAST_CATEGORIES = [
+  { key: 'joyfulSound',      label: 'Make a Joyful Sound',        amount: '30 Espees' },
+  { key: 'raiseBanner',      label: 'Raise a Banner',             amount: '300 Espees' },
+  { key: 'takeShield',       label: 'Take Up the Shield',         amount: '1,000 Espees' },
+  { key: 'greatShout',       label: 'Make a Great Shout',         amount: '2,500 Espees' },
+  { key: 'advanceTroop',     label: 'Advance Against a Troop',    amount: '5,000 Espees' },
+  { key: 'blowTrumpet',      label: 'Blow A Trumpet',             amount: '10,000 Espees' },
+  { key: 'liftHorn',         label: 'Lift the Horn',              amount: '100,000 Espees' },
+  { key: 'blastVictory',     label: 'Blast of Victory (Gold Sponsorship)', amount: '250,000 Espees' },
 ];
 
 function PartnershipForm({ onClose, onSubmit: parentSubmit }) {
-  const [form, setForm] = useState({ selectedArms: [], remittances: {}, totalRemittance: '', notes: '' });
+  const [form, setForm] = useState({
+    selectedArms: [],
+    remittances: {},
+    totalRemittance: '',
+    blaaast: {},
+    notes: '',
+  });
   const [errors, setErrors] = useState({});
   const [submitting, setSubmitting] = useState(false);
 
   const toggleArm = key => setForm(p => ({
-    ...p, selectedArms: p.selectedArms.includes(key) ? p.selectedArms.filter(k => k !== key) : [...p.selectedArms, key],
+    ...p,
+    selectedArms: p.selectedArms.includes(key)
+      ? p.selectedArms.filter(k => k !== key)
+      : [...p.selectedArms, key],
   }));
+
+  const setBlaaast = (key, val) => {
+    // restrict to integers only
+    const int = val === '' ? '' : String(Math.max(0, Math.floor(Number(val))));
+    setForm(p => ({ ...p, blaaast: { ...p.blaaast, [key]: int } }));
+  };
 
   const handleSubmit = async () => {
     const e = {};
@@ -366,7 +382,13 @@ function PartnershipForm({ onClose, onSubmit: parentSubmit }) {
     if (Object.keys(e).length) return;
     setSubmitting(true);
     await new Promise(r => setTimeout(r, 500));
-    parentSubmit({ arms: form.selectedArms.join(', '), totalRemittance: form.totalRemittance, notes: form.notes, status: 'submitted', rawDate: new Date().toISOString().split('T')[0] });
+    parentSubmit({
+      arms: form.selectedArms.map(k => PARTNERSHIP_ARMS.find(a => a.key === k)?.label).join(', '),
+      totalRemittance: form.totalRemittance,
+      notes: form.notes,
+      status: 'submitted',
+      rawDate: new Date().toISOString().split('T')[0],
+    });
     setSubmitting(false);
   };
 
@@ -374,31 +396,39 @@ function PartnershipForm({ onClose, onSubmit: parentSubmit }) {
     <FormPopup title="Partnership Remittance Report" eyebrow="KingsForms · Partnership" icon="🤝"
       onClose={onClose} onSubmit={handleSubmit} submitting={submitting} submitLabel="Submit Partnership Report">
 
+      {/* Partnership Arms — checkboxes */}
       <div className="popup-section-head">💼 Partnership Arms</div>
       <div className="popup-fields">
-        <Field label="Select applicable arms" required error={errors.arms}>
-          <div className="arm-grid">
+        <Field label="Select all applicable partnership arms" required error={errors.arms}>
+          <div className="arm-checkbox-list">
             {PARTNERSHIP_ARMS.map(arm => (
-              <button key={arm.key} type="button"
-                className={`arm-card ${form.selectedArms.includes(arm.key) ? 'selected' : ''}`}
-                onClick={() => toggleArm(arm.key)}>
-                <span className="arm-icon">{arm.icon}</span>
-                <span className="arm-label">{arm.label}</span>
-                <span className="arm-check">✓</span>
-              </button>
+              <label key={arm.key} className={`arm-checkbox-item ${form.selectedArms.includes(arm.key) ? 'selected' : ''}`}>
+                <input
+                  type="checkbox"
+                  checked={form.selectedArms.includes(arm.key)}
+                  onChange={() => toggleArm(arm.key)}
+                  style={{ display: 'none' }}
+                />
+                <span className="arm-checkbox-box">
+                  {form.selectedArms.includes(arm.key) && <Check size={12} />}
+                </span>
+                <span className="arm-checkbox-icon">{arm.icon}</span>
+                <span className="arm-checkbox-label">{arm.label}</span>
+              </label>
             ))}
           </div>
         </Field>
       </div>
 
+      {/* Remittance per arm */}
       {form.selectedArms.length > 0 && (
         <>
-          <div className="popup-section-head">💰 Remittance per Arm</div>
+          <div className="popup-section-head">💰 Remittance per Arm (Espees)</div>
           <div className="popup-fields">
             {form.selectedArms.map(key => {
               const arm = PARTNERSHIP_ARMS.find(a => a.key === key);
               return (
-                <Field key={key} label={`${arm.icon} ${arm.label} — Remittance (Espees)`}>
+                <Field key={key} label={`${arm.icon} ${arm.label}`}>
                   <input className="kf-input" type="number" min="0" placeholder="0"
                     value={form.remittances[key] || ''}
                     onChange={e => setForm(p => ({ ...p, remittances: { ...p.remittances, [key]: e.target.value } }))} />
@@ -409,13 +439,44 @@ function PartnershipForm({ onClose, onSubmit: parentSubmit }) {
         </>
       )}
 
+      {/* Total */}
       <div className="popup-section-head">📊 Summary</div>
       <div className="popup-fields">
         <Field label="Total Partnership Remittance (Espees)" required error={errors.totalRemittance}>
           <input className={`kf-input${errors.totalRemittance ? ' kf-input-err' : ''}`} type="number" min="0" placeholder="0"
             value={form.totalRemittance} onChange={e => setForm(p => ({ ...p, totalRemittance: e.target.value }))} />
         </Field>
-        <Field label="Additional Notes">
+      </div>
+
+      {/* BLAAAST Categories */}
+      <div className="popup-section-head">🎺 BLAAAST Partnership Categories</div>
+      <div className="popup-fields">
+        <p className="kf-section-note">How many partners gave in each of these BLAAAST categories this week?</p>
+        <div className="blaaast-grid">
+          {BLAAAST_CATEGORIES.map(cat => (
+            <div key={cat.key} className="blaaast-row">
+              <div className="blaaast-info">
+                <span className="blaaast-label">{cat.label}</span>
+                <span className="blaaast-amount">{cat.amount}</span>
+              </div>
+              <input
+                className="kf-input blaaast-input"
+                type="number"
+                min="0"
+                step="1"
+                placeholder="0"
+                value={form.blaaast[cat.key] || ''}
+                onChange={e => setBlaaast(cat.key, e.target.value)}
+              />
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Notes */}
+      <div className="popup-section-head">📝 Additional Notes</div>
+      <div className="popup-fields">
+        <Field label="Recruitment notes or special mentions">
           <textarea className="kf-textarea" rows={3} placeholder="Any recruitment notes or special mentions…"
             value={form.notes} onChange={e => setForm(p => ({ ...p, notes: e.target.value }))} />
         </Field>
@@ -424,29 +485,48 @@ function PartnershipForm({ onClose, onSubmit: parentSubmit }) {
   );
 }
 
-// ── Testimonials Form ──────────────────────────────────
+
+// ══════════════════════════════════════════════════════
+// TESTIMONIALS FORM
+// ══════════════════════════════════════════════════════
 function TestimonialsForm({ onClose, onSubmit: parentSubmit }) {
-  const [form, setForm] = useState({ testimony: '', beforeImages: [], afterImages: [], documents: [] });
+  const [form, setForm] = useState({
+    testimony: '',
+    testimoniesCount: '',
+    beforeImages: [],
+    afterImages: [],
+    documents: [],   // video, PDF, Word
+  });
   const [errors, setErrors] = useState({});
   const [submitting, setSubmitting] = useState(false);
 
   const addFiles = (field, files) => {
-    const prev = files.map(f => ({ name: f.name, type: f.type, url: f.type.startsWith('image') ? URL.createObjectURL(f) : null, size: f.size }));
+    const prev = files.map(f => ({
+      name: f.name, type: f.type,
+      url: f.type.startsWith('image') ? URL.createObjectURL(f) : f.type.startsWith('video') ? URL.createObjectURL(f) : null,
+      size: f.size,
+    }));
     setForm(p => ({ ...p, [field]: [...p[field], ...prev] }));
   };
   const removeFile = (field, i) => setForm(p => ({ ...p, [field]: p[field].filter((_,j) => j !== i) }));
 
   const handleSubmit = async () => {
     const e = {};
-    if (!form.testimony.trim()) e.testimony = 'Please share a testimony';
+    // testimony is now NOT mandatory
     setErrors(e);
     if (Object.keys(e).length) return;
     setSubmitting(true);
     await new Promise(r => setTimeout(r, 500));
     parentSubmit({
-      testimony: form.testimony.slice(0, 80) + (form.testimony.length > 80 ? '…' : ''),
-      beforeImages: form.beforeImages.length, afterImages: form.afterImages.length, documents: form.documents.length,
-      status: 'submitted', rawDate: new Date().toISOString().split('T')[0],
+      testimony: form.testimony
+        ? form.testimony.slice(0, 80) + (form.testimony.length > 80 ? '…' : '')
+        : '(No written testimony)',
+      testimoniesCount: form.testimoniesCount,
+      beforeImages: form.beforeImages.length,
+      afterImages: form.afterImages.length,
+      documents: form.documents.length,
+      status: 'submitted',
+      rawDate: new Date().toISOString().split('T')[0],
       media: [...form.beforeImages, ...form.afterImages, ...form.documents],
     });
     setSubmitting(false);
@@ -456,15 +536,26 @@ function TestimonialsForm({ onClose, onSubmit: parentSubmit }) {
     <FormPopup title="Submit a Testimony" eyebrow="KingsForms · Testimonials" icon="✍️"
       onClose={onClose} onSubmit={handleSubmit} submitting={submitting} submitLabel="Submit Testimony">
 
-      <div className="popup-section-head">✍️ Your Testimony</div>
+      {/* Count */}
+      <div className="popup-section-head">📊 Testimonies Count</div>
       <div className="popup-fields">
-        <Field label="Share your testimony" required error={errors.testimony}>
-          <textarea className={`kf-textarea${errors.testimony ? ' kf-input-err' : ''}`} rows={7}
+        <Field label="How many testimonies were received this week?" hint="(e.g. partnership, healing, salvation, etc.)">
+          <input className="kf-input" type="number" min="0" placeholder="0"
+            value={form.testimoniesCount} onChange={e => setForm(p => ({ ...p, testimoniesCount: e.target.value }))} />
+        </Field>
+      </div>
+
+      {/* Written testimony — no longer mandatory */}
+      <div className="popup-section-head">✍️ Written Testimony</div>
+      <div className="popup-fields">
+        <Field label="Share a testimony" hint="(optional)">
+          <textarea className="kf-textarea" rows={6}
             placeholder="Write your testimony here — what happened, how you were impacted, what God did…"
             value={form.testimony} onChange={e => setForm(p => ({ ...p, testimony: e.target.value }))} />
         </Field>
       </div>
 
+      {/* Before & After */}
       <div className="popup-section-head">🖼️ Before &amp; After Images</div>
       <div className="popup-fields">
         <Field label="Before Images (optional)">
@@ -475,21 +566,41 @@ function TestimonialsForm({ onClose, onSubmit: parentSubmit }) {
         </Field>
       </div>
 
-      <div className="popup-section-head">📄 Supporting Documents</div>
+      {/* Video / Document upload */}
+      <div className="popup-section-head">🎥 Video &amp; Written Testimonies</div>
       <div className="popup-fields">
-        <Field label="Documents (optional)">
-          <MediaUploader files={form.documents} onAdd={f => addFiles('documents', f)} onRemove={i => removeFile('documents', i)} label="Upload Documents" accept=".pdf,.doc,.docx" />
+        <Field label="Upload video, PDF, or Word document testimonies (optional)">
+          <MediaUploader
+            files={form.documents}
+            onAdd={f => addFiles('documents', f)}
+            onRemove={i => removeFile('documents', i)}
+            label="Upload Video / PDF / Word Files"
+            accept="video/*,.pdf,.doc,.docx"
+          />
         </Field>
       </div>
     </FormPopup>
   );
 }
 
-// ── Magazine Form ──────────────────────────────────────
+
+// ══════════════════════════════════════════════════════
+// MAGAZINE FORM
+// ══════════════════════════════════════════════════════
 const LANGUAGES = ['English', 'French', 'Spanish', 'Portuguese', 'Arabic', 'Chinese', 'Swahili', 'Hausa', 'Yoruba', 'Igbo', 'Other'];
 
 function MagazineForm({ onClose, onSubmit: parentSubmit }) {
-  const [form, setForm] = useState({ language: '', orderedCopies: '', receivedCopies: '', received: '', notReceivedReason: '', notes: '' });
+  const [form, setForm] = useState({
+    language: '',
+    orderedCopies: '',
+    receivedCopies: '',
+    received: '',
+    notReceivedReason: '',
+    sponsoredCopies: '',
+    healingOutreaches: '',
+    healingMedia: [],
+    notes: '',
+  });
   const [errors, setErrors] = useState({});
   const [submitting, setSubmitting] = useState(false);
 
@@ -504,10 +615,15 @@ function MagazineForm({ onClose, onSubmit: parentSubmit }) {
     setSubmitting(true);
     await new Promise(r => setTimeout(r, 500));
     parentSubmit({
-      language: form.language, ordered: form.orderedCopies,
+      language: form.language,
+      ordered: form.orderedCopies,
       received: form.received === 'Yes' ? form.receivedCopies : '0',
-      receiptStatus: form.received, reason: form.notReceivedReason,
-      status: 'submitted', rawDate: new Date().toISOString().split('T')[0],
+      receiptStatus: form.received,
+      reason: form.notReceivedReason,
+      sponsoredCopies: form.sponsoredCopies,
+      healingOutreaches: form.healingOutreaches,
+      status: 'submitted',
+      rawDate: new Date().toISOString().split('T')[0],
     });
     setSubmitting(false);
   };
@@ -516,6 +632,7 @@ function MagazineForm({ onClose, onSubmit: parentSubmit }) {
     <FormPopup title="Magazine Order Report" eyebrow="KingsForms · Magazine" icon="📚"
       onClose={onClose} onSubmit={handleSubmit} submitting={submitting} submitLabel="Submit Magazine Report">
 
+      {/* Order Details */}
       <div className="popup-section-head">📚 Order Details</div>
       <div className="popup-fields">
         <Field label="Language" required error={errors.language}>
@@ -528,14 +645,19 @@ function MagazineForm({ onClose, onSubmit: parentSubmit }) {
             <ChevronDown size={13} className="kf-select-chevron" />
           </div>
         </Field>
-        <Field label="Number of Copies Ordered" required error={errors.orderedCopies}>
+        <Field label="Number of magazines ordered" required error={errors.orderedCopies}>
           <input className={`kf-input${errors.orderedCopies ? ' kf-input-err' : ''}`} type="number" min="0" placeholder="0"
             value={form.orderedCopies} onChange={e => setForm(p => ({ ...p, orderedCopies: e.target.value }))} />
         </Field>
       </div>
 
+      {/* Receipt Status */}
       <div className="popup-section-head">📬 Receipt Status</div>
       <div className="popup-fields">
+        <Field label="Number of copies received" required error={errors.received}>
+          <input className="kf-input" type="number" min="0" placeholder="0"
+            value={form.receivedCopies} onChange={e => setForm(p => ({ ...p, receivedCopies: e.target.value }))} />
+        </Field>
         <Field label="Were copies received?" required error={errors.received}>
           <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
             {['Yes', 'No', 'Partial'].map(opt => (
@@ -547,20 +669,48 @@ function MagazineForm({ onClose, onSubmit: parentSubmit }) {
             ))}
           </div>
         </Field>
-        {(form.received === 'Yes' || form.received === 'Partial') && (
-          <Field label="Number of Copies Received">
-            <input className="kf-input" type="number" min="0" placeholder="0"
-              value={form.receivedCopies} onChange={e => setForm(p => ({ ...p, receivedCopies: e.target.value }))} />
-          </Field>
-        )}
         {(form.received === 'No' || form.received === 'Partial') && (
-          <Field label="Reason for non-receipt" required error={errors.notReceivedReason}>
+          <Field label="If not received — provide reason" required error={errors.notReceivedReason}>
             <textarea className={`kf-textarea${errors.notReceivedReason ? ' kf-input-err' : ''}`} rows={3}
               placeholder="Explain why copies were not received…"
               value={form.notReceivedReason} onChange={e => setForm(p => ({ ...p, notReceivedReason: e.target.value }))} />
           </Field>
         )}
-        <Field label="Additional Notes">
+        <Field label="How many copies were sponsored for the week?">
+          <input className="kf-input" type="number" min="0" placeholder="0"
+            value={form.sponsoredCopies} onChange={e => setForm(p => ({ ...p, sponsoredCopies: e.target.value }))} />
+        </Field>
+      </div>
+
+      {/* Healing Outreaches */}
+      <div className="popup-section-head">💊 Healing Outreaches</div>
+      <div className="popup-fields">
+        <Field label="How many Healing Outreaches were carried out this week?">
+          <input className="kf-input" type="number" min="0" placeholder="0"
+            value={form.healingOutreaches} onChange={e => setForm(p => ({ ...p, healingOutreaches: e.target.value }))} />
+        </Field>
+        <Field label="Upload pictures and videos from the Healing Outreach">
+          <MediaUploader
+            files={form.healingMedia}
+            onAdd={files => {
+              const prev = files.map(f => ({
+                name: f.name, type: f.type,
+                url: (f.type.startsWith('image') || f.type.startsWith('video')) ? URL.createObjectURL(f) : null,
+                size: f.size,
+              }));
+              setForm(p => ({ ...p, healingMedia: [...p.healingMedia, ...prev] }));
+            }}
+            onRemove={i => setForm(p => ({ ...p, healingMedia: p.healingMedia.filter((_,j) => j !== i) }))}
+            label="Upload Healing Outreach Photos & Videos"
+            accept="image/*,video/*"
+          />
+        </Field>
+      </div>
+
+      {/* Notes */}
+      <div className="popup-section-head">📝 Additional Notes</div>
+      <div className="popup-fields">
+        <Field label="Any other notes">
           <textarea className="kf-textarea" rows={2} placeholder="Any other notes…"
             value={form.notes} onChange={e => setForm(p => ({ ...p, notes: e.target.value }))} />
         </Field>
@@ -569,15 +719,28 @@ function MagazineForm({ onClose, onSubmit: parentSubmit }) {
   );
 }
 
-// ── Outreach Report Form ───────────────────────────────
+
+// ══════════════════════════════════════════════════════
+// OUTREACH REPORT FORM
+// ══════════════════════════════════════════════════════
+const OUTREACH_CATEGORIES = ['Healing', 'Soul-winning', 'HTTNM', 'Prison Outreach', 'School Outreach', 'Market Outreach', 'Hospital Outreach', 'Other'];
+
 function OutreachForm({ onClose, onSubmit: parentSubmit }) {
-  const [form, setForm] = useState({ date: '', locations: '', story: '', images: [] });
+  const [form, setForm] = useState({
+    date: '',
+    category: '',
+    customCategory: '',
+    locations: '',
+    story: '',
+    images: [],
+  });
   const [errors, setErrors] = useState({});
   const [submitting, setSubmitting] = useState(false);
 
   const handleSubmit = async () => {
     const e = {};
     if (!form.date) e.date = 'Required';
+    if (!form.category) e.category = 'Please select an outreach category';
     if (!form.locations.trim()) e.locations = 'Required';
     if (!form.story.trim()) e.story = 'Required';
     setErrors(e);
@@ -585,10 +748,14 @@ function OutreachForm({ onClose, onSubmit: parentSubmit }) {
     setSubmitting(true);
     await new Promise(r => setTimeout(r, 500));
     parentSubmit({
-      date: formatDate(form.date), locations: form.locations,
+      date: formatDate(form.date),
+      category: form.category === 'Other' ? form.customCategory || 'Other' : form.category,
+      locations: form.locations,
       story: form.story.slice(0, 80) + (form.story.length > 80 ? '…' : ''),
-      images: form.images.length, status: 'submitted',
-      rawDate: form.date, media: form.images,
+      images: form.images.length,
+      status: 'submitted',
+      rawDate: form.date,
+      media: form.images,
     });
     setSubmitting(false);
   };
@@ -597,6 +764,29 @@ function OutreachForm({ onClose, onSubmit: parentSubmit }) {
     <FormPopup title="Outreach Activity Report" eyebrow="KingsForms · Outreach" icon="📍"
       onClose={onClose} onSubmit={handleSubmit} submitting={submitting} submitLabel="Submit Outreach Report">
 
+      {/* Category */}
+      <div className="popup-section-head">🏷️ Outreach Category</div>
+      <div className="popup-fields">
+        <Field label="What type of outreach was this?" required hint="(healing, soul-winning, etc.)" error={errors.category}>
+          <div className="outreach-cat-grid">
+            {OUTREACH_CATEGORIES.map(cat => (
+              <button key={cat} type="button"
+                className={`toggle-btn outreach-cat-btn ${form.category === cat ? 'selected' : ''}`}
+                onClick={() => setForm(p => ({ ...p, category: cat }))}>
+                {cat}
+              </button>
+            ))}
+          </div>
+        </Field>
+        {form.category === 'Other' && (
+          <Field label="Please specify outreach type">
+            <input className="kf-input" placeholder="Enter outreach category…"
+              value={form.customCategory} onChange={e => setForm(p => ({ ...p, customCategory: e.target.value }))} />
+          </Field>
+        )}
+      </div>
+
+      {/* Outreach Details */}
       <div className="popup-section-head">📍 Outreach Details</div>
       <div className="popup-fields">
         <Field label="Date of Outreach" required error={errors.date}>
@@ -610,6 +800,7 @@ function OutreachForm({ onClose, onSubmit: parentSubmit }) {
         </Field>
       </div>
 
+      {/* Story */}
       <div className="popup-section-head">📝 Outreach Story</div>
       <div className="popup-fields">
         <Field label="Tell the outreach story" required error={errors.story}>
@@ -619,6 +810,7 @@ function OutreachForm({ onClose, onSubmit: parentSubmit }) {
         </Field>
       </div>
 
+      {/* Images */}
       <div className="popup-section-head">📸 Outreach Images</div>
       <div className="popup-fields">
         <MediaUploader files={form.images}
@@ -635,6 +827,7 @@ function OutreachForm({ onClose, onSubmit: parentSubmit }) {
   );
 }
 
+
 // ══════════════════════════════════════════════════════
 // TABS CONFIG
 // ══════════════════════════════════════════════════════
@@ -646,7 +839,7 @@ const TABS_CONFIG = [
       { key: 'zone', label: 'Zone' }, { key: 'submittedBy', label: 'Submitted By' },
       { key: 'partners', label: 'New Partners' }, { key: 'status', label: 'Status' },
     ],
-    FormComponent: ZonalReportForm, btnLabel: 'New Zonal Report',
+    FormComponent: ZonalReportForm, btnLabel: 'Upload a New Zonal Report',
   },
   {
     id: 'partnership', label: 'Partnership Report', icon: <Heart size={14} />, emoji: '🤝', color: '#16a34a',
@@ -655,15 +848,16 @@ const TABS_CONFIG = [
       { key: 'arms', label: 'Arms' }, { key: 'totalRemittance', label: 'Remittance (Espees)' },
       { key: 'status', label: 'Status' },
     ],
-    FormComponent: PartnershipForm, btnLabel: 'New Partnership Report',
+    FormComponent: PartnershipForm, btnLabel: 'Upload a New Partnership Report',
   },
   {
     id: 'testimonials', label: 'Testimonials', icon: <BookOpen size={14} />, emoji: '✍️', color: '#d97706',
     columns: [
       { key: 'id', label: 'Report ID' }, { key: 'rawDate', label: 'Date' },
+      { key: 'testimoniesCount', label: 'Count' },
       { key: 'testimony', label: 'Testimony (preview)' }, { key: 'status', label: 'Status' },
     ],
-    FormComponent: TestimonialsForm, btnLabel: 'New Testimony',
+    FormComponent: TestimonialsForm, btnLabel: 'Upload a New Testimony',
   },
   {
     id: 'magazine', label: 'Magazine', icon: <Newspaper size={14} />, emoji: '📚', color: '#dc2626',
@@ -672,16 +866,17 @@ const TABS_CONFIG = [
       { key: 'language', label: 'Language' }, { key: 'ordered', label: 'Ordered' },
       { key: 'receiptStatus', label: 'Received?' }, { key: 'status', label: 'Status' },
     ],
-    FormComponent: MagazineForm, btnLabel: 'New Magazine Report',
+    FormComponent: MagazineForm, btnLabel: 'Upload a New Magazine Report',
   },
   {
     id: 'outreach', label: 'Outreach Report', icon: <FileText size={14} />, emoji: '📍', color: '#0891b2',
     columns: [
       { key: 'id', label: 'Report ID' }, { key: 'rawDate', label: 'Date' },
+      { key: 'category', label: 'Category' },
       { key: 'locations', label: 'Location(s)' }, { key: 'story', label: 'Story (preview)' },
       { key: 'status', label: 'Status' },
     ],
-    FormComponent: OutreachForm, btnLabel: 'New Outreach Report',
+    FormComponent: OutreachForm, btnLabel: 'Upload a New Outreach Report',
   },
 ];
 
