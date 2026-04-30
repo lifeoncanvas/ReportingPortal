@@ -66,7 +66,7 @@ const DATA = {
       { label: 'Partnership Remittance', pct: 78, color: '#f59e0b', target: '10,000 espees', achieved: '7,800' },
       { label: 'New Partners Recruited', pct: 92, color: '#22c55e', target: '10 / week',     achieved: '9.2 avg' },
       { label: 'Testimonies Submitted',  pct: 61, color: '#818cf8', target: '50 / week',     achieved: '30.5 avg' },
-      { label: 'HTTNM Outreaches',       pct: 84, color: '#2dd4bf', target: '10 / week',     achieved: '8.4 avg' },
+      { label: 'Healing Outreaches',       pct: 84, color: '#2dd4bf', target: '10 / week',     achieved: '8.4 avg' },
     ],
   },
   zonal: {
@@ -415,7 +415,7 @@ function ZonalPanel() {
       </div>
 
       <div className="two-col">
-        <SectionCard title="HTTNM Outreach Metrics" icon="📖">
+        <SectionCard title="Healing Outreach Metrics" icon="📖">
           {d.httnm.map(s => (
             <div key={s.label} className="stat-pair">
               <span className="stat-key">{s.label}</span>

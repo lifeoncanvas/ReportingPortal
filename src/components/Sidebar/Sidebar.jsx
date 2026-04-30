@@ -26,46 +26,22 @@ export default function Sidebar({ isOpen, onClose }) {
 
   const NAV_CONFIG = {
     global: [
-<<<<<<< HEAD
-      { label: t?.dashboard       || 'Dashboard',       icon: LayoutDashboard, path: '/global/dashboard' },
-      { label: t?.reportingPortal || 'Reporting Portal',icon: FileText,         path: '/global/reporting' },
-      { label: t?.analytics       || 'Analytics',       icon: BarChart2,        path: '/global/analytics' },
-      { label: t?.auditLogs       || 'Audit Logs',      icon: ClipboardList,    path: '/global/audit'     },
-    ],
-    zonal: [
-      { label: t?.dashboard       || 'Dashboard',       icon: LayoutDashboard, path: '/zonal/dashboard' },
-      { label: t?.reportingPortal || 'Reporting Portal',icon: FileText,         path: '/zonal/reporting' },
-      { label: t?.analytics       || 'Analytics',       icon: BarChart2,        path: '/zonal/analytics' },
-    ],
-    admin: [
-      { label: t?.dashboard       || 'Dashboard',       icon: LayoutDashboard, path: '/admin/dashboard'  },
-      { label: t?.userManagement  || 'User Management', icon: Users,            path: '/admin/users'      },
-      { label: t?.reportingPortal || 'Reporting Portal',icon: FileText,         path: '/admin/reporting'  },
-      { label: t?.analytics       || 'Analytics',       icon: BarChart2,        path: '/admin/analytics'  },
-      { label: t?.auditLogs       || 'Audit Logs',      icon: ClipboardList,    path: '/admin/audit'      },
-=======
       { label: t?.dashboard || 'Dashboard', icon: LayoutDashboard, path: '/global/dashboard' },
       { label: t?.reportingPortal || 'Reporting Portal', icon: FileText, path: '/global/reporting' },
-      { label: t?.financePortal || 'Finance Portal', icon: DollarSign, path: '/global/finance' },
-      // { label: t?.analytics || 'Analytics', icon: BarChart2, path: '/global/analytics' },
-      { label: t?.magazine || 'Magazine', icon: BookOpen, path: '/global/magazine' },
+      { label: t?.analytics || 'Analytics', icon: BarChart2, path: '/global/analytics' },
       { label: t?.auditLogs || 'Audit Logs', icon: ClipboardList, path: '/global/audit' },
     ],
     zonal: [
       { label: t?.dashboard || 'Dashboard', icon: LayoutDashboard, path: '/zonal/dashboard' },
       { label: t?.reportingPortal || 'Reporting Portal', icon: FileText, path: '/zonal/reporting' },
-      // { label: t?.analytics || 'Analytics', icon: BarChart2, path: '/zonal/analytics' },
-      { label: t?.magazine || 'Magazine', icon: BookOpen, path: '/zonal/magazine' },
+      { label: t?.analytics || 'Analytics', icon: BarChart2, path: '/zonal/analytics' },
     ],
     admin: [
       { label: t?.dashboard || 'Dashboard', icon: LayoutDashboard, path: '/admin/dashboard' },
       { label: t?.userManagement || 'User Management', icon: Users, path: '/admin/users' },
       { label: t?.reportingPortal || 'Reporting Portal', icon: FileText, path: '/admin/reporting' },
-      { label: t?.financePortal || 'Finance Portal', icon: DollarSign, path: '/admin/finance' },
       { label: t?.analytics || 'Analytics', icon: BarChart2, path: '/admin/analytics' },
-      { label: t?.magazine || 'Magazine', icon: BookOpen, path: '/admin/magazine' },
       { label: t?.auditLogs || 'Audit Logs', icon: ClipboardList, path: '/admin/audit' },
->>>>>>> 42cb4602337a17172f6e96ad65b280ca46679939
     ],
   };
 

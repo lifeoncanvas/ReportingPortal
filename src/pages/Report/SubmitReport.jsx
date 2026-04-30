@@ -43,9 +43,9 @@ const FIELDS = [
     icon: "📣",
     fields: [
       { key: "testimoniesSubmitted", label: "How many Testimonies were submitted to the Department?", type: "number", required: true, hint: "Target of 50 weekly" },
-      { key: "httnmTranslations", label: "Total number of HTTNM translations achieved?", type: "number", required: true, hint: "Target of 2 weekly" },
-      { key: "httnmOutreaches", label: "How many HTTNM outreaches held this week?", type: "number", required: true, hint: "Target of 10 weekly" },
-      { key: "httnmMediaSubmitted", label: "How many pictures or videos from the HTTNM outreaches were submitted?", type: "number", required: true, hint: "Target of 10 weekly" }
+      { key: "httnmTranslations", label: "Total number of Healing translations achieved?", type: "number", required: true, hint: "Target of 2 weekly" },
+      { key: "httnmOutreaches", label: "How many Healing outreaches held this week?", type: "number", required: true, hint: "Target of 10 weekly" },
+      { key: "httnmMediaSubmitted", label: "How many pictures or videos from the Healing outreaches were submitted?", type: "number", required: true, hint: "Target of 10 weekly" }
     ]
   },
   {

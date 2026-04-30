@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Eye, Download, Search, Upload, X, Check, ChevronDown, Plus, FileText, Heart, BookOpen, Newspaper, Users } from 'lucide-react';
+import { useAuth } from '../../../auth/AuthContext';
 import './styles.css';
 
 // ── Icons ──────────────────────────────────────────────
@@ -208,16 +209,20 @@ function ZonalReportForm({ onClose, onSubmit: parentSubmit }) {
     zoneName: '',
     zonalManager: '',
     partnershipRemittance: '',
+    popMedia: [],
+    popMediaFiles: [],
+    remittancePurpose: '',
+    trumpetsBlown: '',
     newPartners: '',
     testimoniesSubmitted: '',
-    httnmTranslations: '',
-    httnmOutreaches: '',
-    httnmPicturesVideos: '',
-    // pastoralAttendanceDirector: '',
-    // managerAttendanceDirector: '',
-    // managerAttendanceStrategy: '',
-    // healingCrusadeSponsorship: '',
-    // testimonyClarificationConcern: '',
+    healingTranslations: '',
+    healingOutreaches: '',
+    healingPicturesVideos: '',
+    pastoralAttendanceDirector: '',
+    managerAttendanceDirector: '',
+    managerAttendanceStrategy: '',
+    healingCrusadeSponsorship: '',
+    testimonyClarificationConcern: '',
     media: [],
     mediaFiles: [],
   };
@@ -225,18 +230,23 @@ function ZonalReportForm({ onClose, onSubmit: parentSubmit }) {
   const [errors, setErrors] = useState({});
   const [submitting, setSubmitting] = useState(false);
   const set = (k, v) => setForm(p => ({ ...p, [k]: v }));
-  const ATTENDANCE = ['', 'Yes', 'No', 'Officially Excused'];
+  const ATTENDANCE_OPTIONS = ['', 'Yes', 'No', 'Officially Excused'];
 
   const validate = () => {
     const e = {};
     if (!form.zoneName.trim()) e.zoneName = 'Required';
     if (!form.zonalManager.trim()) e.zonalManager = 'Required';
     if (!String(form.partnershipRemittance).trim()) e.partnershipRemittance = 'Required';
+    if (!form.remittancePurpose.trim()) e.remittancePurpose = 'Required';
+    if (!String(form.trumpetsBlown).trim()) e.trumpetsBlown = 'Required';
     if (!String(form.newPartners).trim()) e.newPartners = 'Required';
     if (!String(form.testimoniesSubmitted).trim()) e.testimoniesSubmitted = 'Required';
-    if (!String(form.httnmTranslations).trim()) e.httnmTranslations = 'Required';
-    if (!String(form.httnmOutreaches).trim()) e.httnmOutreaches = 'Required';
-    if (!String(form.httnmPicturesVideos).trim()) e.httnmPicturesVideos = 'Required';
+    if (!String(form.healingTranslations).trim()) e.healingTranslations = 'Required';
+    if (!String(form.healingOutreaches).trim()) e.healingOutreaches = 'Required';
+    if (!String(form.healingPicturesVideos).trim()) e.healingPicturesVideos = 'Required';
+    if (!form.pastoralAttendanceDirector) e.pastoralAttendanceDirector = 'Required';
+    if (!form.managerAttendanceDirector) e.managerAttendanceDirector = 'Required';
+    if (!form.managerAttendanceStrategy) e.managerAttendanceStrategy = 'Required';
     return e;
   };
 
@@ -277,38 +287,94 @@ function ZonalReportForm({ onClose, onSubmit: parentSubmit }) {
       {/* Partnership */}
       <div className="popup-section-head">🤝 Partnership & Recruitment</div>
       <div className="popup-fields">
-        <Field label="Total Partnership Remittance for this week" required hint="Weekly Target: 10,000 Espees" error={errors.partnershipRemittance}>
+        <Field label="Total Partnership Remittance for this week" required hint="Weekly Target of 10,000 Espees" error={errors.partnershipRemittance}>
           <input className={`kf-input${errors.partnershipRemittance ? ' kf-input-err' : ''}`} type="number" min="0" placeholder="0"
             value={form.partnershipRemittance} onChange={e => set('partnershipRemittance', e.target.value)} />
         </Field>
-        <Field label="How many new partners were recruited?" required hint="Target: 10 new partners weekly" error={errors.newPartners}>
+        <Field label="State purpose for each remittance" required hint="e.g. HSLHS, Healing, DOME, etc." error={errors.remittancePurpose}>
+          <textarea className={`kf-textarea${errors.remittancePurpose ? ' kf-input-err' : ''}`} rows={2} placeholder="Provide details..."
+            value={form.remittancePurpose} onChange={e => set('remittancePurpose', e.target.value)} />
+        </Field>
+        <Field label="Proof of Payment (POP)" hint="Upload POP for the transactions">
+          <MediaUploader files={form.popMedia}
+            onAdd={files => {
+              const prev = files.map(f => ({ name: f.name, type: f.type, url: (f.type.startsWith('image') || f.type.startsWith('video')) ? URL.createObjectURL(f) : null, size: f.size }));
+              set('popMedia', [...form.popMedia, ...prev]); set('popMediaFiles', [...form.popMediaFiles, ...files]);
+            }}
+            onRemove={i => { set('popMedia', form.popMedia.filter((_,j)=>j!==i)); set('popMediaFiles', form.popMediaFiles.filter((_,j)=>j!==i)); }}
+            label="Upload POP"
+          />
+        </Field>
+        <Field label="How many Trumpets were blown this week?" required hint="Each Zone has a target of 1000 trumpets" error={errors.trumpetsBlown}>
+          <input className={`kf-input${errors.trumpetsBlown ? ' kf-input-err' : ''}`} type="number" min="0" placeholder="0"
+            value={form.trumpetsBlown} onChange={e => set('trumpetsBlown', e.target.value)} />
+        </Field>
+        <Field label="How many new partners were recruited?" required hint="Target of 10 new partners weekly" error={errors.newPartners}>
           <input className={`kf-input${errors.newPartners ? ' kf-input-err' : ''}`} type="number" min="0" placeholder="0"
             value={form.newPartners} onChange={e => set('newPartners', e.target.value)} />
         </Field>
-        <Field label="How many Testimonies were submitted to the Department?" required hint="Target: 50 weekly" error={errors.testimoniesSubmitted}>
+        <Field label="How many Testimonies were submitted to the Department?" required hint="Target of 50 weekly" error={errors.testimoniesSubmitted}>
           <input className={`kf-input${errors.testimoniesSubmitted ? ' kf-input-err' : ''}`} type="number" min="0" placeholder="0"
             value={form.testimoniesSubmitted} onChange={e => set('testimoniesSubmitted', e.target.value)} />
         </Field>
       </div>
 
-      {/* HTTNM Outreach */}
-      <div className="popup-section-head">📖 HTTNM Outreach</div>
+      {/* Healing Outreach */}
+      <div className="popup-section-head">📖 Healing Outreach</div>
       <div className="popup-fields">
-        <Field label="Total number of HTTNM translations achieved?" required hint="Target: 2 weekly" error={errors.httnmTranslations}>
-          <input className={`kf-input${errors.httnmTranslations ? ' kf-input-err' : ''}`} type="number" min="0" placeholder="0"
-            value={form.httnmTranslations} onChange={e => set('httnmTranslations', e.target.value)} />
+        <Field label="Total number of Healing translations achieved?" required hint="Target of 2 weekly" error={errors.healingTranslations}>
+          <input className={`kf-input${errors.healingTranslations ? ' kf-input-err' : ''}`} type="number" min="0" placeholder="0"
+            value={form.healingTranslations} onChange={e => set('healingTranslations', e.target.value)} />
         </Field>
-        <Field label="How many HTTNM outreaches were held this week?" required hint="Target: 10 weekly" error={errors.httnmOutreaches}>
-          <input className={`kf-input${errors.httnmOutreaches ? ' kf-input-err' : ''}`} type="number" min="0" placeholder="0"
-            value={form.httnmOutreaches} onChange={e => set('httnmOutreaches', e.target.value)} />
+        <Field label="How many Healing outreaches held this week?" required hint="Target of 10 weekly" error={errors.healingOutreaches}>
+          <input className={`kf-input${errors.healingOutreaches ? ' kf-input-err' : ''}`} type="number" min="0" placeholder="0"
+            value={form.healingOutreaches} onChange={e => set('healingOutreaches', e.target.value)} />
         </Field>
-        <Field label="How many pictures or videos from the HTTNM outreaches were submitted?" required hint="Target: 10 weekly" error={errors.httnmPicturesVideos}>
-          <input className={`kf-input${errors.httnmPicturesVideos ? ' kf-input-err' : ''}`} type="number" min="0" placeholder="0"
-            value={form.httnmPicturesVideos} onChange={e => set('httnmPicturesVideos', e.target.value)} />
+        <Field label="How many pictures of videos from the Healing outreaches were submitted?" required hint="Target of 10 weekly" error={errors.healingPicturesVideos}>
+          <input className={`kf-input${errors.healingPicturesVideos ? ' kf-input-err' : ''}`} type="number" min="0" placeholder="0"
+            value={form.healingPicturesVideos} onChange={e => set('healingPicturesVideos', e.target.value)} />
         </Field>
       </div>
 
-    
+      {/* Attendance & Sponsorship */}
+      <div className="popup-section-head">📅 Meetings & Sponsorship</div>
+      <div className="popup-fields">
+        <Field label="Zonal Pastor's attendance in the Esteemed Director's weekly meeting?" required error={errors.pastoralAttendanceDirector}>
+          <div className="kf-select-wrap">
+            <select className={`kf-select${errors.pastoralAttendanceDirector ? ' kf-input-err' : ''}`} value={form.pastoralAttendanceDirector} onChange={e => set('pastoralAttendanceDirector', e.target.value)}>
+              <option value="">Please select</option>
+              {ATTENDANCE_OPTIONS.filter(o => o).map(opt => <option key={opt} value={opt}>{opt}</option>)}
+            </select>
+            <ChevronDown size={13} className="kf-select-chevron" />
+          </div>
+        </Field>
+        <Field label="Zonal Manager's attendance in the Esteemed Director's weekly meeting?" required error={errors.managerAttendanceDirector}>
+          <div className="kf-select-wrap">
+            <select className={`kf-select${errors.managerAttendanceDirector ? ' kf-input-err' : ''}`} value={form.managerAttendanceDirector} onChange={e => set('managerAttendanceDirector', e.target.value)}>
+              <option value="">Please select</option>
+              {ATTENDANCE_OPTIONS.filter(o => o).map(opt => <option key={opt} value={opt}>{opt}</option>)}
+            </select>
+            <ChevronDown size={13} className="kf-select-chevron" />
+          </div>
+        </Field>
+        <Field label="Zonal Manager's attendance in the weekly Managers strategy meeting?" required error={errors.managerAttendanceStrategy}>
+          <div className="kf-select-wrap">
+            <select className={`kf-select${errors.managerAttendanceStrategy ? ' kf-input-err' : ''}`} value={form.managerAttendanceStrategy} onChange={e => set('managerAttendanceStrategy', e.target.value)}>
+              <option value="">Please select</option>
+              {ATTENDANCE_OPTIONS.filter(o => o).map(opt => <option key={opt} value={opt}>{opt}</option>)}
+            </select>
+            <ChevronDown size={13} className="kf-select-chevron" />
+          </div>
+        </Field>
+        <Field label="How much Sponsorship was given for the Healing Crusade this week?">
+          <input className="kf-input" type="text" placeholder="Amount"
+            value={form.healingCrusadeSponsorship} onChange={e => set('healingCrusadeSponsorship', e.target.value)} />
+        </Field>
+        <Field label="Any Testimony, Clarification or Concern?">
+          <textarea className="kf-textarea" rows={3} placeholder="Provide details..."
+            value={form.testimonyClarificationConcern} onChange={e => set('testimonyClarificationConcern', e.target.value)} />
+        </Field>
+      </div>
 
       {/* Media */}
       <div className="popup-section-head">📎 Supporting Media</div>
@@ -608,8 +674,10 @@ function MagazineForm({ onClose, onSubmit: parentSubmit }) {
     const e = {};
     if (!form.language) e.language = 'Required';
     if (!form.orderedCopies) e.orderedCopies = 'Required';
-    if (!form.received) e.received = 'Please select a receipt status';
-    if ((form.received === 'No' || form.received === 'Partial') && !form.notReceivedReason.trim()) e.notReceivedReason = 'Please provide a reason';
+    if (!String(form.receivedCopies).trim()) e.receivedCopies = 'Required';
+    if (Number(form.receivedCopies) < Number(form.orderedCopies) && !form.notReceivedReason.trim()) {
+      e.notReceivedReason = 'Please provide a reason';
+    }
     setErrors(e);
     if (Object.keys(e).length) return;
     setSubmitting(true);
@@ -617,8 +685,8 @@ function MagazineForm({ onClose, onSubmit: parentSubmit }) {
     parentSubmit({
       language: form.language,
       ordered: form.orderedCopies,
-      received: form.received === 'Yes' ? form.receivedCopies : '0',
-      receiptStatus: form.received,
+      received: form.receivedCopies,
+      receiptStatus: Number(form.receivedCopies) === 0 ? 'No' : (Number(form.receivedCopies) < Number(form.orderedCopies) ? 'Partial' : 'Yes'),
       reason: form.notReceivedReason,
       sponsoredCopies: form.sponsoredCopies,
       healingOutreaches: form.healingOutreaches,
@@ -654,22 +722,11 @@ function MagazineForm({ onClose, onSubmit: parentSubmit }) {
       {/* Receipt Status */}
       <div className="popup-section-head">📬 Receipt Status</div>
       <div className="popup-fields">
-        <Field label="Number of copies received" required error={errors.received}>
-          <input className="kf-input" type="number" min="0" placeholder="0"
+        <Field label="Number of copies received" required error={errors.receivedCopies}>
+          <input className={`kf-input${errors.receivedCopies ? ' kf-input-err' : ''}`} type="number" min="0" placeholder="0"
             value={form.receivedCopies} onChange={e => setForm(p => ({ ...p, receivedCopies: e.target.value }))} />
         </Field>
-        <Field label="Were copies received?" required error={errors.received}>
-          <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
-            {['Yes', 'No', 'Partial'].map(opt => (
-              <button key={opt} type="button"
-                className={`toggle-btn ${form.received === opt ? 'selected' : ''}`}
-                onClick={() => setForm(p => ({ ...p, received: opt }))}>
-                {opt}
-              </button>
-            ))}
-          </div>
-        </Field>
-        {(form.received === 'No' || form.received === 'Partial') && (
+        {Number(form.receivedCopies) < Number(form.orderedCopies) && form.orderedCopies !== '' && (
           <Field label="If not received — provide reason" required error={errors.notReceivedReason}>
             <textarea className={`kf-textarea${errors.notReceivedReason ? ' kf-input-err' : ''}`} rows={3}
               placeholder="Explain why copies were not received…"
@@ -685,7 +742,7 @@ function MagazineForm({ onClose, onSubmit: parentSubmit }) {
       {/* Healing Outreaches */}
       <div className="popup-section-head">💊 Healing Outreaches</div>
       <div className="popup-fields">
-        <Field label="How many Healing Outreaches were carried out this week?">
+        <Field label="How many Healing Outreaches (not HTTNM outreaches) were carried out?">
           <input className="kf-input" type="number" min="0" placeholder="0"
             value={form.healingOutreaches} onChange={e => setForm(p => ({ ...p, healingOutreaches: e.target.value }))} />
         </Field>
@@ -723,7 +780,7 @@ function MagazineForm({ onClose, onSubmit: parentSubmit }) {
 // ══════════════════════════════════════════════════════
 // OUTREACH REPORT FORM
 // ══════════════════════════════════════════════════════
-const OUTREACH_CATEGORIES = ['Healing', 'Soul-winning', 'HTTNM', 'Prison Outreach', 'School Outreach', 'Market Outreach', 'Hospital Outreach', 'Other'];
+const OUTREACH_CATEGORIES = ['Healing', 'Soul-winning', 'Prison Outreach', 'School Outreach', 'Market Outreach', 'Hospital Outreach', 'Other'];
 
 function OutreachForm({ onClose, onSubmit: parentSubmit }) {
   const [form, setForm] = useState({
@@ -884,6 +941,7 @@ const TABS_CONFIG = [
 // MAIN COMPONENT
 // ══════════════════════════════════════════════════════
 export default function ReportingPortal() {
+  const { user } = useAuth();
   const [activeTab, setActiveTab]       = useState('zonal');
   const [search, setSearch]             = useState('');
   const [reportsByTab, setReportsByTab] = useState({ zonal: [], partnership: [], testimonials: [], magazine: [], outreach: [] });
@@ -899,9 +957,26 @@ export default function ReportingPortal() {
     Object.values(r).some(v => String(v).toLowerCase().includes(search.toLowerCase()))
   );
 
-  const handleSubmit = (data) => {
+  const handleSubmit = async (data) => {
     const prefix = { zonal: 'ZR', partnership: 'PR', testimonials: 'TS', magazine: 'MG', outreach: 'OR' }[activeTab];
     const id = `${prefix}-${String(counters[activeTab]).padStart(3, '0')}`;
+    
+    if (['partnership', 'testimonials', 'magazine', 'outreach'].includes(activeTab)) {
+      try {
+        await fetch(`${process.env.REACT_APP_API_URL || 'http://65.0.71.13:8080'}/api/portal-reports/${activeTab}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            ...data,
+            submitterEmail: user?.email,
+            zoneName: user?.zone
+          })
+        });
+      } catch (e) {
+        console.error('Failed to save to backend DB', e);
+      }
+    }
+
     setReportsByTab(p => ({ ...p, [activeTab]: [{ id, ...data }, ...p[activeTab]] }));
     setCounters(p => ({ ...p, [activeTab]: p[activeTab] + 1 }));
     setShowForm(false);
