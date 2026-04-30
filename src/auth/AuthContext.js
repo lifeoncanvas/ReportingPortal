@@ -65,9 +65,11 @@ export function AuthProvider({ children }) {
       });
 
       if (!res.ok) {
-
         const errText = await res.text();
-        return errText || 'Invalid email or password.';
+        if (errText && errText.length < 150 && !errText.includes('<!DOCTYPE')) {
+          return errText;
+        }
+        return `Login Failed (${res.status})`;
       }
 
       const userData = await res.json();
