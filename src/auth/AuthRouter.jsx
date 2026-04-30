@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import Signin from './Signin/signin';
+import Signup from './Signup/signup';
 import InviteSignup from './InviteSignup/InviteSignup';
 import ForgotPassword from './ForgotPassword/ForgotPassword';
 
 export default function AuthRouter() {
-  const [view, setView] = useState('login'); // 'login', 'forgot-password'
+  const [view, setView] = useState('login'); // 'login', 'signup', 'forgot-password'
   
   const search = new URLSearchParams(window.location.search);
   const token = search.get('token');
@@ -20,11 +21,13 @@ export default function AuthRouter() {
     }} />;
   }
 
+  if (view === 'signup') {
+    return <Signup onSwitch={() => setView('login')} />;
+  }
+
   return (
     <Signin 
-      onSwitch={() => { 
-        alert('Public registrations have been disabled by the Administrator. You must receive an invitation link from an Admin to create an account.'); 
-      }} 
+      onSwitch={() => setView('signup')} 
       onForgotPassword={() => setView('forgot-password')}
     />
   );

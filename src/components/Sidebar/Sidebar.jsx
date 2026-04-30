@@ -22,24 +22,19 @@ export default function Sidebar({ isOpen, onClose }) {
     global: [
       { label: t?.dashboard       || 'Dashboard',       icon: LayoutDashboard, path: '/global/dashboard' },
       { label: t?.reportingPortal || 'Reporting Portal',icon: FileText,         path: '/global/reporting' },
-      { label: t?.financePortal   || 'Finance Portal',  icon: DollarSign,       path: '/global/finance'   },
       { label: t?.analytics       || 'Analytics',       icon: BarChart2,        path: '/global/analytics' },
-      { label: t?.magazine        || 'Magazine',        icon: BookOpen,         path: '/global/magazine'  },
       { label: t?.auditLogs       || 'Audit Logs',      icon: ClipboardList,    path: '/global/audit'     },
     ],
     zonal: [
       { label: t?.dashboard       || 'Dashboard',       icon: LayoutDashboard, path: '/zonal/dashboard' },
       { label: t?.reportingPortal || 'Reporting Portal',icon: FileText,         path: '/zonal/reporting' },
       { label: t?.analytics       || 'Analytics',       icon: BarChart2,        path: '/zonal/analytics' },
-      { label: t?.magazine        || 'Magazine',        icon: BookOpen,         path: '/zonal/magazine'  },
     ],
     admin: [
       { label: t?.dashboard       || 'Dashboard',       icon: LayoutDashboard, path: '/admin/dashboard'  },
       { label: t?.userManagement  || 'User Management', icon: Users,            path: '/admin/users'      },
       { label: t?.reportingPortal || 'Reporting Portal',icon: FileText,         path: '/admin/reporting'  },
-      { label: t?.financePortal   || 'Finance Portal',  icon: DollarSign,       path: '/admin/finance'    },
       { label: t?.analytics       || 'Analytics',       icon: BarChart2,        path: '/admin/analytics'  },
-      { label: t?.magazine        || 'Magazine',        icon: BookOpen,         path: '/admin/magazine'  },
       { label: t?.auditLogs       || 'Audit Logs',      icon: ClipboardList,    path: '/admin/audit'      },
     ],
   };

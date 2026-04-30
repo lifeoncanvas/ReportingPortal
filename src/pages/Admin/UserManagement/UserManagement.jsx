@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Search, Filter, Plus, Edit2, Trash2, X } from 'lucide-react';
+import { Search, Filter, Plus, Edit2, Trash2, X, Check } from 'lucide-react';
 import './styles.css';
 
 const INITIAL_USERS = [
@@ -49,12 +49,6 @@ export default function UserManagement() {
     )
   );
 
-  const openAdd = () => {
-    setEditUser(null);
-    setForm(EMPTY_FORM);
-    setShowModal(true);
-  };
-
   const openEdit = (u) => {
     setEditUser(u);
     setForm({ firstName: u.firstName, lastName: u.lastName, email: u.email, role: u.role, region: u.region, status: u.status });
@@ -62,28 +56,13 @@ export default function UserManagement() {
   };
 
   const handleSave = async () => {
-    if (!form.email) return;
+    if (!form.email || !editUser) return;
 
-    if (editUser) {
-      await fetch(`${process.env.REACT_APP_API_URL}/api/users/${editUser.id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form)
-      });
-    } else {
-      const res = await fetch(`${process.env.REACT_APP_API_URL}/api/users/invite`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: form.email, role: form.role, region: form.region })
-      });
-      if (res.ok) {
-        alert('Invitation Sent! The user will receive an email from sharonshelke7@gmail.com to set up their account.');
-      } else {
-        const err = await res.text();
-        alert('Error: ' + err);
-        return;
-      }
-    }
+    await fetch(`${process.env.REACT_APP_API_URL}/api/users/${editUser.id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(form)
+    });
     
     setShowModal(false);
     fetchUsers();
@@ -106,6 +85,17 @@ export default function UserManagement() {
     fetchUsers();
   };
 
+  const handleApprove = async (id) => {
+    const res = await fetch(`${process.env.REACT_APP_API_URL}/api/users/${id}/approve`, { method: 'POST' });
+    if (res.ok) {
+      alert('User approved successfully!');
+      fetchUsers();
+    } else {
+      const err = await res.text();
+      alert('Error approving user: ' + err);
+    }
+  };
+
   return (
     <div className="um-page">
       <div className="um-page-header">
@@ -113,9 +103,6 @@ export default function UserManagement() {
           <h2>User Management</h2>
           <p>Manage platform users, roles and access</p>
         </div>
-        <button className="um-add-btn" onClick={openAdd}>
-          <Plus size={15} /> Add User
-        </button>
       </div>
 
       {/* Stats */}
@@ -195,7 +182,17 @@ export default function UserManagement() {
                     <td>{u.joined}</td>
                     <td>
                       <div className="um-actions">
-                        {u.status === 'pending' && u.inviteToken && (
+                        {u.status === 'inactive' && (
+                          <button 
+                            className="um-icon-btn" 
+                            style={{ color: '#16a34a', borderColor: '#16a34a', background: '#dcfce7' }} 
+                            onClick={() => handleApprove(u.id)} 
+                            title="Approve User"
+                          >
+                            <Check size={14} />
+                          </button>
+                        )}
+                        {u.status === 'inactive' && u.inviteToken && (
                           <button 
                             className="um-icon-btn copy" 
                             onClick={() => {
@@ -229,7 +226,7 @@ export default function UserManagement() {
         <div className="um-overlay">
           <div className="um-modal">
             <div className="um-modal-header">
-              <h3>{editUser ? 'Edit User' : 'Add New User'}</h3>
+              <h3>Edit User</h3>
               <button className="um-modal-close" onClick={() => setShowModal(false)}>
                 <X size={16} />
               </button>
@@ -237,25 +234,21 @@ export default function UserManagement() {
 
             <div className="um-modal-body">
               <div className="um-form-grid">
-                {editUser && (
-                  <>
-                    <div className="um-field">
-                      <label>First Name</label>
-                      <input type="text" value={form.firstName || ''}
-                        onChange={e => setForm(p => ({ ...p, firstName: e.target.value }))}
-                        placeholder="First name" />
-                    </div>
-                    <div className="um-field">
-                      <label>Last Name</label>
-                      <input type="text" value={form.lastName || ''}
-                        onChange={e => setForm(p => ({ ...p, lastName: e.target.value }))}
-                        placeholder="Last name" />
-                    </div>
-                  </>
-                )}
-                <div className={`um-field ${editUser ? 'um-field-full' : ''}`}>
+                <div className="um-field">
+                  <label>First Name</label>
+                  <input type="text" value={form.firstName || ''}
+                    onChange={e => setForm(p => ({ ...p, firstName: e.target.value }))}
+                    placeholder="First name" />
+                </div>
+                <div className="um-field">
+                  <label>Last Name</label>
+                  <input type="text" value={form.lastName || ''}
+                    onChange={e => setForm(p => ({ ...p, lastName: e.target.value }))}
+                    placeholder="Last name" />
+                </div>
+                <div className="um-field um-field-full">
                   <label>Email Address</label>
-                  <input type="email" value={form.email || ''} disabled={!!editUser}
+                  <input type="email" value={form.email || ''} disabled={true}
                     onChange={e => setForm(p => ({ ...p, email: e.target.value }))}
                     placeholder="email@loveworld.com" />
                 </div>
@@ -292,7 +285,7 @@ export default function UserManagement() {
             <div className="um-modal-footer">
               <button className="um-btn-ghost" onClick={() => setShowModal(false)}>Cancel</button>
               <button className="um-btn-primary" onClick={handleSave}>
-                {editUser ? 'Save Changes' : 'Add User'}
+                Save Changes
               </button>
             </div>
           </div>
