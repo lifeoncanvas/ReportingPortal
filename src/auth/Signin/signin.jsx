@@ -42,14 +42,14 @@ export default function Signin({ onSwitch, onForgotPassword }) {
 
   const handleKingChatLogin = () => {
     const loginOptions = {
-      scopes: ["authenticate"],
+      scopes: ["authenticate", "profile"],
       clientId: process.env.REACT_APP_KINGSCHAT_CLIENT_ID || 'YOUR_CLIENT_ID_HERE', 
     };
     
     kingsChatWebSdk.login(loginOptions)
       .then(async (tokenResponse) => {
-        const { accessToken } = tokenResponse;
-        const err = await loginWithKingChat(accessToken, handleLoginResponse);
+        const { accessToken, user: kcUser } = tokenResponse;
+        const err = await loginWithKingChat(accessToken, handleLoginResponse, kcUser);
         if (err) setError(err);
       })
       .catch(err => {

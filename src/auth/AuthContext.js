@@ -28,12 +28,18 @@ export function AuthProvider({ children }) {
     return await baseLogin({ email, password, loginMethod: 'password' }, onPendingToasts);
   };
 
-  const loginWithKingChat = async (accessToken, onPendingToasts) => {
+  const loginWithKingChat = async (accessToken, onPendingToasts, kcUser) => {
     try {
       const res = await fetch(`${process.env.REACT_APP_API_URL}/api/auth/kingchat`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token: accessToken })
+        body: JSON.stringify({
+          token: accessToken,
+          email: kcUser?.email || null,
+          firstName: kcUser?.first_name || kcUser?.firstName || kcUser?.name || null,
+          lastName: kcUser?.last_name || kcUser?.lastName || null,
+          username: kcUser?.username || null,
+        })
       });
 
       if (!res.ok) {
