@@ -1,0 +1,18 @@
+[33m0d3bb42[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mui-changes[m[33m, [m[1;31morigin/ui-changes[m[33m)[m HEAD@{0}: pull origin ui-changes --rebase (finish): returning to refs/heads/ui-changes
+[33m0d3bb42[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mui-changes[m[33m, [m[1;31morigin/ui-changes[m[33m)[m HEAD@{1}: pull origin ui-changes --rebase (pick): responsive
+[33mac09bda[m HEAD@{2}: pull origin ui-changes --rebase (pick): responsive
+[33mbaf20b4[m HEAD@{3}: pull origin ui-changes --rebase (start): checkout baf20b4e326215d31ac5af5ec690e9f2842acdab
+[33m443c431[m HEAD@{4}: commit: responsive
+[33m43c7748[m HEAD@{5}: commit: responsive
+[33m6c15906[m HEAD@{6}: checkout: moving from main to ui-changes
+[33m506335c[m[33m ([m[1;32mmain[m[33m)[m HEAD@{7}: reset: moving to HEAD
+[33m506335c[m[33m ([m[1;32mmain[m[33m)[m HEAD@{8}: reset: moving to HEAD~1
+[33mf7dfc85[m HEAD@{9}: commit: responsive
+[33m506335c[m[33m ([m[1;32mmain[m[33m)[m HEAD@{10}: commit: reporting portal
+[33mc318e3e[m HEAD@{11}: pull --tags origin main: Fast-forward
+[33m2107243[m HEAD@{12}: checkout: moving from ui-changes to main
+[33m6c15906[m HEAD@{13}: commit: magazine
+[33m2107243[m HEAD@{14}: checkout: moving from main to ui-changes
+[33m2107243[m HEAD@{15}: Branch: renamed refs/heads/master to refs/heads/main
+[33m2107243[m HEAD@{17}: commit: Initial commit
+[33mcd4432f[m HEAD@{18}: commit (initial): Initialize project using Create React App
