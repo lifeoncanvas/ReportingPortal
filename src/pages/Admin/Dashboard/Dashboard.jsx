@@ -121,7 +121,7 @@ export default function AdminDashboard() {
               <span className="ad-badge" style={{ background: '#ede9fe', color: '#5b21b6' }}>
                 {u.role}
               </span>
-              <span className={`ad-status ${u.status || 'active'}`}>{u.status || 'active'}</span>
+              <span className={`ad-status ${u.status || 'inactive'}`}>{u.status || 'inactive'}</span>
             </div>
           ))}
         </div>
