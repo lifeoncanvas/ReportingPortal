@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { useAuth } from '../AuthContext';
 import { useToast } from '../../context/ToastContext';
 import { useNavigate } from 'react-router-dom';
+import kingsChatWebSdk from 'kingschat-web-sdk';
+import 'kingschat-web-sdk/dist/stylesheets/style.min.css';
 import './styles.css';
 
 const ROLE_NOTIF_PATH = {
@@ -38,13 +40,22 @@ export default function Signin({ onSwitch, onForgotPassword }) {
     if (err) setError(err);
   };
 
-  const handleKingChatLogin = async () => {
-    if (!email || !password) {
-      setError('Please enter email and password to login with KingChat');
-      return;
-    }
-    const err = await loginWithKingChat(email, password, handleLoginResponse);
-    if (err) setError(err);
+  const handleKingChatLogin = () => {
+    const loginOptions = {
+      scopes: ["authenticate"],
+      clientId: process.env.REACT_APP_KINGSCHAT_CLIENT_ID || 'YOUR_CLIENT_ID_HERE', 
+    };
+    
+    kingsChatWebSdk.login(loginOptions)
+      .then(async (tokenResponse) => {
+        const { accessToken } = tokenResponse;
+        const err = await loginWithKingChat(accessToken, handleLoginResponse);
+        if (err) setError(err);
+      })
+      .catch(err => {
+        console.error("KingsChat login error:", err);
+        setError('KingsChat login was cancelled or failed.');
+      });
   };
 
   return (
@@ -62,9 +73,11 @@ export default function Signin({ onSwitch, onForgotPassword }) {
             <span>OR</span>
           </div>
 
-          <button className="auth-button kingchat-btn" type="button" onClick={handleKingChatLogin} style={{ background: '#4f46e5' }}>
-            Login with KingChat
-          </button>
+          <div 
+            className="kc-web-sdk-btn" 
+            onClick={handleKingChatLogin} 
+            style={{ width: '100%', display: 'flex', justifyContent: 'center', cursor: 'pointer' }}
+          ></div>
         </form>
         <p className="auth-switch">
           <span className="auth-link" onClick={onForgotPassword}>Forgot password?</span>

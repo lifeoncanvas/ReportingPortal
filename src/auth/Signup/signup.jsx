@@ -9,10 +9,18 @@ export default function Signup({ onSwitch }) {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
+  const [success, setSuccess] = useState(false);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     const err = await signup(name, email, password);
-    if (err) setError(err);
+    if (err) {
+      setError(err);
+      setSuccess(false);
+    } else {
+      setError('');
+      setSuccess(true);
+    }
   };
 
   return (
@@ -21,15 +29,22 @@ export default function Signup({ onSwitch }) {
         <h2 className="auth-title">Loveworld Reports</h2>
         <p className="auth-subtitle">Create your account</p>
         {error && <p className="auth-error">{error}</p>}
-        <form onSubmit={handleSubmit}>
-          <input className="auth-input" type="text" placeholder="Full Name" value={name} onChange={e => setName(e.target.value)} required />
-          <input className="auth-input" type="email" placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} required />
-          <input className="auth-input" type="password" placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} required />
-          <p className="auth-role-note">New accounts are assigned <strong>Zonal Mgr</strong> role by default.</p>
-          <button className="auth-button" type="submit">Sign Up</button>
-        </form>
+        {success ? (
+          <div className="auth-success" style={{ color: '#16a34a', background: '#dcfce7', padding: '1rem', borderRadius: '8px', marginBottom: '1rem', textAlign: 'center' }}>
+            <p><strong>Success!</strong></p>
+            <p>Your account has been created and is currently pending admin approval.</p>
+          </div>
+        ) : (
+          <form onSubmit={handleSubmit}>
+            <input className="auth-input" type="text" placeholder="Full Name" value={name} onChange={e => setName(e.target.value)} required />
+            <input className="auth-input" type="email" placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} required />
+            <input className="auth-input" type="password" placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} required />
+            <p className="auth-role-note">New accounts are assigned <strong>Zonal Mgr</strong> role by default.</p>
+            <button className="auth-button" type="submit">Sign Up</button>
+          </form>
+        )}
         <p className="auth-switch">
-          Already have an account? <span className="auth-link" onClick={onSwitch}>Sign in</span>
+          {success ? 'Ready to login?' : 'Already have an account?'} <span className="auth-link" onClick={onSwitch}>Sign in</span>
         </p>
       </div>
     </div>

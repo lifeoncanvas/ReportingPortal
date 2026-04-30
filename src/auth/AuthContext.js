@@ -32,8 +32,31 @@ export function AuthProvider({ children }) {
     return await baseLogin({ email, password, loginMethod: 'password' }, onPendingToasts);
   };
 
-  const loginWithKingChat = async (email, password, onPendingToasts) => {
-    return await baseLogin({ email, password, loginMethod: 'kingchat' }, onPendingToasts);
+  const loginWithKingChat = async (accessToken, onPendingToasts) => {
+    try {
+      const res = await fetch(`${process.env.REACT_APP_API_URL}/api/auth/kingchat`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token: accessToken })
+      });
+
+      if (!res.ok) {
+        const errText = await res.text();
+        return errText || 'KingsChat login failed.';
+      }
+
+      const userData = await res.json();
+      session.set('lw_user', userData);
+      setUser(userData);
+
+      const pending = flushPendingToasts(userData.role);
+      if (pending.length && onPendingToasts) onPendingToasts(pending, userData.role);
+
+      return null;
+    } catch (err) {
+      console.error("KingsChat Auth failed:", err);
+      return 'Network error or Invalid KingsChat session.';
+    }
   };
 
   const baseLogin = async (payload, onPendingToasts) => {
@@ -96,8 +119,27 @@ export function AuthProvider({ children }) {
     setAvatar(null);
   };
 
+  const signup = async (name, email, password) => {
+    try {
+      const res = await fetch(`${process.env.REACT_APP_API_URL}/api/auth/signup`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, password })
+      });
+
+      if (!res.ok) {
+        const errText = await res.text();
+        return errText || 'Registration failed.';
+      }
+      return null;
+    } catch (err) {
+      console.error("Signup failed:", err);
+      return 'Network error.';
+    }
+  };
+
   return (
-    <AuthContext.Provider value={{ user, login, loginWithKingChat, logout, avatar, updateAvatar }}>
+    <AuthContext.Provider value={{ user, login, loginWithKingChat, signup, logout, avatar, updateAvatar }}>
       {children}
     </AuthContext.Provider>
   );

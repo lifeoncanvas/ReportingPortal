@@ -1,5 +1,5 @@
 import React from 'react';
-import { Users, FileText, DollarSign, Shield, Download, BookOpen } from 'lucide-react';
+import { Users, FileText, Shield, Download } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useNotifications } from '../../../context/NotificationContext';
 import { useAuth } from '../../../auth/AuthContext';
@@ -8,7 +8,6 @@ import './styles.css';
 const KPI = [
   { label: 'Total Users',   value: '248',    pct: '+5%',  iconBg: '#ede9fe', iconColor: '#5b21b6', icon: Users      },
   { label: 'Total Reports', value: '1,284',  pct: '+12%', iconBg: '#dcfce7', iconColor: '#16a34a', icon: FileText   },
-  { label: 'Total Finance', value: '$84.2K', pct: '+8%',  iconBg: '#e0f2fe', iconColor: '#0284c7', icon: DollarSign },
   { label: 'Active Roles',  value: '3',      pct: '',     iconBg: '#fff7ed', iconColor: '#ea580c', icon: Shield     },
 ];
 
@@ -65,7 +64,6 @@ export default function AdminDashboard() {
   const KPI_DATA = [
     { label: 'Total Users',   value: stats?.totalUsers || '0',    pct: '+5%',  iconBg: '#ede9fe', iconColor: '#5b21b6', icon: Users      },
     { label: 'Total Reports', value: stats?.totalReports || '0',  pct: '+12%', iconBg: '#dcfce7', iconColor: '#16a34a', icon: FileText   },
-    { label: 'Total Finance', value: `$${stats?.totalFinance?.toLocaleString() || '0'}`, pct: '+8%',  iconBg: '#e0f2fe', iconColor: '#0284c7', icon: DollarSign },
     { label: 'Active Roles',  value: '3',      pct: '',     iconBg: '#fff7ed', iconColor: '#ea580c', icon: Shield     },
   ];
 
@@ -200,29 +198,7 @@ export default function AdminDashboard() {
         </div>
       </div>
 
-      {/* Magazine Order Updates */}
-      {magazineNotifs.length > 0 && (
-        <div className="ad-card" style={{ gridColumn: '1 / -1' }}>
-          <div className="ad-card-header">
-            <h3 style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <BookOpen size={16} color="#d97706" /> Magazine Order Updates
-            </h3>
-            <span style={{ fontSize: '0.75rem', color: '#9ca3af' }}>{magazineNotifs.length} new</span>
-          </div>
-          {magazineNotifs.map(n => (
-            <div className="ad-log-row" key={n.id}>
-              <div className="ad-log-dot" style={{ background: '#d97706' }} />
-              <div className="ad-log-info">
-                <p>
-                  {n.title}
-                  <span className="ad-mod-badge" style={{ background: '#fef3c7', color: '#d97706' }}>Magazine</span>
-                </p>
-                <span>{n.message} · {n.time}</span>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
+
 
     </div>
   );
