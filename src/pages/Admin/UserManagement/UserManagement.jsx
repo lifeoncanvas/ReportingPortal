@@ -20,7 +20,7 @@ const ROLE_COLORS = {
 
 const EMPTY_FORM = {
   firstName: '', lastName: '', email: '',
-  role: 'zonal', region: '', status: 'active',
+  role: 'zonal', region: '', status: 'inactive',
 };
 
 export default function UserManagement() {
