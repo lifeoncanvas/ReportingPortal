@@ -124,13 +124,36 @@ export default function Settings() {
   const [pwForm,  setPwForm]  = useState({ current: '', new: '', confirm: '' });
   const [showPw,  setShowPw]  = useState({ current: false, new: false, confirm: false });
   const [pwError, setPwError] = useState('');
-  const handlePasswordSave = () => {
+  const [pwLoading, setPwLoading] = useState(false);
+  const handlePasswordSave = async () => {
     setPwError('');
+    if (!pwForm.current)                   { setPwError('Current password is required.'); return; }
     if (pwForm.new.length < 6)             { setPwError('New password must be at least 6 characters.'); return; }
     if (pwForm.new !== pwForm.confirm)      { setPwError('Passwords do not match.'); return; }
-    updateSection('security', { passwordUpdatedAt: new Date().toISOString() });
-    setPwForm({ current: '', new: '', confirm: '' });
-    showToast(t?.updatePassword || 'Password updated successfully');
+
+    setPwLoading(true);
+    try {
+      const res = await fetch(`${process.env.REACT_APP_API_URL}/api/auth/change-password`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: user?.email,
+          currentPassword: pwForm.current,
+          newPassword: pwForm.new,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setPwError(data.error || data.message || 'Failed to update password.');
+      } else {
+        setPwForm({ current: '', new: '', confirm: '' });
+        showToast(t?.updatePassword || 'Password updated successfully');
+      }
+    } catch (err) {
+      setPwError('Network error. Please try again.');
+    } finally {
+      setPwLoading(false);
+    }
   };
   const handle2FAToggle = () => {
     const next = !settings.security.twoFactor;
@@ -285,26 +308,9 @@ export default function Settings() {
                   ))}
                 </div>
                 {pwError && <p className="st-error">{pwError}</p>}
-                <button className="st-btn-primary" onClick={handlePasswordSave}>
-                  {t?.updatePassword || 'Update Password'}
+                <button className="st-btn-primary" onClick={handlePasswordSave} disabled={pwLoading}>
+                  {pwLoading ? 'Updating...' : (t?.updatePassword || 'Update Password')}
                 </button>
-              </div>
-              <div className="st-divider" />
-              <div className="st-section-block">
-                <div className="st-block-title">{t?.twoFactor || 'Two-Factor Authentication'}</div>
-                <p className="st-block-desc">{t?.twoFactorDesc || 'Add an extra layer of security to your account.'}</p>
-                <div className="st-toggle-row">
-                  <div>
-                    <span className="st-toggle-label">{t?.enable2FA || 'Enable 2FA'}</span>
-                    <span className={settings.security?.twoFactor ? 'st-badge-on' : 'st-badge-off'}>
-                      {settings.security?.twoFactor ? (t?.enabled || 'Enabled') : (t?.disabled || 'Disabled')}
-                    </span>
-                  </div>
-                  <label className="st-toggle">
-                    <input type="checkbox" checked={!!settings.security?.twoFactor} onChange={handle2FAToggle} />
-                    <span className="st-toggle-slider" />
-                  </label>
-                </div>
               </div>
               <div className="st-divider" />
               <div className="st-section-block">

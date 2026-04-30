@@ -80,9 +80,6 @@ export default function Signin({ onSwitch, onForgotPassword }) {
           ></div>
         </form>
         <p className="auth-switch">
-          <span className="auth-link" onClick={onForgotPassword}>Forgot password?</span>
-        </p>
-        <p className="auth-switch">
           Don't have an account? <span className="auth-link" onClick={onSwitch}>Sign up</span>
         </p>
       </div>
