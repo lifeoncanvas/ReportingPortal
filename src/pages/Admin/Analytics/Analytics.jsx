@@ -494,6 +494,12 @@ function ZonalPanel({ stats }) {
     { label: 'Avg New Partners',  value: stats?.avgNewPartners   ?? d.kpis[2].value, trend: '+9%',  icon: '🤝', color: 'green' },
     { label: 'Total Remittance',  value: stats?.totalRemittance != null ? '₦' + Number(stats.totalRemittance).toLocaleString() : d.kpis[3].value, trend: '+12%', icon: '💰', color: 'amber' },
   ];
+
+  const remittance = stats?.remittance ?? d.remittance;
+  const attendance = stats?.attendance ?? d.attendance;
+  const httnm = stats?.httnm ?? d.httnm;
+  const zones = stats?.zones ?? d.zones;
+
   return (
     <div className="panel">
       <div className="kpi-grid">
@@ -503,7 +509,7 @@ function ZonalPanel({ stats }) {
       <div className="two-col">
         <SectionCard title="Remittance per Zone (₦K)" icon="🏛️">
           <ResponsiveContainer width="100%" height={220}>
-            <BarChart data={d.remittance} layout="vertical">
+            <BarChart data={remittance} layout="vertical">
               <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" horizontal={false} />
               <XAxis type="number" tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
               <YAxis dataKey="zone" type="category" tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false} width={55} />
@@ -516,16 +522,16 @@ function ZonalPanel({ stats }) {
         <div className="flex-col-gap">
           <SectionCard title="Director's Meeting — Pastors" icon="📅">
             <div className="att-grid">
-              <AttPill val={d.attendance.pastor.yes} label="Present" color="#22c55e" />
-              <AttPill val={d.attendance.pastor.no} label="Absent" color="#ef4444" />
-              <AttPill val={d.attendance.pastor.excused} label="Excused" color="#f59e0b" />
+              <AttPill val={attendance.pastor.yes} label="Present" color="#22c55e" />
+              <AttPill val={attendance.pastor.no} label="Absent" color="#ef4444" />
+              <AttPill val={attendance.pastor.excused} label="Excused" color="#f59e0b" />
             </div>
           </SectionCard>
           <SectionCard title="Strategy Meeting — Managers" icon="📅">
             <div className="att-grid">
-              <AttPill val={d.attendance.manager.yes} label="Present" color="#22c55e" />
-              <AttPill val={d.attendance.manager.no} label="Absent" color="#ef4444" />
-              <AttPill val={d.attendance.manager.excused} label="Excused" color="#f59e0b" />
+              <AttPill val={attendance.manager.yes} label="Present" color="#22c55e" />
+              <AttPill val={attendance.manager.no} label="Absent" color="#ef4444" />
+              <AttPill val={attendance.manager.excused} label="Excused" color="#f59e0b" />
             </div>
           </SectionCard>
         </div>
@@ -533,7 +539,7 @@ function ZonalPanel({ stats }) {
 
       <div className="two-col">
         <SectionCard title="Healing Outreach Metrics" icon="📖">
-          {d.httnm.map(s => (
+          {httnm.map(s => (
             <div key={s.label} className="stat-pair">
               <span className="stat-key">{s.label}</span>
               <span className="stat-val">{s.value}</span>
@@ -544,7 +550,7 @@ function ZonalPanel({ stats }) {
         <SectionCard title="Zone-by-Zone Breakdown" icon="📋" noPad>
           <DataTable
             headers={['Zone', 'Manager', 'Remittance', 'Partners', 'Outreaches', 'Status']}
-            rows={d.zones.map(z => [z.name, z.manager, z.remit, z.partners, z.outreaches, <Badge key={z.id} status={z.status} />])}
+            rows={zones.map(z => [z.name, z.manager, z.remit, z.partners, z.outreaches, <Badge key={z.id} status={z.status} />])}
           />
         </SectionCard>
       </div>
@@ -552,18 +558,29 @@ function ZonalPanel({ stats }) {
   );
 }
 
-function PartnershipPanel() {
+function PartnershipPanel({ stats }) {
   const d = DATA.partnership;
+  const kpis = [
+    { label: 'Total Remittance', value: stats?.totalRemittance != null ? '₦' + Number(stats.totalRemittance).toLocaleString() : d.kpis[0].value,  trend: '+12%', icon: '💰', color: 'green' },
+    { label: 'Reports Filed',    value: stats?.reportsFiled ?? d.kpis[1].value,      trend: '+8%',  icon: '📋', color: 'blue' },
+    { label: 'New Partners',     value: stats?.newPartners ?? d.kpis[2].value,     trend: '+9%',  icon: '🤝', color: 'amber' },
+    { label: 'Arms Active',      value: '4',       trend: '—',    icon: '📡', color: 'purple' },
+  ];
+
+  const arms = stats?.arms ?? d.arms;
+  const dist = stats?.dist ?? d.dist;
+  const trend = stats?.trend ?? d.trend;
+
   return (
     <div className="panel">
       <div className="kpi-grid">
-        {d.kpis.map(k => <KpiCard key={k.label} {...k} />)}
+        {kpis.map(k => <KpiCard key={k.label} {...k} />)}
       </div>
 
       <div className="two-col">
         <SectionCard title="Remittance by Partnership Arm" icon="💼">
           <div className="arm-grid">
-            {d.arms.map(a => (
+            {arms.map(a => (
               <div key={a.key} className="arm-card">
                 <div className="arm-card-top">
                   <span style={{ fontSize: 20 }}>{a.icon}</span>
@@ -578,7 +595,7 @@ function PartnershipPanel() {
 
         <SectionCard title="Arm Distribution" icon="📊">
           <div className="legend-row">
-            {d.dist.map(x => (
+            {dist.map(x => (
               <div key={x.name} className="legend-item">
                 <div className="legend-dot" style={{ background: x.color }} />
                 <span>{x.name}</span>
@@ -587,8 +604,8 @@ function PartnershipPanel() {
           </div>
           <ResponsiveContainer width="100%" height={180}>
             <PieChart>
-              <Pie data={d.dist} cx="50%" cy="50%" innerRadius={50} outerRadius={80} paddingAngle={3} dataKey="value">
-                {d.dist.map((e, i) => <Cell key={i} fill={e.color} />)}
+              <Pie data={dist} cx="50%" cy="50%" innerRadius={50} outerRadius={80} paddingAngle={3} dataKey="value">
+                {dist.map((e, i) => <Cell key={i} fill={e.color} />)}
               </Pie>
               <Tooltip content={<CustomTooltip />} />
             </PieChart>
@@ -598,7 +615,7 @@ function PartnershipPanel() {
 
       <SectionCard title="Monthly Remittance Trend (₦K)" icon="📈">
         <ResponsiveContainer width="100%" height={240}>
-          <LineChart data={d.trend}>
+          <LineChart data={trend}>
             <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
             <XAxis dataKey="month" tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
             <YAxis tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
@@ -615,18 +632,28 @@ function PartnershipPanel() {
   );
 }
 
-function TestimonialsPanel() {
+function TestimonialsPanel({ stats }) {
   const d = DATA.testimonials;
+  const kpis = [
+    { label: 'Total Testimonies',   value: stats?.totalTestimonies ?? d.kpis[0].value, trend: '+34%', icon: '✍️', color: 'amber' },
+    { label: 'With Before/After',   value: stats?.withMedia ?? d.kpis[1].value, trend: '+21%', icon: '🖼️', color: 'blue' },
+    { label: 'With Documents',      value: stats?.withDocuments ?? d.kpis[2].value,  trend: '+15%', icon: '📄', color: 'green' },
+    { label: 'Avg per Zone',        value: stats?.avgPerZone ?? d.kpis[3].value, trend: '+9%', icon: '📊', color: 'purple' },
+  ];
+
+  const weekly = stats?.weekly ?? d.weekly;
+  const zones = stats?.zones ?? d.zones;
+
   return (
     <div className="panel">
       <div className="kpi-grid">
-        {d.kpis.map(k => <KpiCard key={k.label} {...k} />)}
+        {kpis.map(k => <KpiCard key={k.label} {...k} />)}
       </div>
 
       <div className="two-col">
         <SectionCard title="Testimonies vs Target (Weekly)" icon="📊">
           <ResponsiveContainer width="100%" height={220}>
-            <BarChart data={d.weekly}>
+            <BarChart data={weekly}>
               <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
               <XAxis dataKey="week" tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
               <YAxis tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
@@ -641,7 +668,7 @@ function TestimonialsPanel() {
         <SectionCard title="Top Zones by Testimonies" icon="🏆" noPad>
           <DataTable
             headers={['Zone', 'Count', 'vs Target', 'Media', 'Docs', 'Status']}
-            rows={d.zones.map(z => [z.zone, z.count, z.pct, z.media, z.docs, <Badge key={z.id} status={z.status} />])}
+            rows={zones.map(z => [z.zone, z.count, z.pct, z.media, z.docs, <Badge key={z.id} status={z.status} />])}
           />
         </SectionCard>
       </div>
@@ -649,17 +676,30 @@ function TestimonialsPanel() {
   );
 }
 
-function MagazinePanel() {
+function MagazinePanel({ stats }) {
   const d = DATA.magazine;
+  
+  const formatK = (val) => val >= 1000 ? (val / 1000).toFixed(1) + 'K' : val;
+  const kpis = [
+    { label: 'Reports Filed',    value: stats?.reportsFiled ?? d.kpis[0].value,    trend: '+5%',  icon: '📋', color: 'blue' },
+    { label: 'Copies Ordered',   value: stats?.copiesOrdered != null ? formatK(stats.copiesOrdered) : d.kpis[1].value, trend: '-3%',  icon: '📚', color: 'amber' },
+    { label: 'Copies Received',  value: stats?.copiesReceived != null ? formatK(stats.copiesReceived) : d.kpis[2].value, trend: '+2%',  icon: '📬', color: 'green' },
+    { label: 'Languages Active', value: '7',     trend: '—',    icon: '🌍', color: 'purple' },
+  ];
+
+  const languages = stats?.languages ?? d.languages;
+  const receipt = stats?.receipt ?? d.receipt;
+  const orders = stats?.orders ?? d.orders;
+
   return (
     <div className="panel">
       <div className="kpi-grid">
-        {d.kpis.map(k => <KpiCard key={k.label} {...k} />)}
+        {kpis.map(k => <KpiCard key={k.label} {...k} />)}
       </div>
 
       <div className="two-col">
         <SectionCard title="Orders by Language" icon="🌍">
-          {d.languages.map(l => (
+          {languages.map(l => (
             <div key={l.lang} className="prog-row">
               <div className="prog-header">
                 <span className="prog-label">{l.lang}</span>
@@ -676,7 +716,7 @@ function MagazinePanel() {
         <div className="flex-col-gap">
           <SectionCard title="Receipt Status" icon="📬">
             <div className="legend-row">
-              {d.receipt.map(r => (
+              {receipt.map(r => (
                 <div key={r.name} className="legend-item">
                   <div className="legend-dot" style={{ background: r.color }} />
                   <span>{r.name}: <strong>{r.value}</strong></span>
@@ -685,8 +725,8 @@ function MagazinePanel() {
             </div>
             <ResponsiveContainer width="100%" height={140}>
               <PieChart>
-                <Pie data={d.receipt} cx="50%" cy="50%" innerRadius={38} outerRadius={60} paddingAngle={4} dataKey="value">
-                  {d.receipt.map((e, i) => <Cell key={i} fill={e.color} />)}
+                <Pie data={receipt} cx="50%" cy="50%" innerRadius={38} outerRadius={60} paddingAngle={4} dataKey="value">
+                  {receipt.map((e, i) => <Cell key={i} fill={e.color} />)}
                 </Pie>
                 <Tooltip content={<CustomTooltip />} />
               </PieChart>
@@ -696,7 +736,7 @@ function MagazinePanel() {
           <SectionCard title="Magazine Order Details" icon="📋" noPad>
             <DataTable
               headers={['ID', 'Language', 'Ordered', 'Received', 'Status']}
-              rows={d.orders.map(o => [o.id, o.lang, o.ordered, o.received, <Badge key={o.id} status={o.status} />])}
+              rows={orders.map(o => [o.id, o.lang, o.ordered, o.received, <Badge key={o.id} status={o.status} />])}
             />
           </SectionCard>
         </div>
@@ -705,18 +745,28 @@ function MagazinePanel() {
   );
 }
 
-function OutreachPanel() {
+function OutreachPanel({ stats }) {
   const d = DATA.outreach;
+  const kpis = [
+    { label: 'Outreach Reports',   value: stats?.outreachReports ?? d.kpis[0].value,  trend: '+6%',  icon: '📍', color: 'teal' },
+    { label: 'Locations Covered',  value: d.kpis[1].value,  trend: '+11%', icon: '🗺️', color: 'blue' },
+    { label: 'Photos Submitted',   value: stats?.photosSubmitted ?? d.kpis[2].value, trend: '+24%', icon: '📸', color: 'green' },
+    { label: 'Avg Locations/Event',value: d.kpis[3].value, trend: '+5%',  icon: '📊', color: 'amber' },
+  ];
+
+  const weekly = stats?.weeklyOutreach ?? d.weekly;
+  const reports = stats?.outreachReportsList ?? d.reports;
+
   return (
     <div className="panel">
       <div className="kpi-grid">
-        {d.kpis.map(k => <KpiCard key={k.label} {...k} />)}
+        {kpis.map(k => <KpiCard key={k.label} {...k} />)}
       </div>
 
       <div className="two-col">
         <SectionCard title="Outreach Events by Week" icon="📈">
           <ResponsiveContainer width="100%" height={220}>
-            <BarChart data={d.weekly}>
+            <BarChart data={weekly}>
               <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
               <XAxis dataKey="week" tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
               <YAxis tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
@@ -729,7 +779,7 @@ function OutreachPanel() {
         <SectionCard title="Recent Outreach Reports" icon="📋" noPad>
           <DataTable
             headers={['ID', 'Date', 'Locations', 'Photos', 'Status']}
-            rows={d.reports.map(r => [r.id, r.date, r.locations, r.photos, <Badge key={r.id} status={r.status} />])}
+            rows={reports.map(r => [r.id, r.date, r.locations, r.photos, <Badge key={r.id} status={r.status} />])}
           />
         </SectionCard>
       </div>
@@ -751,7 +801,6 @@ export default function AnalyticsDashboard() {
   const [activeTab, setActiveTab] = useState('overview');
   const [timeRange, setTimeRange] = useState('This Month');
   const [zone, setZone] = useState('All Zones');
-  const [campaign, setCampaign] = useState('All Campaigns');
   const [apiStats, setApiStats] = useState(null);
   const [loading, setLoading] = useState(false);
 
@@ -805,15 +854,6 @@ export default function AnalyticsDashboard() {
           <div className="select-wrap">
             <select className="filter-select" value={zone} onChange={e => setZone(e.target.value)}>
               {ALL_ZONES.map(o => <option key={o}>{o}</option>)}
-            </select>
-            <ChevronIcon />
-          </div>
-        </div>
-        <div className="filter-group">
-          <label className="filter-label">Campaign</label>
-          <div className="select-wrap">
-            <select className="filter-select" value={campaign} onChange={e => setCampaign(e.target.value)}>
-              {['All Campaigns', 'Healing School', 'Rhapsody', 'Inner City Mission', 'LBN'].map(o => <option key={o}>{o}</option>)}
             </select>
             <ChevronIcon />
           </div>
