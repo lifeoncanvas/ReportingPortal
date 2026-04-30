@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   LineChart, Line, BarChart, Bar, PieChart, Pie, Cell,
   XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend
@@ -37,6 +37,66 @@ const SettingsIcon = () => (
     <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
   </svg>
 );
+
+// ── Zone Master List ─────────────────────────────────
+const ALL_ZONES = [
+  'All Zones',
+  // ── ZONE/CHURCH ──────────────────────────────────────
+  'CE Lagos zone 5', 'CE Lagos Virtual Zone', 'CE Lagos zone 1', 'CE Lagos zone 2',
+  'CE Lagos zone 3', 'CE Lagos zone 4', 'CE Lagos zone 6',
+  'CE Lagos Sub Zone A', 'CE Lagos Sub Zone B', 'CE Lagos Sub Zone C', 'CE Egbeda Sub Zone',
+  // ── MC/ZONES IN NIGERIA ───────────────────────────
+  'CE Port harcourt zone 1', 'CE Port harcourt zone 2', 'CE Port harcourt zone 3',
+  'CE Benin zone 1', 'CE Benin Zone 2', 'CE Midwest Zone',
+  'CE Abuja Zone 1', 'CE Abuja Zone 2', 'CE Edo North & Central Zone',
+  'CE Aba Zone', 'CE Warri DSC',
+  'South South Zone 1', 'South South Zone 2', 'South South Zone 3',
+  'South East Zone 1', 'South East Zone 3',
+  'Ministry Centre Abuja', 'Ministry Centre Warri', 'Ministry Centre Calabar',
+  'North Central Zone 1', 'North Central Zone 2',
+  'North West Zone 1', 'North West Zone 2', 'North East Zone 1',
+  'Ministry Centre Abeokuta', 'Ministry Centre Ibadan',
+  'CE Onitsha Zone',
+  'South West Zone 2', 'South West Zone 3', 'South West Zone 4', 'South West Zone 5',
+  'CE Ibadan Zone 1', 'CE Ibadan Zone 2', 'LOVEWORLD CHURCH ZONE', 'CE Abakaliki Zone',
+  // ── INTERNATIONAL ────────────────────────────────
+  'CE UK Zone 1, DSP Region', 'CE UK Zone 2, DSP Region', 'CE UK Zone 3, DSP Region', 'CE UK Zone 4, DSP Region',
+  'CE UK Zone 1, Region 2', 'CE UK Zone 3, Region 2', 'CE UK Zone 4, Region 2', 'CE Barking DSP',
+  'Western Europe Zone 1', 'Western Europe Zone 2', 'Western Europe Zone 3', 'Western Europe Zone 4',
+  'Eastern Europe Virtual Region',
+  'USA Zone 1, Region 1', 'USA Zone 2, Region 1', 'Hawaii Zone', 'USA Region 2', 'USA Region 3',
+  'CE Dallas Zone', 'Toronto Zone', 'CE Ottawa Zone', 'CE Quebec',
+  'Middle East & South East Asia Region',
+  'India Zone 1', 'India Zone 2', 'Australia Region',
+  'South America and Pacific Islands Region', 'Intl Missions for Southeast Asia',
+  'CE Amsterdem, DSP', 'CE Ireland Sub-Zone',
+  // ── SOUTHERN AFRICA ──────────────────────────────
+  'Southern Africa Zone 1', 'Southern Africa Zone 2', 'Southern Africa Zone 3', 'Southern Africa Zone 5',
+  'CE Cape Town 1', 'CE Cape Town 2', 'CE Durban',
+  // ── EWCA ──────────────────────────────────────────
+  'Accra Ghana Zone', 'Kenya Zone',
+  'EWCAVZ1 (Ethiopia)', 'EWCAVZ2 (Togo)', 'EWCAVZ3 (Uganda)', 'EWCAVZ4 (Cameroun)', 'EWCAVZ5 (Nungua)', 'EWCAVZ6',
+  'CE Chad Zone', 'CE Cameroon West Zone', 'CE Tanzania Zone',
+  'GRAND TOTAL (CHURCH ZONES)',
+  // ── BLW CAMPUSES ─────────────────────────────────
+  'BLW ZONE C (UNILAG)', 'BLW ZONE J (UNIBEN)', 'BLW ZONE H (UNIPORT)', 'BLW ZONE A (EKPOMA)',
+  'BLW ZONE B (AWKA)', 'BLW ZONE D (ZARIA)', 'BLW ZONE E (ILE-IFE)', 'BLW ZONE F (ABSU)',
+  'BLW ZONE G (AKURE)', 'BLW ZONE I (UNIJOS)', 'BLW ZONE K (ABUJA)', 'BLW ZONE L (CALABAR)',
+  'BLW ZONE N',
+  'BLW ZONE Ghana A', 'BLW ZONE Ghana B', 'BLW ZONE Ghana C', 'BLW ZONE Ghana D', 'BLW ZONE Ghana E', 'BLW ZONE Ghana F',
+  'BLW ZONE SA A', 'BLW ZONE SA B', 'BLW ZONE SA C', 'BLW ZONE SA D', 'BLW ZONE SA E', 'BLW ZONE SA F', 'BLW ZONE SA G', 'BLW ZONE SA H',
+  'BLW UK ZONE A', 'BLW UK ZONE B', 'BLW UK ZONE C',
+  'BLW UGANDA ZONE A', 'ZIMBABWE ZONE', 'BOTSWANA ZONE',
+  'BLW USA REGION  1', 'BLW USA REGION  2', 'BLW USA REGION 1, ZONE B', 'BLW USA REGION 2, ZONE B',
+  'BLW CAMEROON GROUP A', 'BLW CAMEROON GROUP B', 'BLW CAMEROON GROUP 2', 'BLW CAMEROON GROUP 3',
+  'BLW NORTH CYPRUS', 'BLW NAMIBIA', 'BLW IRELAND', 'BLW CANADA GROUP', 'BLW CANADA REGION',
+  'BLW TURKEY GROUP', 'BLW WALES', 'BLW MIDDLE EAST & NORTH AFRICA', 'BLW BURKINA FASO',
+  'BLW DRC ZONE', 'BLW KENYA ZONE A', 'BLW BENIN REPUBLIC ZONE A', 'BLW BENIN REPUBLIC ZONE B',
+  'BLW CONGO DRC', 'BLW KENYA ZONE B', 'BLW UGANDA ZONE B', 'BLW EUROPE ZONE 1',
+  'GRAND TOTAL (CAMPUS ZONES)',
+];
+
+const API = process.env.REACT_APP_API_URL || 'http://65.0.71.13:8080';
 
 // ── Data ─────────────────────────────────────────────
 const DATA = {
@@ -328,12 +388,20 @@ const CustomTooltip = ({ active, payload, label }) => {
 };
 
 // ── Tab Panels ────────────────────────────────────────
-function OverviewPanel() {
+function OverviewPanel({ stats }) {
   const d = DATA.overview;
+  const kpis = [
+    { label: 'Total Reports',   value: stats?.totalReports   ?? d.kpis[0].value, trend: '+18%', icon: '📊', color: 'purple' },
+    { label: 'New Partners',    value: stats?.newPartners    ?? d.kpis[1].value, trend: '+9%',  icon: '🤝', color: 'green' },
+    { label: 'Total Remittance',value: stats?.totalRemittance != null ? '₦' + Number(stats.totalRemittance).toLocaleString() : d.kpis[2].value, trend: '+12%', icon: '💰', color: 'amber' },
+    { label: 'Testimonies',     value: stats?.testimonies    ?? d.kpis[3].value, trend: '+34%', icon: '✍️', color: 'blue' },
+    { label: 'Outreach Events', value: stats?.outreachEvents ?? d.kpis[4].value, trend: '+6%',  icon: '📍', color: 'teal' },
+    { label: 'Completion Rate', value: stats?.completionRate ?? d.kpis[5].value, trend: '+3%',  icon: '✅', color: 'green' },
+  ];
   return (
     <div className="panel">
       <div className="kpi-grid">
-        {d.kpis.map(k => <KpiCard key={k.label} {...k} />)}
+        {kpis.map(k => <KpiCard key={k.label} {...k} />)}
       </div>
 
       <div className="two-col">
@@ -375,12 +443,18 @@ function OverviewPanel() {
   );
 }
 
-function ZonalPanel() {
+function ZonalPanel({ stats }) {
   const d = DATA.zonal;
+  const kpis = [
+    { label: 'Active Zones',      value: stats?.activeZones      ?? d.kpis[0].value, trend: '+2',   icon: '🏛️', color: 'purple' },
+    { label: 'Reports Submitted', value: stats?.reportsSubmitted ?? d.kpis[1].value, trend: '+18%', icon: '📋', color: 'blue' },
+    { label: 'Avg New Partners',  value: stats?.avgNewPartners   ?? d.kpis[2].value, trend: '+9%',  icon: '🤝', color: 'green' },
+    { label: 'Total Remittance',  value: stats?.totalRemittance != null ? '₦' + Number(stats.totalRemittance).toLocaleString() : d.kpis[3].value, trend: '+12%', icon: '💰', color: 'amber' },
+  ];
   return (
     <div className="panel">
       <div className="kpi-grid">
-        {d.kpis.map(k => <KpiCard key={k.label} {...k} />)}
+        {kpis.map(k => <KpiCard key={k.label} {...k} />)}
       </div>
 
       <div className="two-col">
@@ -620,23 +694,44 @@ function OutreachPanel() {
   );
 }
 
+// Wrapper so panels receive live stats
 const PANEL_MAP = {
-  overview: OverviewPanel,
-  zonal: ZonalPanel,
-  partnership: PartnershipPanel,
-  testimonials: TestimonialsPanel,
-  magazine: MagazinePanel,
-  outreach: OutreachPanel,
+  overview:     (props) => <OverviewPanel     {...props} />,
+  zonal:        (props) => <ZonalPanel        {...props} />,
+  partnership:  (props) => <PartnershipPanel  {...props} />,
+  testimonials: (props) => <TestimonialsPanel {...props} />,
+  magazine:     (props) => <MagazinePanel     {...props} />,
+  outreach:     (props) => <OutreachPanel     {...props} />,
 };
 
 // ── Main Component ────────────────────────────────────
 export default function AnalyticsDashboard() {
   const [activeTab, setActiveTab] = useState('overview');
   const [timeRange, setTimeRange] = useState('This Month');
-  const [zone, setZone] = useState('All Zones');
-  const [campaign, setCampaign] = useState('All Campaigns');
+  const [zone, setZone]           = useState('All Zones');
+  const [campaign, setCampaign]   = useState('All Campaigns');
+  const [apiStats, setApiStats]   = useState(null);
+  const [loading, setLoading]     = useState(false);
+
+  const fetchStats = useCallback(async () => {
+    setLoading(true);
+    try {
+      const url = `${API}/api/analytics/stats?tab=${activeTab}&timeRange=${encodeURIComponent(timeRange)}&zone=${encodeURIComponent(zone)}`;
+      const res  = await fetch(url);
+      const data = await res.json();
+      setApiStats(data);
+    } catch (e) {
+      console.error('Analytics fetch failed:', e);
+      setApiStats(null);
+    } finally {
+      setLoading(false);
+    }
+  }, [activeTab, timeRange, zone]);
+
+  useEffect(() => { fetchStats(); }, [fetchStats]);
 
   const ActivePanel = PANEL_MAP[activeTab];
+  const panelKey = `${activeTab}-${timeRange}-${zone}`; // force re-render on filter change
 
   return (
     <div className="dashboard">
@@ -667,8 +762,8 @@ export default function AnalyticsDashboard() {
         <div className="filter-group">
           <label className="filter-label">Zone</label>
           <div className="select-wrap">
-            <select className="filter-select" value={zone} onChange={e => setZone(e.target.value)}>
-              {['All Zones', 'Zone A (Your Zone)', 'Zone B', 'Zone C', 'Zone D', 'Zone E'].map(o => <option key={o}>{o}</option>)}
+          <select className="filter-select" value={zone} onChange={e => setZone(e.target.value)}>
+              {ALL_ZONES.map(o => <option key={o}>{o}</option>)}
             </select>
             <ChevronIcon />
           </div>
@@ -700,7 +795,12 @@ export default function AnalyticsDashboard() {
 
       {/* Content */}
       <div className="content">
-        <ActivePanel />
+        {loading && (
+          <div style={{ textAlign: 'center', padding: '40px 0', color: '#94a3b8', fontSize: 14 }}>
+            ⏳ Loading analytics data…
+          </div>
+        )}
+        {!loading && <ActivePanel key={panelKey} stats={apiStats} />}
       </div>
     </div>
   );

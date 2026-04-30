@@ -254,7 +254,41 @@ function ZonalReportForm({ onClose, onSubmit: parentSubmit }) {
     const e = validate(); setErrors(e);
     if (Object.keys(e).length) return;
     setSubmitting(true);
-    await new Promise(r => setTimeout(r, 500));
+    const today = new Date().toISOString().split('T')[0];
+    const payload = {
+      // Fields matching CreateReportRequest / zone_weekly_reports table
+      submittedBy:                  form.zonalManager,
+      submitterEmail:               null, // injected by main handleSubmit via useAuth
+      submittedDate:                today,
+      submittedTime:                new Date().toTimeString().split(' ')[0],
+      weekStartDate:                today,
+      zoneName:                     form.zoneName,
+      zonalManager:                 form.zonalManager,
+      totalPartnershipRemittance:   Number(form.partnershipRemittance) || 0,
+      newPartnersRecruited:         Number(form.newPartners) || 0,
+      testimoniesSubmitted:         Number(form.testimoniesSubmitted) || 0,
+      httnmTranslations:            Number(form.healingTranslations) || 0,
+      httnmOutreachesHeld:          Number(form.healingOutreaches) || 0,
+      httnmMediaSubmitted:          Number(form.healingPicturesVideos) || 0,
+      zonalPastorDirectorsMeeting:  form.pastoralAttendanceDirector,
+      zonalManagerDirectorsMeeting: form.managerAttendanceDirector,
+      zonalManagerStrategyMeeting:  form.managerAttendanceStrategy,
+      healingCrusadeSponsorship:    Number(form.healingCrusadeSponsorship) || 0,
+      testimonyClarificationConcern: form.testimonyClarificationConcern,
+      remittancePurpose:            form.remittancePurpose,
+      trumpetsBlown:                Number(form.trumpetsBlown) || 0,
+      popMediaUrl:                  null,
+      regionName:                   null,
+    };
+    try {
+      await fetch(`${process.env.REACT_APP_API_URL || 'http://65.0.71.13:8080'}/api/reports`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+    } catch (err) {
+      console.error('Failed to save zonal report to DB', err);
+    }
     parentSubmit({
       zone: form.zoneName,
       submittedBy: form.zonalManager,
@@ -262,7 +296,7 @@ function ZonalReportForm({ onClose, onSubmit: parentSubmit }) {
       remittance: form.partnershipRemittance,
       status: 'submitted',
       media: form.media,
-      rawDate: new Date().toISOString().split('T')[0],
+      rawDate: today,
     });
     setSubmitting(false);
   };
@@ -583,17 +617,15 @@ function TestimonialsForm({ onClose, onSubmit: parentSubmit }) {
     if (Object.keys(e).length) return;
     setSubmitting(true);
     await new Promise(r => setTimeout(r, 500));
+    // Payload matches testimonial_reports table columns
     parentSubmit({
-      testimony: form.testimony
-        ? form.testimony.slice(0, 80) + (form.testimony.length > 80 ? '…' : '')
-        : '(No written testimony)',
-      testimoniesCount: form.testimoniesCount,
-      beforeImages: form.beforeImages.length,
-      afterImages: form.afterImages.length,
-      documents: form.documents.length,
-      status: 'submitted',
-      rawDate: new Date().toISOString().split('T')[0],
-      media: [...form.beforeImages, ...form.afterImages, ...form.documents],
+      testimony:        form.testimony || '(No written testimony)',
+      testimoniesCount: Number(form.testimoniesCount) || 0,
+      beforeImages:     form.beforeImages.length,
+      afterImages:      form.afterImages.length,
+      documents:        form.documents.length,
+      status:           'PENDING',
+      rawDate:          new Date().toISOString().split('T')[0],
     });
     setSubmitting(false);
   };
@@ -682,16 +714,17 @@ function MagazineForm({ onClose, onSubmit: parentSubmit }) {
     if (Object.keys(e).length) return;
     setSubmitting(true);
     await new Promise(r => setTimeout(r, 500));
+    // Payload matches magazine_reports table columns
     parentSubmit({
-      language: form.language,
-      ordered: form.orderedCopies,
-      received: form.receivedCopies,
-      receiptStatus: Number(form.receivedCopies) === 0 ? 'No' : (Number(form.receivedCopies) < Number(form.orderedCopies) ? 'Partial' : 'Yes'),
-      reason: form.notReceivedReason,
-      sponsoredCopies: form.sponsoredCopies,
-      healingOutreaches: form.healingOutreaches,
-      status: 'submitted',
-      rawDate: new Date().toISOString().split('T')[0],
+      language:         form.language,
+      ordered:          Number(form.orderedCopies) || 0,
+      received:         Number(form.receivedCopies) || 0,
+      receiptStatus:    Number(form.receivedCopies) === 0 ? 'No' : (Number(form.receivedCopies) < Number(form.orderedCopies) ? 'Partial' : 'Yes'),
+      reason:           form.notReceivedReason,
+      sponsoredCopies:  Number(form.sponsoredCopies) || 0,
+      healingOutreaches: Number(form.healingOutreaches) || 0,
+      status:           'PENDING',
+      rawDate:          new Date().toISOString().split('T')[0],
     });
     setSubmitting(false);
   };
@@ -804,15 +837,15 @@ function OutreachForm({ onClose, onSubmit: parentSubmit }) {
     if (Object.keys(e).length) return;
     setSubmitting(true);
     await new Promise(r => setTimeout(r, 500));
+    // Payload matches outreach_reports table columns
     parentSubmit({
-      date: formatDate(form.date),
-      category: form.category === 'Other' ? form.customCategory || 'Other' : form.category,
-      locations: form.locations,
-      story: form.story.slice(0, 80) + (form.story.length > 80 ? '…' : ''),
-      images: form.images.length,
-      status: 'submitted',
-      rawDate: form.date,
-      media: form.images,
+      submittedDate: form.date,
+      category:      form.category === 'Other' ? form.customCategory || 'Other' : form.category,
+      locations:     form.locations,
+      story:         form.story,
+      mediaCount:    form.images.length,
+      status:        'PENDING',
+      rawDate:       form.date,
     });
     setSubmitting(false);
   };
@@ -960,7 +993,9 @@ export default function ReportingPortal() {
   const handleSubmit = async (data) => {
     const prefix = { zonal: 'ZR', partnership: 'PR', testimonials: 'TS', magazine: 'MG', outreach: 'OR' }[activeTab];
     const id = `${prefix}-${String(counters[activeTab]).padStart(3, '0')}`;
-    
+
+    // Zonal is saved directly inside ZonalReportForm.handleSubmit above.
+    // All other tabs POST here with submitterEmail/zoneName attached.
     if (['partnership', 'testimonials', 'magazine', 'outreach'].includes(activeTab)) {
       try {
         await fetch(`${process.env.REACT_APP_API_URL || 'http://65.0.71.13:8080'}/api/portal-reports/${activeTab}`, {
@@ -969,8 +1004,8 @@ export default function ReportingPortal() {
           body: JSON.stringify({
             ...data,
             submitterEmail: user?.email,
-            zoneName: user?.zone
-          })
+            zoneName:       user?.zone || user?.region,
+          }),
         });
       } catch (e) {
         console.error('Failed to save to backend DB', e);

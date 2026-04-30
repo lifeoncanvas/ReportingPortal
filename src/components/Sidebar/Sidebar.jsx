@@ -7,7 +7,7 @@ import {
 import { useAuth } from '../../auth/AuthContext';
 import { useSettings } from '../../context/SettingsContext';
 import './styles.css';
-import logo from '../../HSLogo.png';
+// import logo from '../../HSLogo.png'; // Removed in favor of public folder reference
 
 export default function Sidebar({ isOpen, onClose }) {
   const { user, avatar } = useAuth();
@@ -34,7 +34,6 @@ export default function Sidebar({ isOpen, onClose }) {
     zonal: [
       { label: t?.dashboard || 'Dashboard', icon: LayoutDashboard, path: '/zonal/dashboard' },
       { label: t?.reportingPortal || 'Reporting Portal', icon: FileText, path: '/zonal/reporting' },
-      { label: t?.analytics || 'Analytics', icon: BarChart2, path: '/zonal/analytics' },
     ],
     admin: [
       { label: t?.dashboard || 'Dashboard', icon: LayoutDashboard, path: '/admin/dashboard' },
@@ -57,8 +56,9 @@ export default function Sidebar({ isOpen, onClose }) {
         <div className="sidebar-logo">
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             <img
-              src={logo}
-              alt="Logo"
+              src="/HSLogo.jpg"
+              alt="Healing School Logo"
+              onError={(e) => { e.target.src = '/HSLogo.png'; }} // Fallback to old name if jpg not found
               style={{
                 height: '40px',
                 width: 'auto',

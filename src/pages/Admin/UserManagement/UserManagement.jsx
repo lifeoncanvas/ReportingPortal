@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Search, Filter, Plus, Edit2, Trash2, X, Check } from 'lucide-react';
+import { Search, Filter, Plus, Edit2, Trash2, X, Check, Shield } from 'lucide-react';
 import './styles.css';
 
 const INITIAL_USERS = [
@@ -88,16 +88,36 @@ export default function UserManagement() {
   const handleApprove = async (id) => {
     const res = await fetch(`${process.env.REACT_APP_API_URL}/api/users/${id}/approve`, { method: 'POST' });
     if (res.ok) {
-      alert('User approved successfully!');
+      showToast('User approved successfully!');
       fetchUsers();
     } else {
       const err = await res.text();
-      alert('Error approving user: ' + err);
+      showToast('Error approving user: ' + err);
     }
   };
 
+  const handleMakeAdmin = async (u) => {
+    if (!window.confirm(`Promote ${u.firstName} ${u.lastName || ''} to Admin? This will grant full system access.`)) return;
+    await fetch(`${process.env.REACT_APP_API_URL}/api/users/${u.id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ...u, role: 'admin', status: 'active' })
+    });
+    showToast(`✅ ${u.firstName} is now an Admin!`);
+    fetchUsers();
+  };
+
+  const [umToast, setUmToast] = useState('');
+  const showToast = (msg) => { setUmToast(msg); setTimeout(() => setUmToast(''), 3500); };
+
   return (
     <div className="um-page">
+      {umToast && (
+        <div style={{ position:'fixed', top:20, right:20, background:'#1e293b', color:'#fff', padding:'12px 20px',
+          borderRadius:10, zIndex:9999, fontSize:14, fontWeight:500 }}>
+          {umToast}
+        </div>
+      )}
       <div className="um-page-header">
         <div>
           <h2>User Management</h2>
@@ -182,6 +202,7 @@ export default function UserManagement() {
                     <td>{u.joined}</td>
                     <td>
                       <div className="um-actions">
+                        {/* Approve */}
                         {u.status === 'inactive' && (
                           <button 
                             className="um-icon-btn" 
@@ -190,6 +211,17 @@ export default function UserManagement() {
                             title="Approve User"
                           >
                             <Check size={14} />
+                          </button>
+                        )}
+                        {/* Make Admin */}
+                        {u.role !== 'admin' && (
+                          <button
+                            className="um-icon-btn"
+                            style={{ color: '#7c3aed', borderColor: '#c4b5fd', background: '#ede9fe' }}
+                            onClick={() => handleMakeAdmin(u)}
+                            title="Make Admin"
+                          >
+                            <Shield size={14} />
                           </button>
                         )}
                         {u.status === 'inactive' && u.inviteToken && (
