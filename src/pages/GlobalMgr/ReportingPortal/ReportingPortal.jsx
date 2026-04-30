@@ -1038,14 +1038,9 @@ export default function ReportingPortal() {
   );
 
   const handleSubmit = async (data) => {
-    const prefix = { zonal: 'ZR', partnership: 'PR', testimonials: 'TS', magazine: 'MG', outreach: 'OR' }[activeTab];
-    const id = `${prefix}-${String(counters[activeTab]).padStart(3, '0')}`;
-
-    // Zonal is saved directly inside ZonalReportForm.handleSubmit above.
-    // All other tabs POST here with submitterEmail/zoneName attached.
-    if (['partnership', 'testimonials', 'magazine', 'outreach'].includes(activeTab)) {
-      try {
-        await fetch(`${process.env.REACT_APP_API_URL || 'http://65.0.71.13:8080'}/api/portal-reports/${activeTab}`, {
+    try {
+      if (['partnership', 'testimonials', 'magazine', 'outreach'].includes(activeTab)) {
+        const res = await fetch(`${process.env.REACT_APP_API_URL || 'http://65.0.71.13:8080'}/api/portal-reports/${activeTab}`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -1054,16 +1049,19 @@ export default function ReportingPortal() {
             zoneName:       user?.zone || user?.region,
           }),
         });
-      } catch (e) {
-        console.error('Failed to save to backend DB', e);
+        if (!res.ok) {
+          const txt = await res.text();
+          throw new Error(`Submit failed (${res.status}): ${txt}`);
+        }
       }
+      setToast(`${tab.label} submitted successfully`);
+      await fetchAllReports(); // Wait for DB sync
+    } catch (e) {
+      console.error('Submission failed', e);
+      alert(`Failed to save report: ${e.message}`);
     }
-
-    setReportsByTab(p => ({ ...p, [activeTab]: [{ id, ...data }, ...p[activeTab]] }));
-    setCounters(p => ({ ...p, [activeTab]: p[activeTab] + 1 }));
+    
     setShowForm(false);
-    setToast(`${tab.label} submitted`);
-    fetchAllReports(); // Refresh from DB
   };
 
   const handleExport = () => {
