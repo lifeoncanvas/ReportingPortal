@@ -28,9 +28,12 @@ export default function ZonalDashboard() {
   React.useEffect(() => {
     if (user?.email) {
       fetch(`${process.env.REACT_APP_API_URL}/api/dashboard/stats?email=${user.email}`)
-        .then(res => res.json())
+        .then(res => {
+          if (!res.ok) return res.text().then(text => { throw new Error(`HTTP ${res.status}: ${text}`) });
+          return res.json();
+        })
         .then(data => setStats(data))
-        .catch(err => console.error(err));
+        .catch(err => console.error("Zonal Stats Error:", err));
     }
   }, [user]);
 

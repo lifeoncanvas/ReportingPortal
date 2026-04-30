@@ -205,6 +205,7 @@ document.head.appendChild(spinStyle);
 // ZONAL REPORT FORM — matched to kingsforms.online fields
 // ══════════════════════════════════════════════════════
 function ZonalReportForm({ onClose, onSubmit: parentSubmit }) {
+  const { user } = useAuth();
   const EMPTY = {
     zoneName: '',
     zonalManager: '',
@@ -258,7 +259,7 @@ function ZonalReportForm({ onClose, onSubmit: parentSubmit }) {
     const payload = {
       // Fields matching CreateReportRequest / zone_weekly_reports table
       submittedBy:                  form.zonalManager,
-      submitterEmail:               null, // injected by main handleSubmit via useAuth
+      submitterEmail:               user?.email, 
       submittedDate:                today,
       submittedTime:                new Date().toTimeString().split(' ')[0],
       weekStartDate:                today,
@@ -278,7 +279,7 @@ function ZonalReportForm({ onClose, onSubmit: parentSubmit }) {
       remittancePurpose:            form.remittancePurpose,
       trumpetsBlown:                Number(form.trumpetsBlown) || 0,
       popMediaUrl:                  null,
-      regionName:                   null,
+      regionName:                   user?.region || 'Global',
     };
     try {
       await fetch(`${process.env.REACT_APP_API_URL || 'http://65.0.71.13:8080'}/api/reports`, {
@@ -983,6 +984,52 @@ export default function ReportingPortal() {
   const [toast, setToast]               = useState('');
   const [counters, setCounters]         = useState({ zonal: 1, partnership: 1, testimonials: 1, magazine: 1, outreach: 1 });
 
+  useEffect(() => {
+    if (user) fetchAllReports();
+  }, [user]);
+
+  const fetchAllReports = async () => {
+    const baseUrl = process.env.REACT_APP_API_URL || 'http://65.0.71.13:8080';
+    const emailParam = user?.role === 'admin' ? '' : `?email=${user?.email}`;
+    
+    try {
+      const zRes = await fetch(`${baseUrl}/api/reports${emailParam}`);
+      if (!zRes.ok) throw new Error(`ZR Fetch Error: ${zRes.status}`);
+      const zData = await zRes.json();
+      
+      // Fetch others
+      const tabs = ['partnership', 'testimonials', 'magazine', 'outreach'];
+      const otherData = {};
+      for (const t of tabs) {
+        const res = await fetch(`${baseUrl}/api/portal-reports/${t}${emailParam}`);
+        if (!res.ok) {
+          console.warn(`Tab ${t} fetch failed with status ${res.status}`);
+          otherData[t] = [];
+          continue;
+        }
+        otherData[t] = await res.json();
+      }
+
+      setReportsByTab({
+        zonal: zData.map(r => ({
+          id: `ZR-${String(r.id).padStart(3, '0')}`,
+          rawDate: r.submittedAt,
+          zone: r.zoneName,
+          submittedBy: r.submittedBy,
+          partners: r.newPartnersRecruited,
+          status: r.status,
+          ...r
+        })),
+        partnership: otherData.partnership.map(r => ({ id: `PR-${String(r.id).padStart(3, '0')}`, rawDate: r.submittedDate, ...r })),
+        testimonials: otherData.testimonials.map(r => ({ id: `TS-${String(r.id).padStart(3, '0')}`, rawDate: r.submittedDate, ...r })),
+        magazine: otherData.magazine.map(r => ({ id: `MG-${String(r.id).padStart(3, '0')}`, rawDate: r.submittedDate, ...r })),
+        outreach: otherData.outreach.map(r => ({ id: `OR-${String(r.id).padStart(3, '0')}`, rawDate: r.submittedDate, ...r })),
+      });
+    } catch (err) {
+      console.error("Failed to fetch reports", err);
+    }
+  };
+
   const tab     = TABS_CONFIG.find(t => t.id === activeTab);
   const reports = reportsByTab[activeTab] || [];
 
@@ -1015,7 +1062,8 @@ export default function ReportingPortal() {
     setReportsByTab(p => ({ ...p, [activeTab]: [{ id, ...data }, ...p[activeTab]] }));
     setCounters(p => ({ ...p, [activeTab]: p[activeTab] + 1 }));
     setShowForm(false);
-    setToast(`${tab.label} submitted (${id})`);
+    setToast(`${tab.label} submitted`);
+    fetchAllReports(); // Refresh from DB
   };
 
   const handleExport = () => {
