@@ -388,8 +388,10 @@ const CustomTooltip = ({ active, payload, label }) => {
 };
 
 // ── Tab Panels ────────────────────────────────────────
-function OverviewPanel({ stats }) {
+function OverviewPanel({ stats, timeRange }) {
   const d = DATA.overview;
+  
+  // Dynamic KPIs from API stats if available
   const kpis = [
     { label: 'Total Reports',   value: stats?.totalReports   ?? d.kpis[0].value, trend: '+18%', icon: '📊', color: 'purple' },
     { label: 'New Partners',    value: stats?.newPartners    ?? d.kpis[1].value, trend: '+9%',  icon: '🤝', color: 'green' },
@@ -398,6 +400,50 @@ function OverviewPanel({ stats }) {
     { label: 'Outreach Events', value: stats?.outreachEvents ?? d.kpis[4].value, trend: '+6%',  icon: '📍', color: 'teal' },
     { label: 'Completion Rate', value: stats?.completionRate ?? d.kpis[5].value, trend: '+3%',  icon: '✅', color: 'green' },
   ];
+
+  // Calculate dynamic targets multiplier based on time range selected
+  let mult = 1;
+  if (timeRange === 'This Month') mult = 4;
+  else if (timeRange === 'This Quarter') mult = 12;
+  else if (timeRange === 'This Year') mult = 52;
+
+  const targetRemittance = 10000 * mult;
+  const targetPartners = 10 * mult;
+  const targetTestimonies = 50 * mult;
+  const targetOutreaches = 10 * mult;
+
+  // Dynamic targets mapping
+  const targets = [
+    { 
+      label: 'Partnership Remittance', 
+      pct: stats?.totalRemittance != null ? Math.round((Number(stats.totalRemittance) / targetRemittance) * 100) : d.targets[0].pct, 
+      color: '#f59e0b', 
+      target: `${targetRemittance.toLocaleString()} espees`, 
+      achieved: stats?.totalRemittance != null ? Number(stats.totalRemittance).toLocaleString() : d.targets[0].achieved 
+    },
+    { 
+      label: 'New Partners Recruited', 
+      pct: stats?.newPartners != null ? Math.round((stats.newPartners / targetPartners) * 100) : d.targets[1].pct, 
+      color: '#22c55e', 
+      target: `${targetPartners} for ${timeRange}`,     
+      achieved: stats?.newPartners != null ? stats.newPartners : d.targets[1].achieved 
+    },
+    { 
+      label: 'Testimonies Submitted',  
+      pct: stats?.testimonies != null ? Math.round((stats.testimonies / targetTestimonies) * 100) : d.targets[2].pct, 
+      color: '#818cf8', 
+      target: `${targetTestimonies} for ${timeRange}`,     
+      achieved: stats?.testimonies != null ? stats.testimonies : d.targets[2].achieved 
+    },
+    { 
+      label: 'Healing Outreaches',       
+      pct: stats?.outreachEvents != null ? Math.round((stats.outreachEvents / targetOutreaches) * 100) : d.targets[3].pct, 
+      color: '#2dd4bf', 
+      target: `${targetOutreaches} for ${timeRange}`,     
+      achieved: stats?.outreachEvents != null ? stats.outreachEvents : d.targets[3].achieved 
+    },
+  ];
+
   return (
     <div className="panel">
       <div className="kpi-grid">
@@ -405,7 +451,7 @@ function OverviewPanel({ stats }) {
       </div>
 
       <div className="two-col">
-        <SectionCard title="Weekly Submission Trend" icon="📈">
+        <SectionCard title={`Submission Trend (${timeRange})`} icon="📈">
           <ResponsiveContainer width="100%" height={220}>
             <LineChart data={d.trend}>
               <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
@@ -434,9 +480,9 @@ function OverviewPanel({ stats }) {
         </SectionCard>
       </div>
 
-      <SectionCard title="Weekly Target Attainment" icon="🎯">
+      <SectionCard title={`Target Attainment (${timeRange})`} icon="🎯">
         <div className="targets-grid">
-          {d.targets.map(t => <ProgressRow key={t.label} {...t} />)}
+          {targets.map(t => <ProgressRow key={t.label} {...t} />)}
         </div>
       </SectionCard>
     </div>
@@ -716,7 +762,7 @@ export default function AnalyticsDashboard() {
   const fetchStats = useCallback(async () => {
     setLoading(true);
     try {
-      const url = `${API}/api/analytics/stats?tab=${activeTab}&timeRange=${encodeURIComponent(timeRange)}&zone=${encodeURIComponent(zone)}`;
+      const url = `${API}/api/analytics/stats?tab=${activeTab}&timeRange=${encodeURIComponent(timeRange)}&zone=${encodeURIComponent(zone)}&campaign=${encodeURIComponent(campaign)}`;
       const res  = await fetch(url);
       const data = await res.json();
       setApiStats(data);
@@ -726,12 +772,12 @@ export default function AnalyticsDashboard() {
     } finally {
       setLoading(false);
     }
-  }, [activeTab, timeRange, zone]);
+  }, [activeTab, timeRange, zone, campaign]);
 
   useEffect(() => { fetchStats(); }, [fetchStats]);
 
   const ActivePanel = PANEL_MAP[activeTab];
-  const panelKey = `${activeTab}-${timeRange}-${zone}`; // force re-render on filter change
+  const panelKey = `${activeTab}-${timeRange}-${zone}-${campaign}`; // force re-render on filter change
 
   return (
     <div className="dashboard">
@@ -800,7 +846,7 @@ export default function AnalyticsDashboard() {
             ⏳ Loading analytics data…
           </div>
         )}
-        {!loading && <ActivePanel key={panelKey} stats={apiStats} />}
+        {!loading && <ActivePanel key={panelKey} stats={apiStats} timeRange={timeRange} />}
       </div>
     </div>
   );

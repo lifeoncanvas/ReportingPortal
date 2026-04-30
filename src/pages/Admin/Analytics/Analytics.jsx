@@ -38,6 +38,66 @@ const SettingsIcon = () => (
   </svg>
 );
 
+// ── Zone Master List ─────────────────────────────────
+const ALL_ZONES = [
+  'All Zones',
+  // ── ZONE/CHURCH ──────────────────────────────────────
+  'CE Lagos zone 5', 'CE Lagos Virtual Zone', 'CE Lagos zone 1', 'CE Lagos zone 2',
+  'CE Lagos zone 3', 'CE Lagos zone 4', 'CE Lagos zone 6',
+  'CE Lagos Sub Zone A', 'CE Lagos Sub Zone B', 'CE Lagos Sub Zone C', 'CE Egbeda Sub Zone',
+  // ── MC/ZONES IN NIGERIA ───────────────────────────
+  'CE Port harcourt zone 1', 'CE Port harcourt zone 2', 'CE Port harcourt zone 3',
+  'CE Benin zone 1', 'CE Benin Zone 2', 'CE Midwest Zone',
+  'CE Abuja Zone 1', 'CE Abuja Zone 2', 'CE Edo North & Central Zone',
+  'CE Aba Zone', 'CE Warri DSC',
+  'South South Zone 1', 'South South Zone 2', 'South South Zone 3',
+  'South East Zone 1', 'South East Zone 3',
+  'Ministry Centre Abuja', 'Ministry Centre Warri', 'Ministry Centre Calabar',
+  'North Central Zone 1', 'North Central Zone 2',
+  'North West Zone 1', 'North West Zone 2', 'North East Zone 1',
+  'Ministry Centre Abeokuta', 'Ministry Centre Ibadan',
+  'CE Onitsha Zone',
+  'South West Zone 2', 'South West Zone 3', 'South West Zone 4', 'South West Zone 5',
+  'CE Ibadan Zone 1', 'CE Ibadan Zone 2', 'LOVEWORLD CHURCH ZONE', 'CE Abakaliki Zone',
+  // ── INTERNATIONAL ────────────────────────────────
+  'CE UK Zone 1, DSP Region', 'CE UK Zone 2, DSP Region', 'CE UK Zone 3, DSP Region', 'CE UK Zone 4, DSP Region',
+  'CE UK Zone 1, Region 2', 'CE UK Zone 3, Region 2', 'CE UK Zone 4, Region 2', 'CE Barking DSP',
+  'Western Europe Zone 1', 'Western Europe Zone 2', 'Western Europe Zone 3', 'Western Europe Zone 4',
+  'Eastern Europe Virtual Region',
+  'USA Zone 1, Region 1', 'USA Zone 2, Region 1', 'Hawaii Zone', 'USA Region 2', 'USA Region 3',
+  'CE Dallas Zone', 'Toronto Zone', 'CE Ottawa Zone', 'CE Quebec',
+  'Middle East & South East Asia Region',
+  'India Zone 1', 'India Zone 2', 'Australia Region',
+  'South America and Pacific Islands Region', 'Intl Missions for Southeast Asia',
+  'CE Amsterdem, DSP', 'CE Ireland Sub-Zone',
+  // ── SOUTHERN AFRICA ──────────────────────────────
+  'Southern Africa Zone 1', 'Southern Africa Zone 2', 'Southern Africa Zone 3', 'Southern Africa Zone 5',
+  'CE Cape Town 1', 'CE Cape Town 2', 'CE Durban',
+  // ── EWCA ──────────────────────────────────────────
+  'Accra Ghana Zone', 'Kenya Zone',
+  'EWCAVZ1 (Ethiopia)', 'EWCAVZ2 (Togo)', 'EWCAVZ3 (Uganda)', 'EWCAVZ4 (Cameroun)', 'EWCAVZ5 (Nungua)', 'EWCAVZ6',
+  'CE Chad Zone', 'CE Cameroon West Zone', 'CE Tanzania Zone',
+  'GRAND TOTAL (CHURCH ZONES)',
+  // ── BLW CAMPUSES ─────────────────────────────────
+  'BLW ZONE C (UNILAG)', 'BLW ZONE J (UNIBEN)', 'BLW ZONE H (UNIPORT)', 'BLW ZONE A (EKPOMA)',
+  'BLW ZONE B (AWKA)', 'BLW ZONE D (ZARIA)', 'BLW ZONE E (ILE-IFE)', 'BLW ZONE F (ABSU)',
+  'BLW ZONE G (AKURE)', 'BLW ZONE I (UNIJOS)', 'BLW ZONE K (ABUJA)', 'BLW ZONE L (CALABAR)',
+  'BLW ZONE N',
+  'BLW ZONE Ghana A', 'BLW ZONE Ghana B', 'BLW ZONE Ghana C', 'BLW ZONE Ghana D', 'BLW ZONE Ghana E', 'BLW ZONE Ghana F',
+  'BLW ZONE SA A', 'BLW ZONE SA B', 'BLW ZONE SA C', 'BLW ZONE SA D', 'BLW ZONE SA E', 'BLW ZONE SA F', 'BLW ZONE SA G', 'BLW ZONE SA H',
+  'BLW UK ZONE A', 'BLW UK ZONE B', 'BLW UK ZONE C',
+  'BLW UGANDA ZONE A', 'ZIMBABWE ZONE', 'BOTSWANA ZONE',
+  'BLW USA REGION  1', 'BLW USA REGION  2', 'BLW USA REGION 1, ZONE B', 'BLW USA REGION 2, ZONE B',
+  'BLW CAMEROON GROUP A', 'BLW CAMEROON GROUP B', 'BLW CAMEROON GROUP 2', 'BLW CAMEROON GROUP 3',
+  'BLW NORTH CYPRUS', 'BLW NAMIBIA', 'BLW IRELAND', 'BLW CANADA GROUP', 'BLW CANADA REGION',
+  'BLW TURKEY GROUP', 'BLW WALES', 'BLW MIDDLE EAST & NORTH AFRICA', 'BLW BURKINA FASO',
+  'BLW DRC ZONE', 'BLW KENYA ZONE A', 'BLW BENIN REPUBLIC ZONE A', 'BLW BENIN REPUBLIC ZONE B',
+  'BLW CONGO DRC', 'BLW KENYA ZONE B', 'BLW UGANDA ZONE B', 'BLW EUROPE ZONE 1',
+  'GRAND TOTAL (CAMPUS ZONES)',
+];
+
+const API = process.env.REACT_APP_API_URL || 'http://65.0.71.13:8080';
+
 // ── Data ─────────────────────────────────────────────
 const DATA = {
   overview: {
@@ -268,7 +328,7 @@ function ProgressRow({ label, pct, color, target, achieved }) {
         <span className="prog-val" style={{ color }}>{pct}%</span>
       </div>
       <div className="prog-track">
-        <div className="prog-fill" style={{ width: `${pct}%`, background: color }} />
+        <div className="prog-fill" style={{ width: `${Math.min(100, pct)}%`, background: color }} />
       </div>
       <div className="prog-meta">Target: {target} · Achieved: {achieved}</div>
     </div>
@@ -328,12 +388,63 @@ const CustomTooltip = ({ active, payload, label }) => {
 };
 
 // ── Tab Panels ────────────────────────────────────────
-function OverviewPanel() {
+function OverviewPanel({ stats, timeRange }) {
   const d = DATA.overview;
+
+  const kpis = [
+    { label: 'Total Reports',   value: stats?.totalReports   ?? d.kpis[0].value, trend: '+18%', icon: '📊', color: 'purple' },
+    { label: 'New Partners',    value: stats?.newPartners    ?? d.kpis[1].value, trend: '+9%',  icon: '🤝', color: 'green' },
+    { label: 'Total Remittance',value: stats?.totalRemittance != null ? '₦' + Number(stats.totalRemittance).toLocaleString() : d.kpis[2].value, trend: '+12%', icon: '💰', color: 'amber' },
+    { label: 'Testimonies',     value: stats?.testimonies    ?? d.kpis[3].value, trend: '+34%', icon: '✍️', color: 'blue' },
+    { label: 'Outreach Events', value: stats?.outreachEvents ?? d.kpis[4].value, trend: '+6%',  icon: '📍', color: 'teal' },
+    { label: 'Completion Rate', value: stats?.completionRate ?? d.kpis[5].value, trend: '+3%',  icon: '✅', color: 'green' },
+  ];
+
+  let mult = 1;
+  if (timeRange === 'This Month') mult = 4;
+  else if (timeRange === 'This Quarter') mult = 12;
+  else if (timeRange === 'This Year') mult = 52;
+
+  const targetRemittance = 10000 * mult;
+  const targetPartners = 10 * mult;
+  const targetTestimonies = 50 * mult;
+  const targetOutreaches = 10 * mult;
+
+  const targets = [
+    { 
+      label: 'Partnership Remittance', 
+      pct: stats?.totalRemittance != null ? Math.round((Number(stats.totalRemittance) / targetRemittance) * 100) : d.targets[0].pct, 
+      color: '#f59e0b', 
+      target: `${targetRemittance.toLocaleString()} espees`, 
+      achieved: stats?.totalRemittance != null ? Number(stats.totalRemittance).toLocaleString() : d.targets[0].achieved 
+    },
+    { 
+      label: 'New Partners Recruited', 
+      pct: stats?.newPartners != null ? Math.round((stats.newPartners / targetPartners) * 100) : d.targets[1].pct, 
+      color: '#22c55e', 
+      target: `${targetPartners} for ${timeRange}`,     
+      achieved: stats?.newPartners != null ? stats.newPartners : d.targets[1].achieved 
+    },
+    { 
+      label: 'Testimonies Submitted',  
+      pct: stats?.testimonies != null ? Math.round((stats.testimonies / targetTestimonies) * 100) : d.targets[2].pct, 
+      color: '#818cf8', 
+      target: `${targetTestimonies} for ${timeRange}`,     
+      achieved: stats?.testimonies != null ? stats.testimonies : d.targets[2].achieved 
+    },
+    { 
+      label: 'Healing Outreaches',       
+      pct: stats?.outreachEvents != null ? Math.round((stats.outreachEvents / targetOutreaches) * 100) : d.targets[3].pct, 
+      color: '#2dd4bf', 
+      target: `${targetOutreaches} for ${timeRange}`,     
+      achieved: stats?.outreachEvents != null ? stats.outreachEvents : d.targets[3].achieved 
+    },
+  ];
+
   return (
     <div className="panel">
       <div className="kpi-grid">
-        {d.kpis.map(k => <KpiCard key={k.label} {...k} />)}
+        {kpis.map(k => <KpiCard key={k.label} {...k} />)}
       </div>
 
       <div className="two-col">
@@ -368,19 +479,25 @@ function OverviewPanel() {
 
       <SectionCard title="Weekly Target Attainment" icon="🎯">
         <div className="targets-grid">
-          {d.targets.map(t => <ProgressRow key={t.label} {...t} />)}
+          {targets.map(t => <ProgressRow key={t.label} {...t} />)}
         </div>
       </SectionCard>
     </div>
   );
 }
 
-function ZonalPanel() {
+function ZonalPanel({ stats }) {
   const d = DATA.zonal;
+  const kpis = [
+    { label: 'Active Zones',      value: stats?.activeZones      ?? d.kpis[0].value, trend: '+2',   icon: '🏛️', color: 'purple' },
+    { label: 'Reports Submitted', value: stats?.reportsSubmitted ?? d.kpis[1].value, trend: '+18%', icon: '📋', color: 'blue' },
+    { label: 'Avg New Partners',  value: stats?.avgNewPartners   ?? d.kpis[2].value, trend: '+9%',  icon: '🤝', color: 'green' },
+    { label: 'Total Remittance',  value: stats?.totalRemittance != null ? '₦' + Number(stats.totalRemittance).toLocaleString() : d.kpis[3].value, trend: '+12%', icon: '💰', color: 'amber' },
+  ];
   return (
     <div className="panel">
       <div className="kpi-grid">
-        {d.kpis.map(k => <KpiCard key={k.label} {...k} />)}
+        {kpis.map(k => <KpiCard key={k.label} {...k} />)}
       </div>
 
       <div className="two-col">
@@ -621,12 +738,12 @@ function OutreachPanel() {
 }
 
 const PANEL_MAP = {
-  overview: OverviewPanel,
-  zonal: ZonalPanel,
-  partnership: PartnershipPanel,
-  testimonials: TestimonialsPanel,
-  magazine: MagazinePanel,
-  outreach: OutreachPanel,
+  overview:     (props) => <OverviewPanel     {...props} />,
+  zonal:        (props) => <ZonalPanel        {...props} />,
+  partnership:  (props) => <PartnershipPanel  {...props} />,
+  testimonials: (props) => <TestimonialsPanel {...props} />,
+  magazine:     (props) => <MagazinePanel     {...props} />,
+  outreach:     (props) => <OutreachPanel     {...props} />,
 };
 
 // ── Main Component ────────────────────────────────────
@@ -635,6 +752,25 @@ export default function AnalyticsDashboard() {
   const [timeRange, setTimeRange] = useState('This Month');
   const [zone, setZone] = useState('All Zones');
   const [campaign, setCampaign] = useState('All Campaigns');
+  const [apiStats, setApiStats] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  const fetchStats = React.useCallback(async () => {
+    setLoading(true);
+    try {
+      const url = `${API}/api/analytics/stats?tab=${activeTab}&timeRange=${encodeURIComponent(timeRange)}&zone=${encodeURIComponent(zone)}`;
+      const res  = await fetch(url);
+      const data = await res.json();
+      setApiStats(data);
+    } catch (e) {
+      console.error('Analytics fetch failed:', e);
+      setApiStats(null);
+    } finally {
+      setLoading(false);
+    }
+  }, [activeTab, timeRange, zone]);
+
+  React.useEffect(() => { fetchStats(); }, [fetchStats]);
 
   const ActivePanel = PANEL_MAP[activeTab];
 
@@ -668,7 +804,7 @@ export default function AnalyticsDashboard() {
           <label className="filter-label">Zone</label>
           <div className="select-wrap">
             <select className="filter-select" value={zone} onChange={e => setZone(e.target.value)}>
-              {['All Zones', 'Zone A (Your Zone)', 'Zone B', 'Zone C', 'Zone D', 'Zone E'].map(o => <option key={o}>{o}</option>)}
+              {ALL_ZONES.map(o => <option key={o}>{o}</option>)}
             </select>
             <ChevronIcon />
           </div>
@@ -700,7 +836,12 @@ export default function AnalyticsDashboard() {
 
       {/* Content */}
       <div className="content">
-        <ActivePanel />
+        {loading && (
+          <div style={{ textAlign: 'center', padding: '40px 0', color: '#94a3b8', fontSize: 14 }}>
+            ⏳ Loading analytics data…
+          </div>
+        )}
+        {!loading && <ActivePanel stats={apiStats} timeRange={timeRange} />}
       </div>
     </div>
   );
