@@ -152,9 +152,10 @@ export default function AdminReportingPortal() {
         const res = await fetch(`${API}/api/reports/export?email=${user?.email}`);
         const blob = await res.blob();
         const url = URL.createObjectURL(blob);
+        const dateStr = new Date().toISOString().split('T')[0];
         const a = document.createElement('a');
         a.href = url;
-        a.download = `${userName}_${formName}.xlsx`;
+        a.download = `${userName}_${formName}_Summary_${dateStr}.xlsx`;
         a.click();
         URL.revokeObjectURL(url);
         showToast('Export downloaded 📥');
@@ -177,9 +178,10 @@ export default function AdminReportingPortal() {
     ];
     const blob = new Blob([csvRows.join('\n')], { type: 'text/csv;charset=utf-8;' });
     const url  = URL.createObjectURL(blob);
+    const dateStr = new Date().toISOString().split('T')[0];
     const a    = document.createElement('a');
     a.href     = url;
-    a.download = `${userName}_${formName}.csv`;
+    a.download = `${userName}_${formName}_Summary_${dateStr}.csv`;
     a.click();
     URL.revokeObjectURL(url);
     showToast('Export downloaded 📥');

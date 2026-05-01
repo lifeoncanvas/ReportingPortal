@@ -36,8 +36,8 @@ export function AuthProvider({ children }) {
         body: JSON.stringify({
           token: accessToken,
           email: kcUser?.email || null,
-          firstName: kcUser?.first_name || kcUser?.firstName || kcUser?.name || null,
-          lastName: kcUser?.last_name || kcUser?.lastName || null,
+          firstName: (kcUser?.first_name || kcUser?.firstName || (kcUser?.name ? kcUser.name.split(' ')[0] : null)),
+          lastName: (kcUser?.last_name || kcUser?.lastName || (kcUser?.name && kcUser.name.includes(' ') ? kcUser.name.split(' ').slice(1).join(' ') : null)),
           username: kcUser?.username || null,
         })
       });

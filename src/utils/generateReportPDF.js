@@ -232,7 +232,8 @@ export async function downloadReportPDF(report, formatDate) {
     doc.text(`Page ${p} of ${totalPages}`, pw - 14, ph - 4, { align: 'right' });
   }
 
+  const dateStr = new Date().toISOString().split('T')[0];
   const personName = (report.submittedBy || report.submitterEmail || 'User').replace(/[^a-zA-Z0-9]/g, '_');
-  const formName = (report.formName || 'Report').replace(/\s+/g, '_');
-  doc.save(`${personName}_${formName}.pdf`);
+  const formName = (report.formName || 'Summary').replace(/\s+/g, '_');
+  doc.save(`${personName}_${formName}_${dateStr}.pdf`);
 }

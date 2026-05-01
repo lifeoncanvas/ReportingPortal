@@ -6,9 +6,9 @@ import './styles.css';
 const KC_URL = 'https://kingschat.online/conversations';
 
 export default function KingsChatWidget() {
-  const { user }  = useAuth();
+   const { user }  = useAuth();
   const [open,    setOpen]    = useState(false);
-  const [entered, setEntered] = useState(false);
+  const [entered, setEntered] = useState(!!user?.kingschatId);
 
   return (
     <>
