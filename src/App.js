@@ -5,7 +5,7 @@ import AuthRouter from './auth/AuthRouter';
 import RoleRouter from './router/RoleRouter';
 import { NotificationProvider } from './context/NotificationContext';
 import { ToastProvider } from './context/ToastContext';
-import KingsChatWidget from './components/KingsChat/KingsChatWidget';
+import SupportChatBot from './components/ChatBot/ChatBot';
 
 function AppContent() {
   const { user } = useAuth();
@@ -13,7 +13,7 @@ function AppContent() {
   return (
     <>
       {user ? <RoleRouter /> : <AuthRouter />}
-      {user && <KingsChatWidget />}
+      {user && <SupportChatBot />}
     </>
   );
 }
