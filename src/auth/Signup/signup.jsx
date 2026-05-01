@@ -58,8 +58,8 @@ export default function Signup({ onSwitch }) {
     <div className="auth-container">
       <div className="auth-card signup-card">
         <div className="signup-header">
-          <h2 className="signup-main-title">Loveworld Lifesavers Conference 2026</h2>
-          <h3 className="signup-sub-title">Choose how to register</h3>
+          <h2 className="signup-main-title">Healing School</h2>
+          <h3 className="signup-sub-title">Zonal Master Report</h3>
         </div>
 
         {error && <p className="auth-error">{error}</p>}
@@ -79,10 +79,10 @@ export default function Signup({ onSwitch }) {
               onClick={() => toggleSection('kingschat')}
             >
               <div className="opt-left">
-                <MessageCircle className="opt-icon" size={24} />
+                <img src="https://kingschat.online/favicon.ico" className="opt-icon-img" alt="" />
                 <span>USE KINGSCHAT</span>
               </div>
-              <ArrowRight size={18} />
+              <span className="opt-arrow">→</span>
             </button>
 
             {/* Email Option */}
@@ -92,10 +92,10 @@ export default function Signup({ onSwitch }) {
                 onClick={() => toggleSection('email')}
               >
                 <div className="opt-left">
-                  <Mail className="opt-icon" size={24} />
+                  <Mail className="opt-icon" size={20} fill="currentColor" />
                   <span>USE EMAIL ADDRESS</span>
                 </div>
-                {activeSection === 'email' ? <ChevronDown size={18} /> : <ChevronRight size={18} />}
+                <span className="opt-arrow-down">▼</span>
               </button>
               
               {activeSection === 'email' && (
@@ -128,10 +128,10 @@ export default function Signup({ onSwitch }) {
                 onClick={() => toggleSection('phone')}
               >
                 <div className="opt-left">
-                  <Phone className="opt-icon" size={24} />
+                  <Phone className="opt-icon" size={20} fill="currentColor" />
                   <span>USE PHONE NUMBER</span>
                 </div>
-                {activeSection === 'phone' ? <ChevronDown size={18} /> : <ChevronRight size={18} />}
+                <span className="opt-arrow-down">▼</span>
               </button>
 
               {activeSection === 'phone' && (

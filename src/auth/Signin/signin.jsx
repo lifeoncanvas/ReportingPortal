@@ -3,8 +3,9 @@ import { useAuth } from '../AuthContext';
 import { useToast } from '../../context/ToastContext';
 import { useNavigate } from 'react-router-dom';
 import kingsChatWebSdk from 'kingschat-web-sdk';
+import { MessageCircle, Mail, Phone, ChevronDown, ChevronRight, Lock, ArrowRight } from 'lucide-react';
 import 'kingschat-web-sdk/dist/stylesheets/style.min.css';
-import './styles.css';
+import '../Signup/styles.css'; // Use shared styles
 
 const ROLE_NOTIF_PATH = {
   global: '/global/notifications',
@@ -16,9 +17,12 @@ export default function Signin({ onSwitch, onForgotPassword }) {
   const { login, loginWithKingChat } = useAuth();
   const { showToast } = useToast();
   const navigate = useNavigate();
-  const [email, setEmail] = useState('');
+  
+  const [activeSection, setActiveSection] = useState(null); // 'kingschat', 'email', 'phone'
+  const [identifier, setIdentifier] = useState(''); // Email or Phone
   const [password, setPassword] = useState('');
-  const [error,    setError]    = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const handleLoginResponse = (pendingToasts, role) => {
     const notifPath = ROLE_NOTIF_PATH[role] || '/notifications';
@@ -35,15 +39,19 @@ export default function Signin({ onSwitch, onForgotPassword }) {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    const err = await login(email, password, handleLoginResponse);
+    if (e) e.preventDefault();
+    setLoading(true);
+    setError('');
+    
+    const err = await login(identifier, password, handleLoginResponse);
+    setLoading(false);
     if (err) setError(err);
   };
 
   const handleKingChatLogin = () => {
     const loginOptions = {
       scopes: ["authenticate", "profile", "email"],
-      clientId: process.env.REACT_APP_KINGSCHAT_CLIENT_ID || 'YOUR_CLIENT_ID_HERE', 
+      clientId: window.ENV?.KINGSCHAT_CLIENT_ID || process.env.REACT_APP_KINGSCHAT_CLIENT_ID || '8ae69d5f-d25d-4c05-9914-ab947ffa5b77', 
     };
     
     kingsChatWebSdk.login(loginOptions)
@@ -58,41 +66,132 @@ export default function Signin({ onSwitch, onForgotPassword }) {
       });
   };
 
+  const toggleSection = (section) => {
+    if (section === 'kingschat') {
+      handleKingChatLogin();
+      return;
+    }
+    setActiveSection(activeSection === section ? null : section);
+  };
+
   return (
     <div className="auth-container">
-      <div className="auth-card">
-        <h2 className="auth-title">Loveworld Reports</h2>
-        <p className="auth-subtitle">Sign in to your account</p>
+      <div className="auth-card signup-card">
+        <div className="signup-header">
+          <h2 className="signup-main-title">Healing School</h2>
+          <h3 className="signup-sub-title">Zonal Master Report</h3>
+        </div>
+
         {error && <p className="auth-error">{error}</p>}
-        <form onSubmit={handleSubmit}>
-          <input className="auth-input" type="email" placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} required />
-          <input className="auth-input" type="password" placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} required />
-          <button className="auth-button" type="submit">Login</button>
-          
-          <div className="auth-divider" style={{ margin: '1rem 0', textAlign: 'center', color: '#9ca3af', fontSize: '0.8rem' }}>
-            <span>OR</span>
+
+        <div className="signup-options">
+          {/* KingsChat Option */}
+          <button 
+            className="signup-opt-btn kc-btn"
+            onClick={() => toggleSection('kingschat')}
+          >
+            <div className="opt-left">
+              <img src="https://kingschat.online/favicon.ico" className="opt-icon-img" alt="" />
+              <span>SIGN IN WITH KINGSCHAT</span>
+            </div>
+            <span className="opt-arrow">→</span>
+          </button>
+
+          {/* Email Option */}
+          <div className={`signup-accordion ${activeSection === 'email' ? 'active' : ''}`}>
+            <button 
+              className="signup-opt-btn email-btn"
+              onClick={() => toggleSection('email')}
+            >
+              <div className="opt-left">
+                <Mail className="opt-icon" size={20} fill="currentColor" />
+                <span>SIGN IN WITH EMAIL</span>
+              </div>
+              <span className="opt-arrow-down">▼</span>
+            </button>
+            
+            {activeSection === 'email' && (
+              <div className="accordion-content">
+                <form onSubmit={handleSubmit}>
+                  <div className="input-group">
+                    <Mail size={16} />
+                    <input 
+                      type="email" 
+                      placeholder="Email Address" 
+                      value={identifier} 
+                      onChange={e => setIdentifier(e.target.value)} 
+                      required 
+                    />
+                  </div>
+                  <div className="input-group">
+                    <Lock size={16} />
+                    <input 
+                      type="password" 
+                      placeholder="Password" 
+                      value={password} 
+                      onChange={e => setPassword(e.target.value)} 
+                      required 
+                    />
+                  </div>
+                  <button className="submit-signup-btn" type="submit" disabled={loading}>
+                    {loading ? 'Logging in...' : 'Sign In'}
+                  </button>
+                  <p className="forgot-password-link" onClick={onForgotPassword} style={{ textAlign: 'center', marginTop: '10px', fontSize: '0.8rem', color: '#64748b', cursor: 'pointer' }}>
+                    Forgot password?
+                  </p>
+                </form>
+              </div>
+            )}
           </div>
 
-          <button 
-            type="button"
-            className="auth-button kc-login-button" 
-            onClick={handleKingChatLogin} 
-            style={{ 
-              width: '100%', 
-              background: '#3b82f6', 
-              display: 'flex', 
-              alignItems: 'center', 
-              justifyContent: 'center', 
-              gap: '10px' 
-            }}
-          >
-            <img src="https://kingschat.online/favicon.ico" alt="KC" style={{ width: 18, height: 18, borderRadius: 4 }} />
-            Sign in with KingsChat
-          </button>
-        </form>
-        <p className="auth-switch">
-          Don't have an account? <span className="auth-link" onClick={onSwitch}>Sign up</span>
-        </p>
+          {/* Phone Option */}
+          <div className={`signup-accordion ${activeSection === 'phone' ? 'active' : ''}`}>
+            <button 
+              className="signup-opt-btn phone-btn"
+              onClick={() => toggleSection('phone')}
+            >
+              <div className="opt-left">
+                <Phone className="opt-icon" size={20} fill="currentColor" />
+                <span>SIGN IN WITH PHONE</span>
+              </div>
+              <span className="opt-arrow-down">▼</span>
+            </button>
+
+            {activeSection === 'phone' && (
+              <div className="accordion-content">
+                <form onSubmit={handleSubmit}>
+                  <div className="input-group">
+                    <Phone size={16} />
+                    <input 
+                      type="tel" 
+                      placeholder="Phone Number" 
+                      value={identifier} 
+                      onChange={e => setIdentifier(e.target.value)} 
+                      required 
+                    />
+                  </div>
+                  <div className="input-group">
+                    <Lock size={16} />
+                    <input 
+                      type="password" 
+                      placeholder="Password" 
+                      value={password} 
+                      onChange={e => setPassword(e.target.value)} 
+                      required 
+                    />
+                  </div>
+                  <button className="submit-signup-btn phone-submit" type="submit" disabled={loading}>
+                    {loading ? 'Logging in...' : 'Sign In'}
+                  </button>
+                </form>
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div className="signup-footer">
+          <p>Don't have an account? <span className="auth-link" onClick={onSwitch}>Sign up here →</span> <span className="red-dot">●</span></p>
+        </div>
       </div>
     </div>
   );

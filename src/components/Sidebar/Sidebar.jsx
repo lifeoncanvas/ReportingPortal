@@ -68,7 +68,7 @@ export default function Sidebar({ isOpen, onClose }) {
             <div>
               <h1 style={{ margin: 0, fontSize: '16px' }}>Healing School</h1>
               <p style={{ margin: 0, fontSize: '12px', opacity: 0.7 }}>
-                Zonal Manager Report
+                Zonal Master Report
               </p>
             </div>
           </div>

@@ -70,7 +70,7 @@ export default function RoleRouter() {
     return (
       <Routes>
         <Route path="/admin" element={<AdminLayout />}>
-          <Route index element={<Navigate to="dashboard" replace />} />
+          <Route index element={<Navigate to="users" replace />} />
           <Route path="dashboard"      element={<AdminDashboard />} />
           <Route path="users"          element={<UserManagement />} />
           <Route path="reporting"      element={<AdminReporting />} />
@@ -82,7 +82,7 @@ export default function RoleRouter() {
 
 
         </Route>
-        <Route path="*" element={<Navigate to="/admin/dashboard" replace />} />
+        <Route path="*" element={<Navigate to="/admin/users" replace />} />
       </Routes>
     );
   }
