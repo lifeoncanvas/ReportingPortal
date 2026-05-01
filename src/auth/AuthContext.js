@@ -99,12 +99,12 @@ export function AuthProvider({ children }) {
     setAvatar(null);
   };
 
-  const signup = async (name, email, password) => {
+  const signup = async (name, email, password, phone) => {
     try {
       const res = await fetch(`${process.env.REACT_APP_API_URL}/api/auth/signup`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, password })
+        body: JSON.stringify({ name, email, password, phone })
       });
 
       if (!res.ok) {

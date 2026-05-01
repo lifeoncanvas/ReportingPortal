@@ -51,7 +51,7 @@ export default function UserManagement() {
 
   const openEdit = (u) => {
     setEditUser(u);
-    setForm({ firstName: u.firstName, lastName: u.lastName, email: u.email, role: u.role, region: u.region, status: u.status });
+    setForm({ firstName: u.firstName, lastName: u.lastName, email: u.email, phone: u.phone, role: u.role, region: u.region, status: u.status });
     setShowModal(true);
   };
 
@@ -163,6 +163,7 @@ export default function UserManagement() {
               <tr>
                 <th>User</th>
                 <th>Email</th>
+                <th>Phone</th>
                 <th>Role</th>
                 <th>Region</th>
                 <th>Status</th>
@@ -184,6 +185,7 @@ export default function UserManagement() {
                       </div>
                     </td>
                     <td>{u.email}</td>
+                    <td>{u.phone || '—'}</td>
                     <td>
                       <span className="um-role-badge" style={{ background: rc.bg, color: rc.color }}>
                         {u.role}
@@ -302,6 +304,12 @@ export default function UserManagement() {
                       <option key={r}>{r}</option>
                     ))}
                   </select>
+                </div>
+                <div className="um-field">
+                  <label>Phone Number</label>
+                  <input type="text" value={form.phone || ''}
+                    onChange={e => setForm(p => ({ ...p, phone: e.target.value }))}
+                    placeholder="+234..." />
                 </div>
                 <div className="um-field">
                   <label>Status</label>
