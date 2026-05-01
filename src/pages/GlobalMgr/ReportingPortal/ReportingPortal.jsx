@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Eye, Download, Search, Upload, X, Check, ChevronDown, Plus, FileText, Heart, BookOpen, Newspaper, Users } from 'lucide-react';
 import { useAuth } from '../../../auth/AuthContext';
+import { downloadReportPDF } from '../../../utils/generateReportPDF';
 import './styles.css';
 
 // ── Icons ──────────────────────────────────────────────
@@ -1068,9 +1069,11 @@ export default function ReportingPortal() {
     const headers = tab.columns.map(c => c.label);
     const rows    = filtered.map(r => tab.columns.map(c => r[c.key] ?? ''));
     const content = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+    const userName = user?.name ? user.name.replace(/\s+/g, '_') : 'User';
+    const formName = activeTab;
     const a = Object.assign(document.createElement('a'), {
       href: URL.createObjectURL(new Blob([content], { type: 'text/csv' })),
-      download: `${activeTab}-reports.csv`,
+      download: `${userName}_${formName}.csv`,
     });
     a.click();
     setToast(`Exported ${filtered.length} ${tab.label} reports`);
@@ -1136,7 +1139,13 @@ export default function ReportingPortal() {
           loading={false}
           columns={tab.columns}
           onView={r => setViewReport(r)}
-          onDownload={r => setToast(`Downloading ${r.id}…`)}
+          onDownload={r => {
+            setToast(`Downloading ${r.id}…`);
+            const fullReport = reports.find(x => x.id === r.id);
+            if (fullReport) {
+              downloadReportPDF({ ...fullReport, formName: tab.label }, formatDate);
+            }
+          }}
         />
       </div>
     </div>

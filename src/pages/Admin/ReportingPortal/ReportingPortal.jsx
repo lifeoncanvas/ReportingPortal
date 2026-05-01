@@ -143,10 +143,24 @@ export default function AdminReportingPortal() {
     fetchReports();
   };
 
-  const handleExport = () => {
+  const handleExport = async () => {
+    const userName = user?.name ? user.name.replace(/\s+/g, '_') : 'User';
+    const formName = activeTab;
+
     if (activeTab === 'zonal') {
-      // Use the backend Excel export endpoint for zonal reports
-      window.open(`${API}/api/reports/export?email=${user?.email}`, '_blank');
+      try {
+        const res = await fetch(`${API}/api/reports/export?email=${user?.email}`);
+        const blob = await res.blob();
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${userName}_${formName}.xlsx`;
+        a.click();
+        URL.revokeObjectURL(url);
+        showToast('Export downloaded 📥');
+      } catch (e) {
+        showToast('Export failed ❌');
+      }
       return;
     }
     // CSV export for all other tabs
@@ -165,7 +179,7 @@ export default function AdminReportingPortal() {
     const url  = URL.createObjectURL(blob);
     const a    = document.createElement('a');
     a.href     = url;
-    a.download = `${activeTab}-reports-${new Date().toISOString().split('T')[0]}.csv`;
+    a.download = `${userName}_${formName}.csv`;
     a.click();
     URL.revokeObjectURL(url);
     showToast('Export downloaded 📥');

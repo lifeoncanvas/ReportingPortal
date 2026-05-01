@@ -448,9 +448,9 @@ function OverviewPanel({ stats, timeRange }) {
       </div>
 
       <div className="two-col">
-        <SectionCard title="Weekly Submission Trend" icon="📈">
+        <SectionCard title={`Submission Trend (${timeRange})`} icon="📈">
           <ResponsiveContainer width="100%" height={220}>
-            <LineChart data={d.trend}>
+            <LineChart data={stats?.trend ?? d.trend}>
               <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
               <XAxis dataKey="week" tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
               <YAxis tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false} />

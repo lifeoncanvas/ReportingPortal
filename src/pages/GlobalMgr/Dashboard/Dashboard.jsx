@@ -113,23 +113,6 @@ export default function Dashboard() {
 
       <div className="chart-grid">
         <div className="chart-card">
-          <h3>{t.regionStats}</h3>
-          <ResponsiveContainer width="100%" height={220}>
-            <PieChart>
-              <Pie data={regionData} cx="50%" cy="50%" outerRadius={80}
-                dataKey="value"
-                label={({ name, percent }) => `${name} ${(percent*100).toFixed(0)}%`}
-                labelLine={false}>
-                {regionData.map((_, i) => (
-                  <Cell key={i} fill={REGION_COLORS[i % REGION_COLORS.length]}/>
-                ))}
-              </Pie>
-              <Tooltip contentStyle={{ borderRadius: 8, border: '1px solid #e5e7eb', fontSize: 12 }}/>
-            </PieChart>
-          </ResponsiveContainer>
-        </div>
-
-        <div className="chart-card">
           <h3>{t.recentActivity}</h3>
           <div className="activity-list">
             {(stats?.recentActivity || []).map((item, idx) => (

@@ -232,5 +232,7 @@ export async function downloadReportPDF(report, formatDate) {
     doc.text(`Page ${p} of ${totalPages}`, pw - 14, ph - 4, { align: 'right' });
   }
 
-  doc.save(`${report.id}_report.pdf`);
+  const personName = (report.submittedBy || report.submitterEmail || 'User').replace(/[^a-zA-Z0-9]/g, '_');
+  const formName = (report.formName || 'Report').replace(/\s+/g, '_');
+  doc.save(`${personName}_${formName}.pdf`);
 }

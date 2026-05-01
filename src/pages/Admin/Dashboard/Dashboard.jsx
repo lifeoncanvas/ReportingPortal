@@ -153,19 +153,6 @@ export default function AdminDashboard() {
       {/* Row 3: Stats */}
       <div className="ad-row3">
         <div className="ad-card">
-          <h3>Reports by Region</h3>
-          {REGION_STATS.map(r => (
-            <div className="ad-stat-row" key={r.label}>
-              <span className="ad-stat-lbl">{r.label}</span>
-              <div className="ad-bar-bg">
-                <div className="ad-bar-fill" style={{ width: `${r.pct}%`, background: '#4f46e5' }} />
-              </div>
-              <span className="ad-stat-val">{r.count}</span>
-            </div>
-          ))}
-        </div>
-
-        <div className="ad-card">
           <h3>System Health</h3>
           {[
             { label: 'API Uptime',      value: '99.9%',   color: '#16a34a' },
@@ -180,19 +167,6 @@ export default function AdminDashboard() {
               <span className="ad-stat-val" style={s.color ? { color: s.color } : {}}>
                 {s.value}
               </span>
-            </div>
-          ))}
-        </div>
-
-        <div className="ad-card">
-          <h3>Role Distribution</h3>
-          {ROLE_DIST.map(r => (
-            <div className="ad-stat-row" key={r.label}>
-              <span className="ad-stat-lbl">{r.label}</span>
-              <div className="ad-bar-bg">
-                <div className="ad-bar-fill" style={{ width: `${r.pct}%`, background: r.color }} />
-              </div>
-              <span className="ad-stat-val">{r.count}</span>
             </div>
           ))}
         </div>
