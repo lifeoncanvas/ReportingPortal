@@ -73,11 +73,22 @@ export default function Signin({ onSwitch, onForgotPassword }) {
             <span>OR</span>
           </div>
 
-          <div 
-            className="kc-web-sdk-btn" 
+          <button 
+            type="button"
+            className="auth-button kc-login-button" 
             onClick={handleKingChatLogin} 
-            style={{ width: '100%', display: 'flex', justifyContent: 'center', cursor: 'pointer' }}
-          ></div>
+            style={{ 
+              width: '100%', 
+              background: '#3b82f6', 
+              display: 'flex', 
+              alignItems: 'center', 
+              justifyContent: 'center', 
+              gap: '10px' 
+            }}
+          >
+            <img src="https://kingschat.online/favicon.ico" alt="KC" style={{ width: 18, height: 18, borderRadius: 4 }} />
+            Sign in with KingsChat
+          </button>
         </form>
         <p className="auth-switch">
           Don't have an account? <span className="auth-link" onClick={onSwitch}>Sign up</span>
