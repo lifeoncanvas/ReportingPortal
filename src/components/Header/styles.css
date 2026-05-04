@@ -165,16 +165,20 @@
   gap: 9px;
   width: 100%;
   padding: 12px 16px;
-  background: transparent;
+  background: #fffafa; /* Very light red tint */
   border: none;
+  border-top: 1px solid var(--border-light);
   font-size: 0.875rem;
-  font-weight: 500;
-  color: #dc2626;
+  font-weight: 600;
+  color: #c53030 !important; /* Force solid dark red */
   cursor: pointer;
-  transition: background 0.12s;
+  transition: all 0.2s;
 }
 
-.header-dropdown-signout:hover { background: #fff5f5; }
+.header-dropdown-signout:hover { 
+  background: #fee2e2; 
+  color: #9b2c2c !important;
+}
 
 .mobile-menu-btn {
   display: none;
