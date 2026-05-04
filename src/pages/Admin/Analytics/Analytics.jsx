@@ -462,13 +462,13 @@ function OverviewPanel({ stats, timeRange }) {
 
         <SectionCard title="Reports by Category" icon="📊">
           <ResponsiveContainer width="100%" height={220}>
-            <BarChart data={d.categoryDist}>
+            <BarChart data={stats?.categoryDist ?? d.categoryDist}>
               <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
               <XAxis dataKey="name" tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
               <YAxis tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
               <Tooltip content={<CustomTooltip />} />
               <Bar dataKey="value" radius={[6, 6, 0, 0]} name="Reports">
-                {d.categoryDist.map((entry, i) => (
+                {(stats?.categoryDist ?? d.categoryDist).map((entry, i) => (
                   <Cell key={i} fill={entry.color} />
                 ))}
               </Bar>
@@ -828,8 +828,8 @@ export default function AnalyticsDashboard() {
       {/* Top bar */}
       <div className="topbar">
         <div className="topbar-left">
-          <span className="topbar-crown">👑</span>
-          <span className="topbar-brand">KingsForms Analytics</span>
+          <span className="topbar-crown">🛡️</span>
+          <span className="topbar-brand">Healing School Analytics</span>
         </div>
         <div className="topbar-right">
           <button className="icon-btn notif"><BellIcon /><span className="notif-dot" /></button>
