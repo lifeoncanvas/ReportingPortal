@@ -266,4 +266,20 @@
   cursor: pointer;
 }
 
-.mt-4 { margin-top: 1.5rem; }
+.kc-reg-hint {
+  text-align: center;
+  font-size: 0.75rem;
+  color: #64748b;
+  margin-top: 8px;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.kc-reg-hint span {
+  color: #3b82f6;
+  font-weight: 600;
+}
+
+.kc-reg-hint:hover span {
+  text-decoration: underline;
+}

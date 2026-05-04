@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { useAuth } from '../AuthContext';
 import { MessageCircle, Mail, Phone, ChevronDown, ChevronRight, User, Lock, ArrowRight } from 'lucide-react';
+import kingsChatWebSdk from 'kingschat-web-sdk';
+import 'kingschat-web-sdk/dist/stylesheets/style.min.css';
 import './styles.css';
 
 export default function Signup({ onSwitch }) {
@@ -20,6 +22,37 @@ export default function Signup({ onSwitch }) {
 
   const handleInputChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleKingChatLogin = () => {
+    const loginOptions = {
+      scopes: ["authenticate", "profile"],
+      clientId: (window.ENV?.KINGSCHAT_CLIENT_ID || process.env.REACT_APP_KINGSCHAT_CLIENT_ID || '5510380c-caac-4baa-ad0c-288dcdffaf1f').trim(), 
+    };
+    
+    kingsChatWebSdk.login(loginOptions)
+      .then(async (tokenResponse) => {
+        const { accessToken, user: kcUser } = tokenResponse;
+        const err = await loginWithKingChat(accessToken, null, kcUser);
+        
+        if (err) {
+          // If the "error" is actually a success message about account creation
+          if (err.toLowerCase().includes('created') || err.toLowerCase().includes('pending')) {
+            setSuccess(true);
+            setError('');
+          } else {
+            setError(err);
+          }
+        }
+      })
+      .catch(err => {
+        console.error("KingsChat login error:", err);
+        setError('KingsChat login was cancelled or failed.');
+      });
+  };
+
+  const openKingsChatReg = () => {
+    window.open('https://kingschat.online/', '_blank');
   };
 
   const handleSubmit = async (e, type) => {
@@ -48,7 +81,7 @@ export default function Signup({ onSwitch }) {
 
   const toggleSection = (section) => {
     if (section === 'kingschat') {
-      loginWithKingChat();
+      handleKingChatLogin();
       return;
     }
     setActiveSection(activeSection === section ? null : section);
@@ -73,17 +106,21 @@ export default function Signup({ onSwitch }) {
           </div>
         ) : (
           <div className="signup-options">
-            {/* KingsChat Option */}
-            <button 
-              className="signup-opt-btn kc-btn"
-              onClick={() => toggleSection('kingschat')}
-            >
-              <div className="opt-left">
-                <img src="https://kingschat.online/favicon.ico" className="opt-icon-img" alt="" />
-                <span>USE KINGSCHAT</span>
-              </div>
-              <span className="opt-arrow">→</span>
-            </button>
+            <div className="kc-option-wrap">
+              <button 
+                className="signup-opt-btn kc-btn"
+                onClick={() => toggleSection('kingschat')}
+              >
+                <div className="opt-left">
+                  <img src="https://kingschat.online/favicon.ico" className="opt-icon-img" alt="" />
+                  <span>USE KINGSCHAT</span>
+                </div>
+                <span className="opt-arrow">→</span>
+              </button>
+              <p className="kc-reg-hint" onClick={openKingsChatReg}>
+                Don't have a KingsChat account? <span>Register here</span>
+              </p>
+            </div>
 
             {/* Email Option */}
             <div className={`signup-accordion ${activeSection === 'email' ? 'active' : ''}`}>
@@ -160,7 +197,7 @@ export default function Signup({ onSwitch }) {
         )}
 
         <div className="signup-footer">
-          <p>Already registered? <span className="auth-link" onClick={onSwitch}>Sign in to watch live →</span> <span className="red-dot">●</span></p>
+          <p>Already registered? <span className="auth-link" onClick={onSwitch}>Sign in →</span> <span className="red-dot">●</span></p>
         </div>
       </div>
     </div>
