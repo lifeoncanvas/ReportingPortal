@@ -106,21 +106,17 @@ export default function Signup({ onSwitch }) {
           </div>
         ) : (
           <div className="signup-options">
-            <div className="kc-option-wrap">
-              <button 
-                className="signup-opt-btn kc-btn"
-                onClick={() => toggleSection('kingschat')}
-              >
-                <div className="opt-left">
-                  <img src="https://kingschat.online/favicon.ico" className="opt-icon-img" alt="" />
-                  <span>USE KINGSCHAT</span>
-                </div>
-                <span className="opt-arrow">→</span>
-              </button>
-              <p className="kc-reg-hint" onClick={openKingsChatReg}>
-                Don't have a KingsChat account? <span>Register here</span>
-              </p>
-            </div>
+            {/* KingsChat Option */}
+            <button 
+              className="signup-opt-btn kc-btn"
+              onClick={() => toggleSection('kingschat')}
+            >
+              <div className="opt-left">
+                <img src="https://kingschat.online/favicon.ico" className="opt-icon-img" alt="" />
+                <span>USE KINGSCHAT</span>
+              </div>
+              <span className="opt-arrow">→</span>
+            </button>
 
             {/* Email Option */}
             <div className={`signup-accordion ${activeSection === 'email' ? 'active' : ''}`}>

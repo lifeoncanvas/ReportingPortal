@@ -49,37 +49,32 @@
 
 .signup-header {
   text-align: center;
-  margin-bottom: 2rem;
+  margin-bottom: 2.5rem;
 }
 
 .signup-main-title {
   color: #1e1b4b;
-  font-size: 1.6rem;
-  font-weight: 800;
-  margin-bottom: 0.5rem;
-  letter-spacing: -0.01em;
+  font-size: 2.2rem;
+  font-weight: 900;
+  margin-bottom: 0.2rem;
+  letter-spacing: -0.02em;
   font-family: 'Inter', sans-serif;
 }
 
 .signup-sub-title {
-  color: #3b82f6;
-  font-size: 1.2rem;
-  font-weight: 800;
+  color: #4f46e5;
+  font-size: 1.1rem;
+  font-weight: 700;
   margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
   font-family: 'Inter', sans-serif;
-}
-
-.red-dot {
-  color: #ef4444;
-  margin-left: 4px;
-  font-size: 1.2rem;
-  vertical-align: middle;
 }
 
 .signup-options {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 16px;
 }
 
 .signup-opt-btn {
@@ -87,20 +82,23 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 16px 20px;
+  padding: 18px 24px; /* Balanced padding */
   border: none;
-  border-radius: 12px;
+  border-radius: 16px;
   color: white;
-  font-weight: 700;
-  font-size: 1rem;
+  font-weight: 800;
+  font-size: 0.95rem;
   cursor: pointer;
-  transition: all 0.2s;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
 }
 
 .signup-opt-btn:hover {
-  filter: brightness(1.1);
-  transform: translateY(-2px);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  filter: brightness(1.05);
 }
 
 .signup-opt-btn:active {
@@ -110,7 +108,13 @@
 .opt-left {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
+}
+
+.opt-icon-img {
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
 }
 
 .opt-icon {
@@ -118,15 +122,22 @@
 }
 
 .kc-btn {
-  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  background: linear-gradient(135deg, #4278F5 0%, #2563eb 100%);
+  border: 1px solid rgba(255,255,255,0.1);
 }
 
 .email-btn {
-  background: linear-gradient(135deg, #1e3a8a, #1e293b);
+  background: linear-gradient(135deg, #2D3E61 0%, #1e1b4b 100%);
 }
 
 .phone-btn {
-  background: linear-gradient(135deg, #3f6212, #4d7c0f);
+  background: linear-gradient(135deg, #5D7A1E 0%, #3f6212 100%);
+}
+
+.opt-arrow, .opt-arrow-down {
+  font-size: 1.1rem;
+  opacity: 0.8;
+  font-weight: 400;
 }
 
 .signup-accordion {
@@ -207,8 +218,15 @@
   background: #365314;
 }
 
+.red-dot {
+  color: #ef4444;
+  margin-left: 4px;
+  font-size: 1.2rem;
+  vertical-align: middle;
+}
+
 .signup-footer {
-  margin-top: 2rem;
+  margin-top: 2.5rem;
   text-align: center;
   font-size: 0.925rem;
   color: #64748b;
