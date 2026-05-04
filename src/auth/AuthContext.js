@@ -28,9 +28,14 @@ export function AuthProvider({ children }) {
     return await baseLogin({ email, password, loginMethod: 'password' }, onPendingToasts);
   };
 
+  const getApiUrl = () => {
+    return window.ENV?.API_PATH || process.env.REACT_APP_API_URL || 'http://65.0.71.13:8080';
+  };
+
   const loginWithKingChat = async (accessToken, onPendingToasts, kcUser) => {
     try {
-      const res = await fetch(`${process.env.REACT_APP_API_URL}/api/auth/kingchat`, {
+      const apiUrl = getApiUrl();
+      const res = await fetch(`${apiUrl}/api/auth/kingchat`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -44,7 +49,8 @@ export function AuthProvider({ children }) {
 
       if (!res.ok) {
         const errText = await res.text();
-        return errText || 'KingsChat login failed.';
+        console.error("Backend Auth Error:", errText);
+        return errText || `KingsChat login failed (${res.status}).`;
       }
 
       const userData = await res.json();
@@ -57,14 +63,14 @@ export function AuthProvider({ children }) {
       return null;
     } catch (err) {
       console.error("KingsChat Auth failed:", err);
-      return 'Network error or Invalid KingsChat session.';
+      return 'Connection error: Could not reach the authentication server.';
     }
   };
 
   const baseLogin = async (payload, onPendingToasts) => {
-    const { email, password } = payload;
+    const apiUrl = getApiUrl();
     try {
-      const res = await fetch(`${process.env.REACT_APP_API_URL}/api/auth/login`, {
+      const res = await fetch(`${apiUrl}/api/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
