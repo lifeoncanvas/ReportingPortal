@@ -454,8 +454,11 @@ const BLAAAST_CATEGORIES = [
 
 function PartnershipForm({ onClose, onSubmit: parentSubmit }) {
   const [form, setForm] = useState({
-    selectedArms: [],
-    remittances: {},
+    zonalPartnership: '',
+    zonalPartnershipDetails: '',
+    groupsPartnership: '',
+    churchesPartnership: '',
+    cellPartnership: '',
     totalRemittance: '',
     blaaast: {},
     notes: '',
@@ -463,29 +466,24 @@ function PartnershipForm({ onClose, onSubmit: parentSubmit }) {
   const [errors, setErrors] = useState({});
   const [submitting, setSubmitting] = useState(false);
 
-  const toggleArm = key => setForm(p => ({
-    ...p,
-    selectedArms: p.selectedArms.includes(key)
-      ? p.selectedArms.filter(k => k !== key)
-      : [...p.selectedArms, key],
-  }));
-
   const setBlaaast = (key, val) => {
-    // restrict to integers only
     const int = val === '' ? '' : String(Math.max(0, Math.floor(Number(val))));
     setForm(p => ({ ...p, blaaast: { ...p.blaaast, [key]: int } }));
   };
 
   const handleSubmit = async () => {
     const e = {};
-    if (form.selectedArms.length === 0) e.arms = 'Select at least one partnership arm';
     if (!form.totalRemittance.trim()) e.totalRemittance = 'Required';
     setErrors(e);
     if (Object.keys(e).length) return;
     setSubmitting(true);
     await new Promise(r => setTimeout(r, 500));
     parentSubmit({
-      arms: form.selectedArms.map(k => PARTNERSHIP_ARMS.find(a => a.key === k)?.label).join(', '),
+      zonalPartnership: form.zonalPartnership,
+      zonalPartnershipDetails: form.zonalPartnershipDetails,
+      groupsPartnership: form.groupsPartnership,
+      churchesPartnership: form.churchesPartnership,
+      cellPartnership: form.cellPartnership,
       totalRemittance: form.totalRemittance,
       notes: form.notes,
       status: 'submitted',
@@ -498,50 +496,35 @@ function PartnershipForm({ onClose, onSubmit: parentSubmit }) {
     <FormPopup title="Partnership Remittance Report" eyebrow="KingsForms · Partnership" icon="🤝"
       onClose={onClose} onSubmit={handleSubmit} submitting={submitting} submitLabel="Submit Partnership Report">
 
-      {/* Partnership Arms — checkboxes */}
-      <div className="popup-section-head">💼 Partnership Arms</div>
+      <div className="popup-section-head">💼 Partnership Breakdown (Espees)</div>
       <div className="popup-fields">
-        <Field label="Select all applicable partnership arms" required error={errors.arms}>
-          <div className="arm-checkbox-list">
-            {PARTNERSHIP_ARMS.map(arm => (
-              <label key={arm.key} className={`arm-checkbox-item ${form.selectedArms.includes(arm.key) ? 'selected' : ''}`}>
-                <input
-                  type="checkbox"
-                  checked={form.selectedArms.includes(arm.key)}
-                  onChange={() => toggleArm(arm.key)}
-                  style={{ display: 'none' }}
-                />
-                <span className="arm-checkbox-box">
-                  {form.selectedArms.includes(arm.key) && <Check size={12} />}
-                </span>
-                <span className="arm-checkbox-icon">{arm.icon}</span>
-                <span className="arm-checkbox-label">{arm.label}</span>
-              </label>
-            ))}
-          </div>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '1rem', alignItems: 'start' }}>
+          <Field label="Zonal Partnership">
+            <input className="kf-input" type="number" min="0" placeholder="0"
+              value={form.zonalPartnership} onChange={e => setForm(p => ({ ...p, zonalPartnership: e.target.value }))} />
+          </Field>
+          <Field label="Zonal Partnership Details">
+            <textarea className="kf-textarea" rows={1} placeholder="Enter details..."
+              value={form.zonalPartnershipDetails} onChange={e => setForm(p => ({ ...p, zonalPartnershipDetails: e.target.value }))} />
+          </Field>
+        </div>
+        
+        <Field label="Groups Partnership">
+          <input className="kf-input" type="number" min="0" placeholder="0"
+            value={form.groupsPartnership} onChange={e => setForm(p => ({ ...p, groupsPartnership: e.target.value }))} />
+        </Field>
+        
+        <Field label="Churches Partnership">
+          <input className="kf-input" type="number" min="0" placeholder="0"
+            value={form.churchesPartnership} onChange={e => setForm(p => ({ ...p, churchesPartnership: e.target.value }))} />
+        </Field>
+        
+        <Field label="Cell Partnership">
+          <input className="kf-input" type="number" min="0" placeholder="0"
+            value={form.cellPartnership} onChange={e => setForm(p => ({ ...p, cellPartnership: e.target.value }))} />
         </Field>
       </div>
 
-      {/* Remittance per arm */}
-      {form.selectedArms.length > 0 && (
-        <>
-          <div className="popup-section-head">💰 Remittance per Arm (Espees)</div>
-          <div className="popup-fields">
-            {form.selectedArms.map(key => {
-              const arm = PARTNERSHIP_ARMS.find(a => a.key === key);
-              return (
-                <Field key={key} label={`${arm.icon} ${arm.label}`}>
-                  <input className="kf-input" type="number" min="0" placeholder="0"
-                    value={form.remittances[key] || ''}
-                    onChange={e => setForm(p => ({ ...p, remittances: { ...p.remittances, [key]: e.target.value } }))} />
-                </Field>
-              );
-            })}
-          </div>
-        </>
-      )}
-
-      {/* Total */}
       <div className="popup-section-head">📊 Summary</div>
       <div className="popup-fields">
         <Field label="Total Partnership Remittance (Espees)" required error={errors.totalRemittance}>
@@ -550,7 +533,6 @@ function PartnershipForm({ onClose, onSubmit: parentSubmit }) {
         </Field>
       </div>
 
-      {/* BLAAAST Categories */}
       <div className="popup-section-head">🎺 BLAAAST Partnership Categories</div>
       <div className="popup-fields">
         <p className="kf-section-note">How many partners gave in each of these BLAAAST categories this week?</p>
@@ -575,7 +557,6 @@ function PartnershipForm({ onClose, onSubmit: parentSubmit }) {
         </div>
       </div>
 
-      {/* Notes */}
       <div className="popup-section-head">📝 Additional Notes</div>
       <div className="popup-fields">
         <Field label="Recruitment notes or special mentions">
@@ -700,6 +681,9 @@ function MagazineForm({ onClose, onSubmit: parentSubmit }) {
     healingOutreaches: '',
     healingMedia: [],
     notes: '',
+    isAdult: false,
+    isTeevolution: false,
+    isKidsMagazine: false,
   });
   const [errors, setErrors] = useState({});
   const [submitting, setSubmitting] = useState(false);
@@ -716,7 +700,6 @@ function MagazineForm({ onClose, onSubmit: parentSubmit }) {
     if (Object.keys(e).length) return;
     setSubmitting(true);
     await new Promise(r => setTimeout(r, 500));
-    // Payload matches magazine_reports table columns
     parentSubmit({
       language:         form.language,
       ordered:          Number(form.orderedCopies) || 0,
@@ -725,6 +708,9 @@ function MagazineForm({ onClose, onSubmit: parentSubmit }) {
       reason:           form.notReceivedReason,
       sponsoredCopies:  Number(form.sponsoredCopies) || 0,
       healingOutreaches: Number(form.healingOutreaches) || 0,
+      isAdult:          form.isAdult,
+      isTeevolution:    form.isTeevolution,
+      isKidsMagazine:   form.isKidsMagazine,
       status:           'PENDING',
       rawDate:          new Date().toISOString().split('T')[0],
     });
@@ -735,8 +721,27 @@ function MagazineForm({ onClose, onSubmit: parentSubmit }) {
     <FormPopup title="Magazine Order Report" eyebrow="KingsForms · Magazine" icon="📚"
       onClose={onClose} onSubmit={handleSubmit} submitting={submitting} submitLabel="Submit Magazine Report">
 
+      {/* Magazine Types */}
+      <div className="popup-section-head">📚 Magazine Type</div>
+      <div className="popup-fields">
+        <div style={{ display: 'flex', gap: '2rem', flexWrap: 'wrap', padding: '0.5rem 0' }}>
+          <label className="kf-checkbox-label">
+            <input type="checkbox" checked={form.isAdult} onChange={e => setForm(p => ({ ...p, isAdult: e.target.checked }))} />
+            <span>Adult</span>
+          </label>
+          <label className="kf-checkbox-label">
+            <input type="checkbox" checked={form.isTeevolution} onChange={e => setForm(p => ({ ...p, isTeevolution: e.target.checked }))} />
+            <span>Teevolution</span>
+          </label>
+          <label className="kf-checkbox-label">
+            <input type="checkbox" checked={form.isKidsMagazine} onChange={e => setForm(p => ({ ...p, isKidsMagazine: e.target.checked }))} />
+            <span>Kids Magazine</span>
+          </label>
+        </div>
+      </div>
+
       {/* Order Details */}
-      <div className="popup-section-head">📚 Order Details</div>
+      <div className="popup-section-head">🌍 Language & Quantity</div>
       <div className="popup-fields">
         <Field label="Language" required error={errors.language}>
           <div className="kf-select-wrap">
@@ -937,7 +942,8 @@ const TABS_CONFIG = [
     id: 'partnership', label: 'Partnership Report', icon: <Heart size={14} />, emoji: '🤝', color: '#16a34a',
     columns: [
       { key: 'id', label: 'Report ID' }, { key: 'rawDate', label: 'Date' },
-      { key: 'arms', label: 'Arms' }, { key: 'totalRemittance', label: 'Remittance (Espees)' },
+      { key: 'zonalPartnership', label: 'Zonal (Espees)' },
+      { key: 'totalRemittance', label: 'Total (Espees)' },
       { key: 'status', label: 'Status' },
     ],
     FormComponent: PartnershipForm, btnLabel: 'Upload a New Partnership Report',
@@ -955,8 +961,10 @@ const TABS_CONFIG = [
     id: 'magazine', label: 'Magazine', icon: <Newspaper size={14} />, emoji: '📚', color: '#dc2626',
     columns: [
       { key: 'id', label: 'Report ID' }, { key: 'rawDate', label: 'Date' },
-      { key: 'language', label: 'Language' }, { key: 'ordered', label: 'Ordered' },
-      { key: 'receiptStatus', label: 'Received?' }, { key: 'status', label: 'Status' },
+      { key: 'language', label: 'Language' },
+      { key: 'magazineType', label: 'Type' },
+      { key: 'ordered', label: 'Ordered' },
+      { key: 'status', label: 'Status' },
     ],
     FormComponent: MagazineForm, btnLabel: 'Upload a New Magazine Report',
   },
@@ -1023,7 +1031,12 @@ export default function ReportingPortal() {
         })),
         partnership: otherData.partnership.map(r => ({ id: `PR-${String(r.id).padStart(3, '0')}`, rawDate: r.submittedDate, ...r })),
         testimonials: otherData.testimonials.map(r => ({ id: `TS-${String(r.id).padStart(3, '0')}`, rawDate: r.submittedDate, ...r })),
-        magazine: otherData.magazine.map(r => ({ id: `MG-${String(r.id).padStart(3, '0')}`, rawDate: r.submittedDate, ...r })),
+        magazine: otherData.magazine.map(r => ({
+          id: `MG-${String(r.id).padStart(3, '0')}`,
+          rawDate: r.submittedDate,
+          magazineType: [r.isAdult && 'Adult', r.isTeevolution && 'Teevolution', r.isKidsMagazine && 'Kids'].filter(Boolean).join(', ') || 'N/A',
+          ...r
+        })),
         outreach: otherData.outreach.map(r => ({ id: `OR-${String(r.id).padStart(3, '0')}`, rawDate: r.submittedDate, ...r })),
       });
     } catch (err) {

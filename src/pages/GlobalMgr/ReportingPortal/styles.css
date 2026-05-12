@@ -436,3 +436,24 @@
   .blaaast-label    { white-space: normal; }
   .popup-header     { padding: 16px 18px 14px; }
 }
+
+/* ── Checkboxes ── */
+.kf-checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #1a2540;
+  user-select: none;
+  padding: 4px 0;
+}
+[data-theme="dark"] .kf-checkbox-label { color: #c8d8f0; }
+.kf-checkbox-label input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  accent-color: #c9a84c;
+  border-radius: 4px;
+}
