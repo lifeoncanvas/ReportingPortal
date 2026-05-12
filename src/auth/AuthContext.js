@@ -29,7 +29,7 @@ export function AuthProvider({ children }) {
   };
 
   const getApiUrl = () => {
-    return window.ENV?.API_PATH || process.env.REACT_APP_API_URL || 'http://65.0.71.13:8080';
+    return window.ENV?.API_PATH || process.env.REACT_APP_API_URL || 'http://65.1.248.88:8080';
   };
 
   const loginWithKingChat = async (accessToken, onPendingToasts, kcUser) => {

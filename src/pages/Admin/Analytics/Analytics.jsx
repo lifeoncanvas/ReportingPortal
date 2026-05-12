@@ -96,7 +96,7 @@ const ALL_ZONES = [
   'GRAND TOTAL (CAMPUS ZONES)',
 ];
 
-const API = process.env.REACT_APP_API_URL || 'http://65.0.71.13:8080';
+const API = process.env.REACT_APP_API_URL || 'http://65.1.248.88:8080';
 
 // ── Data ─────────────────────────────────────────────
 const DATA = {

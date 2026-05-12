@@ -283,7 +283,7 @@ function ZonalReportForm({ onClose, onSubmit: parentSubmit }) {
       regionName:                   user?.region || 'Global',
     };
     try {
-      await fetch(`${process.env.REACT_APP_API_URL || 'http://65.0.71.13:8080'}/api/reports`, {
+      await fetch(`${process.env.REACT_APP_API_URL || 'http://65.1.248.88:8080'}/api/reports`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
@@ -990,7 +990,7 @@ export default function ReportingPortal() {
   }, [user]);
 
   const fetchAllReports = async () => {
-    const baseUrl = process.env.REACT_APP_API_URL || 'http://65.0.71.13:8080';
+    const baseUrl = process.env.REACT_APP_API_URL || 'http://65.1.248.88:8080';
     const emailParam = user?.role === 'admin' ? '' : `?email=${user?.email}`;
     
     try {
@@ -1041,7 +1041,7 @@ export default function ReportingPortal() {
   const handleSubmit = async (data) => {
     try {
       if (['partnership', 'testimonials', 'magazine', 'outreach'].includes(activeTab)) {
-        const res = await fetch(`${process.env.REACT_APP_API_URL || 'http://65.0.71.13:8080'}/api/portal-reports/${activeTab}`, {
+        const res = await fetch(`${process.env.REACT_APP_API_URL || 'http://65.1.248.88:8080'}/api/portal-reports/${activeTab}`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
