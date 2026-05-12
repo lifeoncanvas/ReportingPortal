@@ -54,6 +54,11 @@ export function AuthProvider({ children }) {
       }
 
       const userData = await res.json();
+
+      if (userData.status && userData.status !== 'active') {
+        return 'Your account is currently inactive. Please contact your administrator for activation.';
+      }
+
       session.set('lw_user', userData);
       setUser(userData);
 
@@ -85,6 +90,11 @@ export function AuthProvider({ children }) {
       }
 
       const userData = await res.json();
+      
+      if (userData.status && userData.status !== 'active') {
+        return 'Your account is currently inactive. Please contact your administrator for activation.';
+      }
+
       session.set('lw_user', userData);
       setUser(userData);
 

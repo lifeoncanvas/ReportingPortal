@@ -60,10 +60,14 @@ export default function Signin({ onSwitch, onForgotPassword }) {
       clientId: (window.ENV?.KINGSCHAT_CLIENT_ID || process.env.REACT_APP_KINGSCHAT_CLIENT_ID || '8ae69d5f-d25d-4c05-9914-ab947ffa5b77').trim(), 
     };
     
+    setLoading(true);
+    setError('');
+    
     kingsChatWebSdk.login(loginOptions)
       .then(async (tokenResponse) => {
         const { accessToken, user: kcUser } = tokenResponse;
         const err = await loginWithKingChat(accessToken, handleLoginResponse, kcUser);
+        setLoading(false);
         if (err) {
           setError(err);
         } else {
@@ -81,12 +85,15 @@ export default function Signin({ onSwitch, onForgotPassword }) {
       })
       .catch(err => {
         console.error("KingsChat login error:", err);
+        setLoading(false);
         setError('KingsChat login was cancelled or failed.');
       });
   };
 
   const toggleSection = (section) => {
+    if (loading) return;
     if (section === 'kingschat') {
+      setActiveSection('kingschat');
       handleKingChatLogin();
       return;
     }
@@ -108,10 +115,11 @@ export default function Signin({ onSwitch, onForgotPassword }) {
           <button 
             className="signup-opt-btn kc-btn"
             onClick={() => toggleSection('kingschat')}
+            disabled={loading}
           >
             <div className="opt-left">
               <img src="https://kingschat.online/favicon.ico" className="opt-icon-img" alt="" />
-              <span>SIGN IN WITH KINGSCHAT</span>
+              <span>{loading && activeSection === 'kingschat' ? 'CONNECTING...' : 'SIGN IN WITH KINGSCHAT'}</span>
             </div>
             <span className="opt-arrow">→</span>
           </button>
