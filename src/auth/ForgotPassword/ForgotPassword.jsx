@@ -62,8 +62,8 @@ export default function ForgotPassword({ onBack }) {
                 body: JSON.stringify({ email, otp, newPassword })
             });
             if (!res.ok) throw new Error(await res.text());
-            setMessage("Password reset successful. You can now login.");
-            setTimeout(() => onBack(), 2000);
+            setMessage("");
+            setStep(4);
         } catch (err) {
             setError(err.message);
         } finally {
@@ -124,12 +124,25 @@ export default function ForgotPassword({ onBack }) {
                             required
                         />
                         <button type="submit" disabled={loading} style={styles.button}>
-                            {loading ? "Resetting..." : "Reset Password"}
+                            {loading ? "Updating..." : "Change Password"}
                         </button>
                     </form>
                 )}
 
-                <button onClick={onBack} style={styles.backButton}>Back to Login</button>
+                {step === 4 && (
+                    <div style={{ textAlign: 'center' }}>
+                        <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>✅</div>
+                        <h3 style={{ color: '#2e7d32', marginBottom: '0.5rem' }}>Success!</h3>
+                        <p style={styles.text}>Your password has been updated successfully.</p>
+                        <button onClick={onBack} style={{ ...styles.button, marginTop: '1rem' }}>
+                            Go to Login
+                        </button>
+                    </div>
+                )}
+
+                {step !== 4 && (
+                    <button onClick={onBack} style={styles.backButton}>Back to Login</button>
+                )}
             </div>
         </div>
     );

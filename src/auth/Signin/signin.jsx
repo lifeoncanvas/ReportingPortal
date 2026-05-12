@@ -136,7 +136,7 @@ export default function Signin({ onSwitch, onForgotPassword }) {
                   <button className="submit-signup-btn" type="submit" disabled={loading}>
                     {loading ? 'Logging in...' : 'Sign In'}
                   </button>
-                  <p className="forgot-password-link" onClick={onForgotPassword} style={{ textAlign: 'center', marginTop: '10px', fontSize: '0.8rem', color: '#64748b', cursor: 'pointer' }}>
+                  <p className="forgot-password-link" onClick={onForgotPassword} style={{ textAlign: 'center', marginTop: '15px', fontSize: '0.9rem', color: '#c8a951', cursor: 'pointer', fontWeight: '500' }}>
                     Forgot password?
                   </p>
                 </form>
