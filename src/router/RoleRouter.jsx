@@ -19,7 +19,6 @@ import ZonalAnalytics      from '../pages/ZonalMgr/Analytics/Analytics';
 
 import AdminDashboard   from '../pages/Admin/Dashboard/Dashboard';
 import UserManagement   from '../pages/Admin/UserManagement/UserManagement';
-import AdminReporting   from '../pages/Admin/ReportingPortal/ReportingPortal';
 import AdminAnalytics   from '../pages/Admin/Analytics/Analytics';
 import AdminAuditLogs   from '../pages/Admin/AuditLogs/AuditLogs';
 
@@ -73,14 +72,12 @@ export default function RoleRouter() {
           <Route index element={<Navigate to="users" replace />} />
           <Route path="dashboard"      element={<AdminDashboard />} />
           <Route path="users"          element={<UserManagement />} />
-          <Route path="reporting"      element={<AdminReporting />} />
+          <Route path="reporting"      element={<ReportingPortal />} />
           <Route path="analytics"      element={<AdminAnalytics />} />
           <Route path="audit"          element={<AdminAuditLogs />} />
           <Route path="notifications"  element={<Notifications />} />
           <Route path="settings"       element={<Settings />} />
           <Route path="submit-report" element={<SubmitReport />} />
-
-
         </Route>
         <Route path="*" element={<Navigate to="/admin/users" replace />} />
       </Routes>

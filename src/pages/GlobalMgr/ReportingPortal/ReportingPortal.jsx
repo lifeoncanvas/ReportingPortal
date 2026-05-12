@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Eye, Download, Search, Upload, X, Check, ChevronDown, Plus, FileText, Heart, BookOpen, Newspaper, Users } from 'lucide-react';
+import { Eye, Download, Search, Upload, X, Check, ChevronDown, Plus, FileText, Heart, BookOpen, Newspaper, Users, Trash2, MessageSquare } from 'lucide-react';
 import { useAuth } from '../../../auth/AuthContext';
 import { downloadReportPDF } from '../../../utils/generateReportPDF';
 import './styles.css';
@@ -73,8 +73,62 @@ function MediaUploader({ files, onAdd, onRemove, label = "Upload Images / Files"
   );
 }
 
+// ── Clarification Modal ───────────────────────────────
+function ClarificationModal({ report, endpoint, onClose, onDone }) {
+  const [note, setNote] = useState('');
+  const [loading, setLoading] = useState(false);
+  const baseUrl = window.ENV?.API_PATH || process.env.REACT_APP_API_URL || 'http://65.1.248.88:8080';
+
+  const send = async () => {
+    if (!note.trim()) return;
+    setLoading(true);
+    try {
+      await fetch(`${baseUrl}${endpoint}/${report.id.replace(/^[A-Z]+-/, '')}/clarification`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ note }),
+      });
+      onDone();
+    } catch (e) {
+      console.error(e);
+      alert('Failed to send clarification request');
+    }
+    setLoading(false);
+  };
+
+  return (
+    <div className="rp-modal-overlay" onClick={onClose}>
+      <div className="rp-modal" style={{ maxWidth: 480 }} onClick={e => e.stopPropagation()}>
+        <div className="rp-modal-header">
+          <h3>Ask for Clarification</h3>
+          <button className="rp-remove-btn" onClick={onClose}><X size={18}/></button>
+        </div>
+        <div className="rp-modal-body">
+          <p style={{ fontSize:13, color:'#6b7280', marginBottom:12 }}>
+            Your note will be saved against this report and its status will be set to <strong>Needs Clarification</strong>.
+          </p>
+          <textarea
+            rows={4}
+            value={note}
+            onChange={e => setNote(e.target.value)}
+            placeholder="Type your clarification request here..."
+            className="kf-textarea"
+            style={{ width:'100%', fontSize:13 }}
+          />
+        </div>
+        <div className="rp-modal-footer">
+          <button className="rp-ghost-btn" onClick={onClose}>Cancel</button>
+          <button className="submit-report-btn" onClick={send} disabled={loading} style={{ '--btn-color': '#f59e0b' }}>
+            {loading ? 'Sending…' : 'Send Request'}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ── Report Table ───────────────────────────────────────
-function ReportTable({ reports, loading, columns, onView, onDownload }) {
+function ReportTable({ reports, loading, columns, onView, onDownload, onApprove, onClarify, onDelete, userRole }) {
   return (
     <div style={{ overflowX: 'auto' }}>
       <table className="rp-table">
@@ -102,6 +156,22 @@ function ReportTable({ reports, loading, columns, onView, onDownload }) {
                 <div className="rp-actions">
                   <button className="rp-icon-btn view" title="View" onClick={() => onView(row)}><Eye size={14} /></button>
                   <button className="rp-icon-btn dl" title="Download" onClick={() => onDownload(row)}><Download size={14} /></button>
+                  
+                  {userRole === 'admin' && (
+                    <>
+                      {row.status !== 'APPROVED' && row.status !== 'approved' && (
+                        <button className="rp-icon-btn approve" title="Approve" onClick={() => onApprove(row)} style={{ color: '#16a34a', borderColor: '#bbf7d0' }}>
+                          <Check size={14} />
+                        </button>
+                      )}
+                      <button className="rp-icon-btn clarify" title="Clarify" onClick={() => onClarify(row)} style={{ color: '#a16207', borderColor: '#fde68a' }}>
+                        <MessageSquare size={14} />
+                      </button>
+                      <button className="rp-icon-btn delete" title="Delete" onClick={() => onDelete(row)} style={{ color: '#dc2626', borderColor: '#fecaca' }}>
+                        <Trash2 size={14} />
+                      </button>
+                    </>
+                  )}
                 </div>
               </td>
             </tr>
@@ -990,6 +1060,7 @@ export default function ReportingPortal() {
   const [reportsByTab, setReportsByTab] = useState({ zonal: [], partnership: [], testimonials: [], magazine: [], outreach: [] });
   const [showForm, setShowForm]         = useState(false);
   const [viewReport, setViewReport]     = useState(null);
+  const [clarifyReport, setClarifyReport] = useState(null);
   const [toast, setToast]               = useState('');
   const [counters, setCounters]         = useState({ zonal: 1, partnership: 1, testimonials: 1, magazine: 1, outreach: 1 });
 
@@ -1041,6 +1112,41 @@ export default function ReportingPortal() {
       });
     } catch (err) {
       console.error("Failed to fetch reports", err);
+    }
+  };
+
+  const handleApprove = async (report) => {
+    const baseUrl = window.ENV?.API_PATH || process.env.REACT_APP_API_URL || 'http://65.1.248.88:8080';
+    const endpoint = activeTab === 'zonal' ? '/api/reports' : `/api/portal-reports/${activeTab}`;
+    const id = report.id.replace(/^[A-Z]+-/, '');
+    
+    try {
+      const res = await fetch(`${baseUrl}${endpoint}/${id}/approve`, { method: 'POST' });
+      if (res.ok) {
+        setToast('Report approved ✅');
+        fetchAllReports();
+      }
+    } catch (e) {
+      console.error(e);
+      setToast('Failed to approve ❌');
+    }
+  };
+
+  const handleDelete = async (report) => {
+    if (!window.confirm('Delete this report? This cannot be undone.')) return;
+    const baseUrl = window.ENV?.API_PATH || process.env.REACT_APP_API_URL || 'http://65.1.248.88:8080';
+    const endpoint = activeTab === 'zonal' ? '/api/reports' : `/api/portal-reports/${activeTab}`;
+    const id = report.id.replace(/^[A-Z]+-/, '');
+
+    try {
+      const res = await fetch(`${baseUrl}${endpoint}/${id}`, { method: 'DELETE' });
+      if (res.ok) {
+        setToast('Report deleted 🗑️');
+        fetchAllReports();
+      }
+    } catch (e) {
+      console.error(e);
+      setToast('Delete failed ❌');
     }
   };
 
@@ -1096,6 +1202,14 @@ export default function ReportingPortal() {
     <div className="rp-page">
       {toast && <Toast message={toast} onDone={() => setToast('')} />}
       {viewReport && <ViewModal report={viewReport} onClose={() => setViewReport(null)} />}
+      {clarifyReport && (
+        <ClarificationModal
+          report={clarifyReport}
+          endpoint={activeTab === 'zonal' ? '/api/reports' : `/api/portal-reports/${activeTab}`}
+          onClose={() => setClarifyReport(null)}
+          onDone={() => { setClarifyReport(null); setToast('Clarification request sent 💬'); fetchAllReports(); }}
+        />
+      )}
 
       {showForm && (
         <tab.FormComponent
@@ -1106,8 +1220,8 @@ export default function ReportingPortal() {
 
       <div className="rp-page-header">
         <div>
-          <h2>Reporting Portal</h2>
-          <p>Submit, manage, and track weekly activity reports</p>
+          <h2>Reporting Portal {user?.role === 'admin' ? '— Admin View' : ''}</h2>
+          <p>{user?.role === 'admin' ? 'Review, approve, and manage all submitted reports' : 'Submit, manage, and track weekly activity reports'}</p>
         </div>
       </div>
 
@@ -1150,7 +1264,10 @@ export default function ReportingPortal() {
         <ReportTable
           reports={filtered.map(r => ({ ...r, rawDate: formatDate(r.rawDate) }))}
           loading={false}
-          columns={tab.columns}
+          columns={user?.role === 'admin' 
+            ? (tab.columns.some(c => c.key === 'submittedBy') ? tab.columns : [{ key: 'submittedBy', label: 'Submitted By' }, ...tab.columns])
+            : tab.columns
+          }
           onView={r => setViewReport(r)}
           onDownload={r => {
             setToast(`Downloading ${r.id}…`);
@@ -1159,6 +1276,10 @@ export default function ReportingPortal() {
               downloadReportPDF({ ...fullReport, formName: tab.label }, formatDate);
             }
           }}
+          onApprove={handleApprove}
+          onClarify={r => setClarifyReport(r)}
+          onDelete={handleDelete}
+          userRole={user?.role}
         />
       </div>
     </div>
