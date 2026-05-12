@@ -3,7 +3,7 @@ import { useAuth } from '../../../auth/AuthContext';
 import { Eye, Check, Trash2, MessageSquare, X, Download } from 'lucide-react';
 import '../../GlobalMgr/ReportingPortal/styles.css';
 
-const API = process.env.REACT_APP_API_URL || 'http://65.1.248.88:8080';
+const API = window.ENV?.API_PATH || process.env.REACT_APP_API_URL || 'http://65.1.248.88:8080';
 
 const TABS = [
   { id: 'zonal',        label: '🏛️ Zonal Reports',       endpoint: '/api/reports' },
