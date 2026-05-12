@@ -13,7 +13,7 @@ export default function Sidebar({ isOpen, onClose }) {
   const { user, avatar } = useAuth();
   const { t } = useSettings();
 
-  const role = user?.role ?? 'global';
+  const role = user?.role || 'user';
   const initial = (user?.firstName?.[0] ?? 'U').toUpperCase();
   const name = user?.name ?? 'User';
 
@@ -22,7 +22,9 @@ export default function Sidebar({ isOpen, onClose }) {
       ? 'System Administrator'
       : role === 'zonal'
       ? 'Zonal Manager'
-      : 'Global Manager';
+      : role === 'global'
+      ? 'Global Manager'
+      : 'User';
 
   const NAV_CONFIG = {
     global: [
@@ -42,9 +44,12 @@ export default function Sidebar({ isOpen, onClose }) {
       { label: t?.analytics || 'Analytics', icon: BarChart2, path: '/admin/analytics' },
       { label: t?.auditLogs || 'Audit Logs', icon: ClipboardList, path: '/admin/audit' },
     ],
+    user: [
+      { label: 'Submit Report', icon: FileText, path: '/portal/submit-report' },
+    ],
   };
 
-  const navItems = NAV_CONFIG[role] ?? NAV_CONFIG.global;
+  const navItems = NAV_CONFIG[role] || NAV_CONFIG.user;
 
   return (
     <>

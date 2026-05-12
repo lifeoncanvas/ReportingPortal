@@ -43,6 +43,12 @@ export default function Signup({ onSwitch }) {
           } else {
             setError(err);
           }
+        } else {
+          // If err is null, it means the user was successfully logged in (account exists)
+          // We can't use navigate directly here as it's not imported/initialized in the same way, 
+          // but App.js will re-render and RoleRouter will take over.
+          // However, let's make sure we provide feedback.
+          setSuccess(true);
         }
       })
       .catch(err => {

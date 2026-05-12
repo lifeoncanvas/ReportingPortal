@@ -34,7 +34,7 @@ export default function RoleRouter() {
     return (
       <Routes>
         <Route path="/global" element={<GlobalMgrLayout />}>
-          <Route index element={<Navigate to="dashboard" replace />} />
+          <Route index element={<Navigate to="reporting" replace />} />
           <Route path="dashboard"     element={<GlobalDashboard />} />
           <Route path="reporting"     element={<ReportingPortal />} />
           <Route path="analytics"     element={<Analytics />} />
@@ -43,7 +43,7 @@ export default function RoleRouter() {
           <Route path="settings"      element={<Settings />} />
           <Route path="submit-report" element={<SubmitReport />} />
         </Route>
-        <Route path="*" element={<Navigate to="/global/dashboard" replace />} />
+        <Route path="*" element={<Navigate to="/global/reporting" replace />} />
       </Routes>
     );
   }
@@ -52,7 +52,7 @@ export default function RoleRouter() {
     return (
       <Routes>
         <Route path="/zonal" element={<ZonalMgrLayout />}>
-          <Route index element={<Navigate to="dashboard" replace />} />
+          <Route index element={<Navigate to="reporting" replace />} />
           <Route path="dashboard"     element={<ZonalDashboard />} />
           <Route path="reporting"     element={<ZonalReportingTabs />} />
           <Route path="analytics"     element={<ZonalAnalytics />} />
@@ -60,7 +60,7 @@ export default function RoleRouter() {
           <Route path="settings"      element={<Settings />} />
           <Route path="submit-report" element={<SubmitReport />} />
         </Route>
-        <Route path="*" element={<Navigate to="/zonal/dashboard" replace />} />
+        <Route path="*" element={<Navigate to="/zonal/reporting" replace />} />
       </Routes>
     );
   }
@@ -69,7 +69,7 @@ export default function RoleRouter() {
     return (
       <Routes>
         <Route path="/admin" element={<AdminLayout />}>
-          <Route index element={<Navigate to="users" replace />} />
+          <Route index element={<Navigate to="reporting" replace />} />
           <Route path="dashboard"      element={<AdminDashboard />} />
           <Route path="users"          element={<UserManagement />} />
           <Route path="reporting"      element={<ReportingPortal />} />
@@ -79,10 +79,21 @@ export default function RoleRouter() {
           <Route path="settings"       element={<Settings />} />
           <Route path="submit-report" element={<SubmitReport />} />
         </Route>
-        <Route path="*" element={<Navigate to="/admin/users" replace />} />
+        <Route path="*" element={<Navigate to="/admin/reporting" replace />} />
       </Routes>
     );
   }
 
-  return <p style={{ padding: '2rem', color: '#6b7280' }}>Role not configured.</p>;
+  // Default fallback for users with other roles (e.g. 'finance', 'user' or unassigned)
+  return (
+    <Routes>
+      <Route path="/portal" element={<GlobalMgrLayout />}>
+        <Route index element={<Navigate to="submit-report" replace />} />
+        <Route path="submit-report" element={<SubmitReport />} />
+        <Route path="notifications" element={<Notifications />} />
+        <Route path="settings"      element={<Settings />} />
+      </Route>
+      <Route path="*" element={<Navigate to="/portal/submit-report" replace />} />
+    </Routes>
+  );
 }

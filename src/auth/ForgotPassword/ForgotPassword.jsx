@@ -25,11 +25,15 @@ export default function ForgotPassword({ onBack }) {
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ email })
             });
-            if (!res.ok) throw new Error(await res.text());
+            if (!res.ok) {
+                const text = await res.text();
+                throw new Error(text || `Server error (${res.status}). Please try again later.`);
+            }
             setMessage("OTP has been sent to your email.");
             setStep(2);
         } catch (err) {
-            setError(err.message);
+            console.error("Forgot Password Error:", err);
+            setError(err.message || "An unexpected error occurred. Please check your internet connection.");
         } finally {
             setLoading(false);
         }
@@ -45,11 +49,14 @@ export default function ForgotPassword({ onBack }) {
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ email, otp })
             });
-            if (!res.ok) throw new Error(await res.text());
+            if (!res.ok) {
+                const text = await res.text();
+                throw new Error(text || `Invalid OTP (${res.status}). Please try again.`);
+            }
             setMessage("OTP verified. Please enter your new password.");
             setStep(3);
         } catch (err) {
-            setError(err.message);
+            setError(err.message || "Failed to verify OTP.");
         } finally {
             setLoading(false);
         }
@@ -65,11 +72,14 @@ export default function ForgotPassword({ onBack }) {
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ email, otp, newPassword })
             });
-            if (!res.ok) throw new Error(await res.text());
+            if (!res.ok) {
+                const text = await res.text();
+                throw new Error(text || "Failed to reset password. Please try again.");
+            }
             setMessage("");
             setStep(4);
         } catch (err) {
-            setError(err.message);
+            setError(err.message || "An error occurred during password reset.");
         } finally {
             setLoading(false);
         }
