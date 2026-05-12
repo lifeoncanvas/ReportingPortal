@@ -9,6 +9,7 @@ import SupportChatBot from './components/ChatBot/ChatBot';
 
 function AppContent() {
   const { user } = useAuth();
+  console.log("AppContent user state:", user);
   if (user === undefined) return null;
   return (
     <>

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../AuthContext';
 import { useToast } from '../../context/ToastContext';
 import { useNavigate } from 'react-router-dom';
@@ -14,9 +14,15 @@ const ROLE_NOTIF_PATH = {
 };
 
 export default function Signin({ onSwitch, onForgotPassword }) {
-  const { login, loginWithKingChat } = useAuth();
+  const { user, login, loginWithKingChat } = useAuth();
   const { showToast } = useToast();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (user) {
+      navigate('/', { replace: true });
+    }
+  }, [user, navigate]);
   
   const [activeSection, setActiveSection] = useState(null); // 'kingschat', 'email', 'phone'
   const [identifier, setIdentifier] = useState(''); // Email or Phone

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../AuthContext';
 import { MessageCircle, Mail, Phone, ChevronDown, ChevronRight, User, Lock, ArrowRight } from 'lucide-react';
 import kingsChatWebSdk from 'kingschat-web-sdk';
@@ -7,6 +8,7 @@ import './styles.css';
 
 export default function Signup({ onSwitch }) {
   const { signup, loginWithKingChat } = useAuth();
+  const navigate = useNavigate();
   const [activeSection, setActiveSection] = useState(null); // 'kingschat', 'email', 'phone'
   
   const [formData, setFormData] = useState({
@@ -45,10 +47,8 @@ export default function Signup({ onSwitch }) {
           }
         } else {
           // If err is null, it means the user was successfully logged in (account exists)
-          // We can't use navigate directly here as it's not imported/initialized in the same way, 
-          // but App.js will re-render and RoleRouter will take over.
-          // However, let's make sure we provide feedback.
-          setSuccess(true);
+          // Redirect to portal root
+          navigate('/', { replace: true });
         }
       })
       .catch(err => {
