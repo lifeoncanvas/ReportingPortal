@@ -54,6 +54,7 @@ export function AuthProvider({ children }) {
       }
 
       const userData = await res.json();
+      console.log("KingsChat Login Success. UserData:", userData);
 
       if (userData.status && userData.status !== 'active') {
         return 'Your account is currently inactive. Please contact your administrator for activation.';
@@ -61,6 +62,7 @@ export function AuthProvider({ children }) {
 
       session.set('lw_user', userData);
       setUser(userData);
+      console.log("AuthContext: User state updated.");
 
       const pending = flushPendingToasts(userData.role);
       if (pending.length && onPendingToasts) onPendingToasts(pending, userData.role);

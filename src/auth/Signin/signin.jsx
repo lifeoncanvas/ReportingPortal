@@ -63,24 +63,35 @@ export default function Signin({ onSwitch, onForgotPassword }) {
     setLoading(true);
     setError('');
     
-    kingsChatWebSdk.login(loginOptions)
+      kingsChatWebSdk.login(loginOptions)
       .then(async (tokenResponse) => {
+        console.log("KingsChat SDK Login Success:", tokenResponse);
         const { accessToken, user: kcUser } = tokenResponse;
         const err = await loginWithKingChat(accessToken, handleLoginResponse, kcUser);
         setLoading(false);
+        
         if (err) {
+          console.error("Login Error from AuthContext:", err);
           setError(err);
         } else {
-          // Successfully logged in via KingsChat - Redirect to the appropriate portal/dashboard
-          // Since the user state updates in the background, we can calculate the path or just go to /
-          // To be safe and meet the user's request of "redirecting them on that page", 
-          // we force a navigation to the root which will then be handled by RoleRouter catch-alls.
-          navigate('/', { replace: true });
+          console.log("KingsChat Auth successful, navigating to portal...");
+          // Force a small delay to allow state to propagate if needed, 
+          // though navigate should work immediately.
           showToast({
             icon: '✅',
             title: 'Welcome!',
             message: 'You have successfully logged in via KingsChat.',
           });
+          
+          setTimeout(() => {
+            navigate('/', { replace: true });
+            // If navigate doesn't work (rare), fall back to location reload
+            setTimeout(() => {
+              if (window.location.pathname === '/login' || window.location.pathname === '/') {
+                 console.log("Redirection might have stalled, checking user state...");
+              }
+            }, 1000);
+          }, 100);
         }
       })
       .catch(err => {

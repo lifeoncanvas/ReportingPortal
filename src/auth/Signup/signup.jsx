@@ -34,10 +34,12 @@ export default function Signup({ onSwitch }) {
     
     kingsChatWebSdk.login(loginOptions)
       .then(async (tokenResponse) => {
+        console.log("KingsChat SDK Signup/Login Success:", tokenResponse);
         const { accessToken, user: kcUser } = tokenResponse;
         const err = await loginWithKingChat(accessToken, null, kcUser);
         
         if (err) {
+          console.error("Auth error in signup:", err);
           // If the "error" is actually a success message about account creation
           if (err.toLowerCase().includes('created') || err.toLowerCase().includes('pending')) {
             setSuccess(true);
@@ -46,9 +48,12 @@ export default function Signup({ onSwitch }) {
             setError(err);
           }
         } else {
+          console.log("KingsChat Auth successful during signup, navigating to portal...");
           // If err is null, it means the user was successfully logged in (account exists)
-          // Redirect to portal root
-          navigate('/', { replace: true });
+          // Redirect to portal root after a tiny delay to allow state updates
+          setTimeout(() => {
+            navigate('/', { replace: true });
+          }, 100);
         }
       })
       .catch(err => {
