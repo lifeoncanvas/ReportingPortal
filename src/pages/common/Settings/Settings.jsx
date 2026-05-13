@@ -120,198 +120,269 @@ export default function Settings() {
     showToast(t?.saveChanges || 'Profile updated successfully');
   };
 
-  // Security
-  const [pwForm,  setPwForm]  = useState({ current: '', new: '', confirm: '' });
-  const [showPw,  setShowPw]  = useState({ current: false, new: false, confirm: false });
-  const [pwError, setPwError] = useState('');
-  const [pwLoading, setPwLoading] = useState(false);
-  const handlePasswordSave = async () => {
-    setPwError('');
-    if (!pwForm.current)                   { setPwError('Current password is required.'); return; }
-    if (pwForm.new.length < 6)             { setPwError('New password must be at least 6 characters.'); return; }
-    if (pwForm.new !== pwForm.confirm)      { setPwError('Passwords do not match.'); return; }
+    // Security
+    const [pwForm,  setPwForm]  = useState({ current: '', new: '', confirm: '' });
+    const [showPw,  setShowPw]  = useState({ current: false, new: false, confirm: false });
+    const [pwError, setPwError] = useState('');
+    const [pwLoading, setPwLoading] = useState(false);
+    
+    const [secForm, setSecForm] = useState({ question: '', answer: '' });
+    const [secLoading, setSecLoading] = useState(false);
 
-    setPwLoading(true);
-    try {
-      const res = await fetch(`${process.env.REACT_APP_API_URL}/api/auth/change-password`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email: user?.email,
-          currentPassword: pwForm.current,
-          newPassword: pwForm.new,
-        }),
-      });
-      const data = await res.json();
-      if (!res.ok) {
-        setPwError(data.error || data.message || 'Failed to update password.');
-      } else {
-        setPwForm({ current: '', new: '', confirm: '' });
-        showToast(t?.updatePassword || 'Password updated successfully');
-      }
-    } catch (err) {
-      setPwError('Network error. Please try again.');
-    } finally {
-      setPwLoading(false);
-    }
-  };
-  const handle2FAToggle = () => {
-    const next = !settings.security.twoFactor;
-    updateSection('security', { twoFactor: next });
-    showToast(next ? (t?.enabled || 'Enabled') : (t?.disabled || 'Disabled'));
-  };
+    useEffect(() => {
+        if (tab === 'security' && user?.email) {
+            fetch(`${process.env.REACT_APP_API_URL}/api/auth/security-question?email=${encodeURIComponent(user.email)}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.question) setSecForm(s => ({ ...s, question: data.question }));
+                })
+                .catch(() => {});
+        }
+    }, [tab, user?.email]);
 
-  // Preferences
-  const [prefDraft, setPrefDraft] = useState({ ...settings.preferences });
-  useEffect(() => { setPrefDraft({ ...settings.preferences }); }, [settings.preferences]);
-  const handleThemeClick = (value) => { updateSection('preferences', { theme: value }); };
-  const handlePrefSave   = () => { updateSection('preferences', prefDraft); showToast(t?.savePreferences || 'Preferences saved'); };
+    const handlePasswordSave = async () => {
+        setPwError('');
+        if (!pwForm.current)                   { setPwError('Current password is required.'); return; }
+        if (pwForm.new.length < 6)             { setPwError('New password must be at least 6 characters.'); return; }
+        if (pwForm.new !== pwForm.confirm)      { setPwError('Passwords do not match.'); return; }
 
-  // Privacy
-  const handlePrivacyToggle = (key) => updateSection('privacy', { [key]: !settings.privacy[key] });
-  const handleDeleteAccount = () => {
-    if (window.confirm('Are you sure? This cannot be undone.')) { sessionStorage.clear(); logout(); }
-  };
+        setPwLoading(true);
+        try {
+            const res = await fetch(`${process.env.REACT_APP_API_URL}/api/auth/change-password`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    email: user?.email,
+                    currentPassword: pwForm.current,
+                    newPassword: pwForm.new,
+                }),
+            });
+            const data = await res.json();
+            if (!res.ok) {
+                setPwError(data.error || data.message || 'Failed to update password.');
+            } else {
+                setPwForm({ current: '', new: '', confirm: '' });
+                showToast(t?.updatePassword || 'Password updated successfully');
+            }
+        } catch (err) {
+            setPwError('Network error. Please try again.');
+        } finally {
+            setPwLoading(false);
+        }
+    };
 
-  const NOTIF_GROUPS = [
-    {
-      group: t?.reports || 'Reports',
-      items: [
-        { key: 'reportDue',       label: t?.reportDueLabel       || 'Weekly report due reminders',   desc: t?.reportDueDesc       || 'Get notified when your report deadline is approaching'       },
-        { key: 'reportSubmitted', label: t?.reportSubmittedLabel || 'Report submitted confirmations', desc: t?.reportSubmittedDesc || 'Receive confirmation when a report is successfully submitted' },
-        { key: 'missingSubmit',   label: t?.missingSubmitLabel   || 'Missing submission alerts',      desc: t?.missingSubmitDesc   || 'Alert when zones in your region have not submitted'          },
-        { key: 'newTemplate',     label: t?.newTemplateLabel     || 'New report templates',           desc: t?.newTemplateDesc     || 'Notify when new report templates are published'              },
-      ],
-    },
-    {
-      group: t?.financePortal || 'Finance',
-      items: [
-        { key: 'financeUpdates', label: t?.financeUpdatesLabel || 'Finance record updates', desc: t?.financeUpdatesDesc || 'Notify when finance records are added or updated' },
-      ],
-    },
-    {
-      group: 'System',
-      items: [
-        { key: 'systemAlerts', label: t?.systemAlertsLabel || 'System alerts', desc: t?.systemAlertsDesc || 'Important platform-wide announcements and alerts' },
-      ],
-    },
-  ];
+    const handleSecuritySettingsSave = async () => {
+        if (!secForm.question.trim() || !secForm.answer.trim()) {
+            showToast('Question and Answer are required.', 'error');
+            return;
+        }
+        setSecLoading(true);
+        try {
+            const res = await fetch(`${process.env.REACT_APP_API_URL}/api/auth/update-security-settings`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    email: user?.email,
+                    question: secForm.question,
+                    answer: secForm.answer
+                })
+            });
+            if (res.ok) {
+                showToast('Security question updated successfully');
+                setSecForm(s => ({ ...s, answer: '' })); // Clear answer for security
+            } else {
+                const text = await res.text();
+                showToast(text || 'Failed to update security question', 'error');
+            }
+        } catch (err) {
+            showToast('Network error', 'error');
+        } finally {
+            setSecLoading(false);
+        }
+    };
 
-  return (
-    <div className="st-page">
-      {toast && <Toast message={toast.message} type={toast.type} onDone={() => setToast(null)} />}
+    const handle2FAToggle = () => {
+        const next = !settings.security.twoFactor;
+        updateSection('security', { twoFactor: next });
+        showToast(next ? (t?.enabled || 'Enabled') : (t?.disabled || 'Disabled'));
+    };
 
-      <div className="st-page-header">
-        <h2>{t?.settingsTitle || 'Settings'}</h2>
-        <p>{t?.settingsDesc || 'Manage your account preferences and configuration'}</p>
-      </div>
+    // Preferences
+    const [prefDraft, setPrefDraft] = useState({ ...settings.preferences });
+    useEffect(() => { setPrefDraft({ ...settings.preferences }); }, [settings.preferences]);
+    const handleThemeClick = (value) => { updateSection('preferences', { theme: value }); };
+    const handlePrefSave   = () => { updateSection('preferences', prefDraft); showToast(t?.savePreferences || 'Preferences saved'); };
 
-      <div className="st-layout">
-        <aside className="st-sidenav">
-          {TABS.map(tb => {
-            const Icon = tb.icon;
-            return (
-              <button key={tb.key} onClick={() => setTab(tb.key)}
-                className={`st-sidenav-item ${tab === tb.key ? 'active' : ''}`}>
-                <Icon size={16} />
-                {tb.label}
-                <ChevronRight size={14} className="st-sidenav-arrow" />
-              </button>
-            );
-          })}
-        </aside>
+    // Privacy
+    const handlePrivacyToggle = (key) => updateSection('privacy', { [key]: !settings.privacy[key] });
+    const handleDeleteAccount = () => {
+        if (window.confirm('Are you sure? This cannot be undone.')) { sessionStorage.clear(); logout(); }
+    };
 
-        <div className="st-panel">
+    const NOTIF_GROUPS = [
+        {
+            group: t?.reports || 'Reports',
+            items: [
+                { key: 'reportDue',       label: t?.reportDueLabel       || 'Weekly report due reminders',   desc: t?.reportDueDesc       || 'Get notified when your report deadline is approaching'       },
+                { key: 'reportSubmitted', label: t?.reportSubmittedLabel || 'Report submitted confirmations', desc: t?.reportSubmittedDesc || 'Receive confirmation when a report is successfully submitted' },
+                { key: 'missingSubmit',   label: t?.missingSubmitLabel   || 'Missing submission alerts',      desc: t?.missingSubmitDesc   || 'Alert when zones in your region have not submitted'          },
+                { key: 'newTemplate',     label: t?.newTemplateLabel     || 'New report templates',           desc: t?.newTemplateDesc     || 'Notify when new report templates are published'              },
+            ],
+        },
+        {
+            group: t?.financePortal || 'Finance',
+            items: [
+                { key: 'financeUpdates', label: t?.financeUpdatesLabel || 'Finance record updates', desc: t?.financeUpdatesDesc || 'Notify when finance records are added or updated' },
+            ],
+        },
+        {
+            group: 'System',
+            items: [
+                { key: 'systemAlerts', label: t?.systemAlertsLabel || 'System alerts', desc: t?.systemAlertsDesc || 'Important platform-wide announcements and alerts' },
+            ],
+        },
+    ];
 
-          {/* PROFILE */}
-          {tab === 'profile' && (
-            <div className="st-section">
-              <div className="st-section-header">
-                <h3>{t?.profileInfo || 'Profile Information'}</h3>
-                <p>{t?.profileInfoDesc || 'Update your personal details and contact information'}</p>
-              </div>
-              <AvatarUpload profileDraft={profileDraft} setProfileDraft={setProfileDraft} showToast={showToast} t={t} />
-              <div className="st-divider" />
-              <div className="st-form-grid">
-                {[
-                  { key: 'firstName', label: t?.firstName || 'First Name' },
-                  { key: 'lastName',  label: t?.lastName  || 'Last Name'  },
-                ].map(f => (
-                  <div className="st-field" key={f.key}>
-                    <label>{f.label}</label>
-                    <input type="text" value={profileDraft[f.key] || ''}
-                      onChange={e => setProfileDraft(p => ({ ...p, [f.key]: e.target.value }))} />
-                  </div>
-                ))}
-                <div className="st-field st-field-full">
-                  <label>{t?.emailAddress || 'Email Address'}</label>
-                  <input type="email" value={profileDraft.email || ''}
-                    onChange={e => setProfileDraft(p => ({ ...p, email: e.target.value }))} />
-                </div>
-                <div className="st-field">
-                  <label>{t?.phoneNumber || 'Phone Number'}</label>
-                  <input type="text" value={profileDraft.phone || ''}
-                    onChange={e => setProfileDraft(p => ({ ...p, phone: e.target.value }))} />
-                </div>
-                <div className="st-field">
-                  <label>{t?.timezone || 'Timezone'}</label>
-                  <select value={profileDraft.timezone || 'UTC+0'}
-                    onChange={e => setProfileDraft(p => ({ ...p, timezone: e.target.value }))}>
-                    {['UTC-8','UTC-5','UTC+0','UTC+1','UTC+3','UTC+5:30','UTC+8','UTC+9'].map(tz => (
-                      <option key={tz}>{tz}</option>
-                    ))}
-                  </select>
-                </div>
-                <div className="st-field">
-                  <label>{t?.role || 'Role'}</label>
-                  <input type="text" value={profileDraft.role || ''} disabled className="st-input-disabled" />
-                </div>
-                <div className="st-field">
-                  <label>{t?.region || 'Region'}</label>
-                  <input type="text" value={profileDraft.region || ''} disabled className="st-input-disabled" />
-                </div>
-              </div>
-              <div className="st-form-actions">
-                <button className="st-btn-primary" onClick={handleProfileSave}>{t?.saveChanges || 'Save Changes'}</button>
-                <button className="st-btn-ghost" onClick={() => setProfileDraft({ ...settings.profile })}>{t?.cancel || 'Cancel'}</button>
-              </div>
+    return (
+        <div className="st-page">
+            {toast && <Toast message={toast.message} type={toast.type} onDone={() => setToast(null)} />}
+
+            <div className="st-page-header">
+                <h2>{t?.settingsTitle || 'Settings'}</h2>
+                <p>{t?.settingsDesc || 'Manage your account preferences and configuration'}</p>
             </div>
-          )}
 
-          {/* SECURITY */}
-          {tab === 'security' && (
-            <div className="st-section">
-              <div className="st-section-header">
-                <h3>{t?.securityTitle || 'Security'}</h3>
-                <p>{t?.securityDesc || 'Manage your password and account security'}</p>
-              </div>
-              <div className="st-section-block">
-                <div className="st-block-title">{t?.changePassword || 'Change Password'}</div>
-                <div className="st-form-grid" style={{ maxWidth: 480 }}>
-                  {[
-                    { label: t?.currentPassword || 'Current Password', key: 'current' },
-                    { label: t?.newPassword     || 'New Password',      key: 'new'     },
-                    { label: t?.confirmPassword || 'Confirm Password',  key: 'confirm' },
-                  ].map(f => (
-                    <div className="st-field st-field-full" key={f.key}>
-                      <label>{f.label}</label>
-                      <div className="st-pw-wrap">
-                        <input type={showPw[f.key] ? 'text' : 'password'} placeholder="••••••••"
-                          value={pwForm[f.key]}
-                          onChange={e => setPwForm(p => ({ ...p, [f.key]: e.target.value }))} />
-                        <button type="button" className="st-pw-toggle"
-                          onClick={() => setShowPw(p => ({ ...p, [f.key]: !p[f.key] }))}>
-                          {showPw[f.key] ? <EyeOff size={15} /> : <Eye size={15} />}
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-                {pwError && <p className="st-error">{pwError}</p>}
-                <button className="st-btn-primary" onClick={handlePasswordSave} disabled={pwLoading}>
-                  {pwLoading ? 'Updating...' : (t?.updatePassword || 'Update Password')}
-                </button>
-              </div>
+            <div className="st-layout">
+                <aside className="st-sidenav">
+                    {TABS.map(tb => {
+                        const Icon = tb.icon;
+                        return (
+                            <button key={tb.key} onClick={() => setTab(tb.key)}
+                                className={`st-sidenav-item ${tab === tb.key ? 'active' : ''}`}>
+                                <Icon size={16} />
+                                {tb.label}
+                                <ChevronRight size={14} className="st-sidenav-arrow" />
+                            </button>
+                        );
+                    })}
+                </aside>
+
+                <div className="st-panel">
+
+                    {/* PROFILE */}
+                    {tab === 'profile' && (
+                        <div className="st-section">
+                            <div className="st-section-header">
+                                <h3>{t?.profileInfo || 'Profile Information'}</h3>
+                                <p>{t?.profileInfoDesc || 'Update your personal details and contact information'}</p>
+                            </div>
+                            <AvatarUpload profileDraft={profileDraft} setProfileDraft={setProfileDraft} showToast={showToast} t={t} />
+                            <div className="st-divider" />
+                            <div className="st-form-grid">
+                                {[
+                                    { key: 'firstName', label: t?.firstName || 'First Name' },
+                                    { key: 'lastName',  label: t?.lastName  || 'Last Name'  },
+                                ].map(f => (
+                                    <div className="st-field" key={f.key}>
+                                        <label>{f.label}</label>
+                                        <input type="text" value={profileDraft[f.key] || ''}
+                                            onChange={e => setProfileDraft(p => ({ ...p, [f.key]: e.target.value }))} />
+                                    </div>
+                                ))}
+                                <div className="st-field st-field-full">
+                                    <label>{t?.emailAddress || 'Email Address'}</label>
+                                    <input type="email" value={profileDraft.email || ''}
+                                        onChange={e => setProfileDraft(p => ({ ...p, email: e.target.value }))} />
+                                </div>
+                                <div className="st-field">
+                                    <label>{t?.phoneNumber || 'Phone Number'}</label>
+                                    <input type="text" value={profileDraft.phone || ''}
+                                        onChange={e => setProfileDraft(p => ({ ...p, phone: e.target.value }))} />
+                                </div>
+                                <div className="st-field">
+                                    <label>{t?.timezone || 'Timezone'}</label>
+                                    <select value={profileDraft.timezone || 'UTC+0'}
+                                        onChange={e => setProfileDraft(p => ({ ...p, timezone: e.target.value }))}>
+                                        {['UTC-8','UTC-5','UTC+0','UTC+1','UTC+3','UTC+5:30','UTC+8','UTC+9'].map(tz => (
+                                            <option key={tz}>{tz}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                                <div className="st-field">
+                                    <label>{t?.role || 'Role'}</label>
+                                    <input type="text" value={profileDraft.role || ''} disabled className="st-input-disabled" />
+                                </div>
+                                <div className="st-field">
+                                    <label>{t?.region || 'Region'}</label>
+                                    <input type="text" value={profileDraft.region || ''} disabled className="st-input-disabled" />
+                                </div>
+                            </div>
+                            <div className="st-form-actions">
+                                <button className="st-btn-primary" onClick={handleProfileSave}>{t?.saveChanges || 'Save Changes'}</button>
+                                <button className="st-btn-ghost" onClick={() => setProfileDraft({ ...settings.profile })}>{t?.cancel || 'Cancel'}</button>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* SECURITY */}
+                    {tab === 'security' && (
+                        <div className="st-section">
+                            <div className="st-section-header">
+                                <h3>{t?.securityTitle || 'Security'}</h3>
+                                <p>{t?.securityDesc || 'Manage your password and account security'}</p>
+                            </div>
+                            
+                            <div className="st-section-block">
+                                <div className="st-block-title">Security Question</div>
+                                <p className="st-block-desc">Used for account recovery when email OTP fails.</p>
+                                <div className="st-form-grid" style={{ maxWidth: 480 }}>
+                                    <div className="st-field st-field-full">
+                                        <label>Question</label>
+                                        <input type="text" placeholder="e.g. What is your mother's maiden name?"
+                                            value={secForm.question}
+                                            onChange={e => setSecForm(p => ({ ...p, question: e.target.value }))} />
+                                    </div>
+                                    <div className="st-field st-field-full">
+                                        <label>Answer</label>
+                                        <input type="password" placeholder="••••••••"
+                                            value={secForm.answer}
+                                            onChange={e => setSecForm(p => ({ ...p, answer: e.target.value }))} />
+                                    </div>
+                                </div>
+                                <button className="st-btn-primary" onClick={handleSecuritySettingsSave} disabled={secLoading}>
+                                    {secLoading ? 'Saving...' : 'Save Security Question'}
+                                </button>
+                            </div>
+
+                            <div className="st-divider" />
+
+                            <div className="st-section-block">
+                                <div className="st-block-title">{t?.changePassword || 'Change Password'}</div>
+                                <div className="st-form-grid" style={{ maxWidth: 480 }}>
+                                    {[
+                                        { label: t?.currentPassword || 'Current Password', key: 'current' },
+                                        { label: t?.newPassword     || 'New Password',      key: 'new'     },
+                                        { label: t?.confirmPassword || 'Confirm Password',  key: 'confirm' },
+                                    ].map(f => (
+                                        <div className="st-field st-field-full" key={f.key}>
+                                            <label>{f.label}</label>
+                                            <div className="st-pw-wrap">
+                                                <input type={showPw[f.key] ? 'text' : 'password'} placeholder="••••••••"
+                                                    value={pwForm[f.key]}
+                                                    onChange={e => setPwForm(p => ({ ...p, [f.key]: e.target.value }))} />
+                                                <button type="button" className="st-pw-toggle"
+                                                    onClick={() => setShowPw(p => ({ ...p, [f.key]: !p[f.key] }))}>
+                                                    {showPw[f.key] ? <EyeOff size={15} /> : <Eye size={15} />}
+                                                </button>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                                {pwError && <p className="st-error">{pwError}</p>}
+                                <button className="st-btn-primary" onClick={handlePasswordSave} disabled={pwLoading}>
+                                    {pwLoading ? 'Updating...' : (t?.updatePassword || 'Update Password')}
+                                </button>
+                            </div>
               <div className="st-divider" />
               <div className="st-section-block">
                 <div className="st-block-title">{t?.activeSessions || 'Active Sessions'}</div>
