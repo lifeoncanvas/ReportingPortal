@@ -119,7 +119,12 @@ export default function Signin({ onSwitch, onForgotPassword }) {
           <h3 className="signup-sub-title">Zonal Master Report</h3>
         </div>
 
-        {error && <p className="auth-error">{error}</p>}
+        {error && (
+          <div className="auth-error">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            <span>{error === "Incorrect password." ? "Wrong password. Please try again." : error}</span>
+          </div>
+        )}
 
         <div className="signup-options">
           {/* KingsChat Option */}
@@ -157,7 +162,7 @@ export default function Signin({ onSwitch, onForgotPassword }) {
                       type="email" 
                       placeholder="Email Address" 
                       value={identifier} 
-                      onChange={e => setIdentifier(e.target.value)} 
+                      onChange={e => { setIdentifier(e.target.value); if (error) setError(''); }} 
                       required 
                     />
                   </div>
@@ -167,7 +172,7 @@ export default function Signin({ onSwitch, onForgotPassword }) {
                       type="password" 
                       placeholder="Password" 
                       value={password} 
-                      onChange={e => setPassword(e.target.value)} 
+                      onChange={e => { setPassword(e.target.value); if (error) setError(''); }} 
                       required 
                     />
                   </div>
@@ -204,7 +209,7 @@ export default function Signin({ onSwitch, onForgotPassword }) {
                       type="tel" 
                       placeholder="Phone Number" 
                       value={identifier} 
-                      onChange={e => setIdentifier(e.target.value)} 
+                      onChange={e => { setIdentifier(e.target.value); if (error) setError(''); }} 
                       required 
                     />
                   </div>
@@ -214,7 +219,7 @@ export default function Signin({ onSwitch, onForgotPassword }) {
                       type="password" 
                       placeholder="Password" 
                       value={password} 
-                      onChange={e => setPassword(e.target.value)} 
+                      onChange={e => { setPassword(e.target.value); if (error) setError(''); }} 
                       required 
                     />
                   </div>

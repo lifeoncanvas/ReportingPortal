@@ -33,11 +33,17 @@ export function AuthProvider({ children }) {
   };
 
   const loginWithKingChat = async (accessToken, onPendingToasts, kcUser) => {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 15000); // 15s timeout
+
     try {
       const apiUrl = getApiUrl();
+      console.log(`[${new Date().toLocaleTimeString()}] AuthContext: Initiating KingsChat backend auth at ${apiUrl}`);
+      
       const res = await fetch(`${apiUrl}/api/auth/kingchat`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        signal: controller.signal,
         body: JSON.stringify({
           token: accessToken,
           email: kcUser?.email || null,
@@ -46,6 +52,9 @@ export function AuthProvider({ children }) {
           username: kcUser?.username || null,
         })
       });
+
+      clearTimeout(timeoutId);
+      console.log(`[${new Date().toLocaleTimeString()}] AuthContext: Backend responded with status ${res.status}`);
 
       if (!res.ok) {
         const errText = await res.text();
@@ -69,7 +78,11 @@ export function AuthProvider({ children }) {
 
       return null;
     } catch (err) {
+      clearTimeout(timeoutId);
       console.error("KingsChat Auth failed:", err);
+      if (err.name === 'AbortError') {
+        return 'Request timed out. The server is taking too long to respond.';
+      }
       return 'Connection error: Could not reach the authentication server.';
     }
   };
