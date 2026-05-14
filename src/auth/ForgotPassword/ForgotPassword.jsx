@@ -19,6 +19,7 @@ export default function ForgotPassword({ onBack }) {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
     const [message, setMessage] = useState("");
+    const [showSetupForm, setShowSetupForm] = useState(false);
 
     const handleRequestOtp = async (e) => {
         if (e) e.preventDefault();
@@ -95,7 +96,7 @@ export default function ForgotPassword({ onBack }) {
     };
 
     const handleResetPassword = async (e) => {
-        e.preventDefault();
+        if (e) e.preventDefault();
         setLoading(true);
         setError("");
         try {
@@ -103,19 +104,32 @@ export default function ForgotPassword({ onBack }) {
             let body = { email, otp, newPassword };
 
             if (recoveryMethod === 'security') {
-                url = `${API_BASE}/reset-password-security`;
-                if (securityQuestion === 'SET_3_QUESTIONS') {
+                if (securityQuestion === 'NOT_SET') {
+                    url = `${API_BASE}/reset-password-set-questions`;
                     body = { 
                         email, 
+                        otp,
                         answer1: securityAnswer, 
                         answer2: securityAnswer2, 
                         answer3: securityAnswer3, 
                         newPassword 
                     };
                 } else {
-                    body = { email, answer: securityAnswer, newPassword };
+                    url = `${API_BASE}/reset-password-security`;
+                    if (securityQuestion === 'SET_3_QUESTIONS') {
+                        body = { 
+                            email, 
+                            answer1: securityAnswer, 
+                            answer2: securityAnswer2, 
+                            answer3: securityAnswer3, 
+                            newPassword 
+                        };
+                    } else {
+                        body = { email, answer: securityAnswer, newPassword };
+                    }
                 }
             }
+// ...
 
             const res = await fetch(url, {
                 method: "POST",
@@ -200,59 +214,121 @@ export default function ForgotPassword({ onBack }) {
 
                 {step === 2 && recoveryMethod === 'security' && (
                     <div style={{ textAlign: 'left' }}>
-                        {securityQuestion === 'SET_3_QUESTIONS' ? (
+                        {securityQuestion === 'NOT_SET' ? (
                             <>
-                                <p style={styles.text}>Please answer your security questions:</p>
-                                <div style={{ marginBottom: '1rem' }}>
-                                    <label style={styles.label}>1. What is your mother's maiden name?</label>
-                                    <input
-                                        type="password"
-                                        placeholder="Your Answer"
-                                        style={styles.input}
-                                        value={securityAnswer}
-                                        onChange={(e) => setSecurityAnswer(e.target.value)}
-                                        required
-                                    />
-                                </div>
-                                <div style={{ marginBottom: '1rem' }}>
-                                    <label style={styles.label}>2. What was the name of your first school?</label>
-                                    <input
-                                        type="password"
-                                        placeholder="Your Answer"
-                                        style={styles.input}
-                                        value={securityAnswer2}
-                                        onChange={(e) => setSecurityAnswer2(e.target.value)}
-                                        required
-                                    />
-                                </div>
-                                <div style={{ marginBottom: '1rem' }}>
-                                    <label style={styles.label}>3. What is the name of your favorite pet?</label>
-                                    <input
-                                        type="password"
-                                        placeholder="Your Answer"
-                                        style={styles.input}
-                                        value={securityAnswer3}
-                                        onChange={(e) => setSecurityAnswer3(e.target.value)}
-                                        required
-                                    />
-                                </div>
+                                {showSetupForm ? (
+                                    <>
+                                        <p style={styles.text}>Identity verified! Please set your 3 security questions for future use:</p>
+                                        <div style={{ marginBottom: '1rem' }}>
+                                            <label style={styles.label}>1. What is your mother's maiden name?</label>
+                                            <input type="password" placeholder="Your Answer" style={styles.input}
+                                                value={securityAnswer} onChange={(e) => setSecurityAnswer(e.target.value)} required />
+                                        </div>
+                                        <div style={{ marginBottom: '1rem' }}>
+                                            <label style={styles.label}>2. What was the name of your first school?</label>
+                                            <input type="password" placeholder="Your Answer" style={styles.input}
+                                                value={securityAnswer2} onChange={(e) => setSecurityAnswer2(e.target.value)} required />
+                                        </div>
+                                        <div style={{ marginBottom: '1rem' }}>
+                                            <label style={styles.label}>3. What is the name of your favorite pet?</label>
+                                            <input type="password" placeholder="Your Answer" style={styles.input}
+                                                value={securityAnswer3} onChange={(e) => setSecurityAnswer3(e.target.value)} required />
+                                        </div>
+                                        <div style={{ marginTop: '1.5rem', paddingTop: '1.5rem', borderTop: '1px solid #eee' }}>
+                                            <p style={styles.text}>Enter your new password:</p>
+                                            <input type="password" placeholder="New Password" style={styles.input}
+                                                value={newPassword} onChange={(e) => setNewPassword(e.target.value)} required />
+                                            <button onClick={handleResetPassword} disabled={loading} style={styles.button}>
+                                                {loading ? "Updating..." : "Save Questions & Reset Password"}
+                                            </button>
+                                        </div>
+                                    </>
+                                ) : (
+                                    <>
+                                        <p style={styles.text}>Security questions not found. Please verify your identity with a 6-digit OTP to set them.</p>
+                                        <input type="text" placeholder="6-Digit OTP" style={styles.input}
+                                            value={otp} onChange={(e) => setOtp(e.target.value)} />
+                                        
+                                        <div style={{ display: 'flex', gap: '1rem' }}>
+                                            <button onClick={handleRequestOtp} disabled={loading} style={{ ...styles.button, flex: 1, background: '#666' }}>
+                                                {loading ? "..." : "Send OTP"}
+                                            </button>
+                                            <button onClick={() => { if(otp.length === 6) { setShowSetupForm(true); setMessage("OTP entered. Now please set your questions below."); } else { setError("Please enter the 6-digit OTP."); } }} style={{ ...styles.button, flex: 2 }}>
+                                                Verify & Continue
+                                            </button>
+                                        </div>
+                                    </>
+                                )}
                             </>
                         ) : (
                             <>
-                                <p style={{ ...styles.text, fontWeight: 'bold', color: '#1a2e45' }}>{securityQuestion}</p>
-                                <input
-                                    type="text"
-                                    placeholder="Your Answer"
-                                    style={styles.input}
-                                    value={securityAnswer}
-                                    onChange={(e) => setSecurityAnswer(e.target.value)}
-                                    required
-                                />
+                                {securityQuestion === 'SET_3_QUESTIONS' ? (
+                                    <>
+                                        <p style={styles.text}>Please answer your security questions:</p>
+                                        <div style={{ marginBottom: '1rem' }}>
+                                            <label style={styles.label}>1. What is your mother's maiden name?</label>
+                                            <input
+                                                type="password"
+                                                placeholder="Your Answer"
+                                                style={styles.input}
+                                                value={securityAnswer}
+                                                onChange={(e) => setSecurityAnswer(e.target.value)}
+                                                required
+                                            />
+                                        </div>
+                                        <div style={{ marginBottom: '1rem' }}>
+                                            <label style={styles.label}>2. What was the name of your first school?</label>
+                                            <input
+                                                type="password"
+                                                placeholder="Your Answer"
+                                                style={styles.input}
+                                                value={securityAnswer2}
+                                                onChange={(e) => setSecurityAnswer2(e.target.value)}
+                                                required
+                                            />
+                                        </div>
+                                        <div style={{ marginBottom: '1rem' }}>
+                                            <label style={styles.label}>3. What is the name of your favorite pet?</label>
+                                            <input
+                                                type="password"
+                                                placeholder="Your Answer"
+                                                style={styles.input}
+                                                value={securityAnswer3}
+                                                onChange={(e) => setSecurityAnswer3(e.target.value)}
+                                                required
+                                            />
+                                        </div>
+                                    </>
+                                ) : (
+                                    <>
+                                        <p style={{ ...styles.text, fontWeight: 'bold', color: '#1a2e45' }}>{securityQuestion}</p>
+                                        <input
+                                            type="text"
+                                            placeholder="Your Answer"
+                                            style={styles.input}
+                                            value={securityAnswer}
+                                            onChange={(e) => setSecurityAnswer(e.target.value)}
+                                            required
+                                        />
+                                    </>
+                                )}
+                                
+                                <div style={{ marginTop: '1.5rem', paddingTop: '1.5rem', borderTop: '1px solid #eee' }}>
+                                    <p style={styles.text}>Enter your new password:</p>
+                                    <input
+                                        type="password"
+                                        placeholder="New Password"
+                                        style={styles.input}
+                                        value={newPassword}
+                                        onChange={(e) => setNewPassword(e.target.value)}
+                                        required
+                                    />
+                                    <button onClick={handleResetPassword} disabled={loading} style={styles.button}>
+                                        {loading ? "Updating..." : "Verify & Change Password"}
+                                    </button>
+                                </div>
                             </>
                         )}
-                        <button onClick={() => setStep(3)} style={styles.button}>
-                            Next
-                        </button>
                     </div>
                 )}
 
