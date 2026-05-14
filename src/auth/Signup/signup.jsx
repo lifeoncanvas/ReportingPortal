@@ -98,7 +98,7 @@ export default function Signup({ onSwitch }) {
     };
 
     try {
-        const apiUrl = window.ENV?.API_PATH || process.env.REACT_APP_API_URL || 'http://65.1.248.88:8080';
+        const apiUrl = window.ENV?.API_PATH || process.env.REACT_APP_API_URL || 'http://65.1.248.88:8081';
         const res = await fetch(`${apiUrl}/api/auth/signup`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },

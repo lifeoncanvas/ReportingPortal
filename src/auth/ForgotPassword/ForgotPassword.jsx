@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
 const getApiBase = () => {
-    return (window.ENV?.API_PATH || process.env.REACT_APP_API_URL || 'http://65.1.248.88:8080') + '/api/auth';
+    return (window.ENV?.API_PATH || process.env.REACT_APP_API_URL || 'http://65.1.248.88:8081') + '/api/auth';
 };
 
 const API_BASE = getApiBase();
