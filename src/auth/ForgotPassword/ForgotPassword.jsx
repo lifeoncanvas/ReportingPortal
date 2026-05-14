@@ -19,6 +19,7 @@ export default function ForgotPassword({ onBack }) {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
     const [message, setMessage] = useState("");
+    const [confirmPassword, setConfirmPassword] = useState("");
     const [showSetupForm, setShowSetupForm] = useState(false);
 
     const handleRequestOtp = async (e) => {
@@ -97,6 +98,12 @@ export default function ForgotPassword({ onBack }) {
 
     const handleResetPassword = async (e) => {
         if (e) e.preventDefault();
+        
+        if (newPassword !== confirmPassword) {
+            setError("Passwords do not match.");
+            return;
+        }
+
         setLoading(true);
         setError("");
         try {
@@ -231,19 +238,21 @@ export default function ForgotPassword({ onBack }) {
                                         value={securityAnswer3} onChange={(e) => setSecurityAnswer3(e.target.value)} required />
                                 </div>
                                 <div style={{ marginTop: '1.5rem', paddingTop: '1.5rem', borderTop: '1px solid #eee' }}>
-                                    <p style={styles.text}>Enter your new password:</p>
+                                    <p style={styles.text}>Set your new password:</p>
                                     <input type="password" placeholder="New Password" style={styles.input}
                                         value={newPassword} onChange={(e) => setNewPassword(e.target.value)} required />
+                                    <input type="password" placeholder="Confirm New Password" style={styles.input}
+                                        value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required />
                                     <button onClick={handleResetPassword} disabled={loading} style={styles.button}>
                                         {loading ? "Updating..." : "Save Questions & Reset Password"}
                                     </button>
                                 </div>
                             </>
                         ) : (
-                            <>
+                            <div style={{ textAlign: 'left' }}>
                                 {securityQuestion === 'SET_3_QUESTIONS' ? (
                                     <>
-                                        <p style={styles.text}>Please answer your security questions:</p>
+                                        <p style={styles.text}>Security Questions verified. Please answer them to continue:</p>
                                         <div style={{ marginBottom: '1rem' }}>
                                             <label style={styles.label}>1. What is your mother's maiden name?</label>
                                             <input
@@ -302,11 +311,19 @@ export default function ForgotPassword({ onBack }) {
                                         onChange={(e) => setNewPassword(e.target.value)}
                                         required
                                     />
+                                    <input
+                                        type="password"
+                                        placeholder="Confirm New Password"
+                                        style={styles.input}
+                                        value={confirmPassword}
+                                        onChange={(e) => setConfirmPassword(e.target.value)}
+                                        required
+                                    />
                                     <button onClick={handleResetPassword} disabled={loading} style={styles.button}>
                                         {loading ? "Updating..." : "Verify & Change Password"}
                                     </button>
                                 </div>
-                            </>
+                            </div>
                         )}
                     </div>
                 )}
