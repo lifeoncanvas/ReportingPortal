@@ -126,7 +126,7 @@ export default function Settings() {
     const [pwError, setPwError] = useState('');
     const [pwLoading, setPwLoading] = useState(false);
     
-    const [secForm, setSecForm] = useState({ question: '', answer: '' });
+    const [secForm, setSecForm] = useState({ answer1: '', answer2: '', answer3: '' });
     const [secLoading, setSecLoading] = useState(false);
 
     useEffect(() => {
@@ -134,7 +134,7 @@ export default function Settings() {
             fetch(`${process.env.REACT_APP_API_URL}/api/auth/security-question?email=${encodeURIComponent(user.email)}`)
                 .then(res => res.json())
                 .then(data => {
-                    if (data.question) setSecForm(s => ({ ...s, question: data.question }));
+                    // data.question might be 'SET_3_QUESTIONS' or a specific question
                 })
                 .catch(() => {});
         }
@@ -172,8 +172,8 @@ export default function Settings() {
     };
 
     const handleSecuritySettingsSave = async () => {
-        if (!secForm.question.trim() || !secForm.answer.trim()) {
-            showToast('Question and Answer are required.', 'error');
+        if (!secForm.answer1.trim() || !secForm.answer2.trim() || !secForm.answer3.trim()) {
+            showToast('All 3 answers are required.', 'error');
             return;
         }
         setSecLoading(true);
@@ -183,16 +183,17 @@ export default function Settings() {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     email: user?.email,
-                    question: secForm.question,
-                    answer: secForm.answer
+                    answer1: secForm.answer1,
+                    answer2: secForm.answer2,
+                    answer3: secForm.answer3
                 })
             });
             if (res.ok) {
-                showToast('Security question updated successfully');
-                setSecForm(s => ({ ...s, answer: '' })); // Clear answer for security
+                showToast('Security questions updated successfully');
+                setSecForm({ answer1: '', answer2: '', answer3: '' }); // Clear for security
             } else {
                 const text = await res.text();
-                showToast(text || 'Failed to update security question', 'error');
+                showToast(text || 'Failed to update security questions', 'error');
             }
         } catch (err) {
             showToast('Network error', 'error');
@@ -333,24 +334,30 @@ export default function Settings() {
                             </div>
                             
                             <div className="st-section-block">
-                                <div className="st-block-title">Security Question</div>
-                                <p className="st-block-desc">Used for account recovery when email OTP fails.</p>
+                                <div className="st-block-title">Security Questions</div>
+                                <p className="st-block-desc">Used for account recovery when email OTP fails. Please answer all 3.</p>
                                 <div className="st-form-grid" style={{ maxWidth: 480 }}>
                                     <div className="st-field st-field-full">
-                                        <label>Question</label>
-                                        <input type="text" placeholder="e.g. What is your mother's maiden name?"
-                                            value={secForm.question}
-                                            onChange={e => setSecForm(p => ({ ...p, question: e.target.value }))} />
+                                        <label>1. What is your mother's maiden name?</label>
+                                        <input type="password" placeholder="Your Answer"
+                                            value={secForm.answer1}
+                                            onChange={e => setSecForm(p => ({ ...p, answer1: e.target.value }))} />
                                     </div>
                                     <div className="st-field st-field-full">
-                                        <label>Answer</label>
-                                        <input type="password" placeholder="••••••••"
-                                            value={secForm.answer}
-                                            onChange={e => setSecForm(p => ({ ...p, answer: e.target.value }))} />
+                                        <label>2. What was the name of your first school?</label>
+                                        <input type="password" placeholder="Your Answer"
+                                            value={secForm.answer2}
+                                            onChange={e => setSecForm(p => ({ ...p, answer2: e.target.value }))} />
+                                    </div>
+                                    <div className="st-field st-field-full">
+                                        <label>3. What is the name of your favorite pet?</label>
+                                        <input type="password" placeholder="Your Answer"
+                                            value={secForm.answer3}
+                                            onChange={e => setSecForm(p => ({ ...p, answer3: e.target.value }))} />
                                     </div>
                                 </div>
                                 <button className="st-btn-primary" onClick={handleSecuritySettingsSave} disabled={secLoading}>
-                                    {secLoading ? 'Saving...' : 'Save Security Question'}
+                                    {secLoading ? 'Saving...' : 'Save Security Questions'}
                                 </button>
                             </div>
 

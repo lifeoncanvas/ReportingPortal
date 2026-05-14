@@ -13,6 +13,8 @@ export default function ForgotPassword({ onBack }) {
     const [otp, setOtp] = useState("");
     const [securityQuestion, setSecurityQuestion] = useState("");
     const [securityAnswer, setSecurityAnswer] = useState("");
+    const [securityAnswer2, setSecurityAnswer2] = useState("");
+    const [securityAnswer3, setSecurityAnswer3] = useState("");
     const [newPassword, setNewPassword] = useState("");
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
@@ -102,7 +104,17 @@ export default function ForgotPassword({ onBack }) {
 
             if (recoveryMethod === 'security') {
                 url = `${API_BASE}/reset-password-security`;
-                body = { email, answer: securityAnswer, newPassword };
+                if (securityQuestion === 'SET_3_QUESTIONS') {
+                    body = { 
+                        email, 
+                        answer1: securityAnswer, 
+                        answer2: securityAnswer2, 
+                        answer3: securityAnswer3, 
+                        newPassword 
+                    };
+                } else {
+                    body = { email, answer: securityAnswer, newPassword };
+                }
             }
 
             const res = await fetch(url, {
@@ -187,16 +199,57 @@ export default function ForgotPassword({ onBack }) {
                 )}
 
                 {step === 2 && recoveryMethod === 'security' && (
-                    <div>
-                        <p style={{ ...styles.text, fontWeight: 'bold', color: '#1a2e45' }}>{securityQuestion}</p>
-                        <input
-                            type="text"
-                            placeholder="Your Answer"
-                            style={styles.input}
-                            value={securityAnswer}
-                            onChange={(e) => setSecurityAnswer(e.target.value)}
-                            required
-                        />
+                    <div style={{ textAlign: 'left' }}>
+                        {securityQuestion === 'SET_3_QUESTIONS' ? (
+                            <>
+                                <p style={styles.text}>Please answer your security questions:</p>
+                                <div style={{ marginBottom: '1rem' }}>
+                                    <label style={styles.label}>1. What is your mother's maiden name?</label>
+                                    <input
+                                        type="password"
+                                        placeholder="Your Answer"
+                                        style={styles.input}
+                                        value={securityAnswer}
+                                        onChange={(e) => setSecurityAnswer(e.target.value)}
+                                        required
+                                    />
+                                </div>
+                                <div style={{ marginBottom: '1rem' }}>
+                                    <label style={styles.label}>2. What was the name of your first school?</label>
+                                    <input
+                                        type="password"
+                                        placeholder="Your Answer"
+                                        style={styles.input}
+                                        value={securityAnswer2}
+                                        onChange={(e) => setSecurityAnswer2(e.target.value)}
+                                        required
+                                    />
+                                </div>
+                                <div style={{ marginBottom: '1rem' }}>
+                                    <label style={styles.label}>3. What is the name of your favorite pet?</label>
+                                    <input
+                                        type="password"
+                                        placeholder="Your Answer"
+                                        style={styles.input}
+                                        value={securityAnswer3}
+                                        onChange={(e) => setSecurityAnswer3(e.target.value)}
+                                        required
+                                    />
+                                </div>
+                            </>
+                        ) : (
+                            <>
+                                <p style={{ ...styles.text, fontWeight: 'bold', color: '#1a2e45' }}>{securityQuestion}</p>
+                                <input
+                                    type="text"
+                                    placeholder="Your Answer"
+                                    style={styles.input}
+                                    value={securityAnswer}
+                                    onChange={(e) => setSecurityAnswer(e.target.value)}
+                                    required
+                                />
+                            </>
+                        )}
                         <button onClick={() => setStep(3)} style={styles.button}>
                             Next
                         </button>
@@ -251,5 +304,6 @@ const styles = {
     backButton: { background: 'none', border: 'none', color: '#666', marginTop: '1rem', cursor: 'pointer', textDecoration: 'underline' },
     error: { color: '#e05a5a', marginBottom: '1rem', fontSize: '0.9rem', padding: '0.5rem', background: '#fff1f1', borderRadius: '4px' },
     message: { color: '#2e7d32', marginBottom: '1rem', fontSize: '0.9rem', padding: '0.5rem', background: '#f1f8f1', borderRadius: '4px' },
-    text: { color: '#555', marginBottom: '1rem', fontSize: '0.9rem' }
+    text: { color: '#555', marginBottom: '1rem', fontSize: '0.9rem' },
+    label: { display: 'block', fontSize: '0.8rem', color: '#666', marginBottom: '0.25rem', textAlign: 'left' }
 }

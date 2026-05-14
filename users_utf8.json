@@ -1,0 +1,75 @@
+{
+    "value":  [
+                  {
+                      "id":  1,
+                      "firstName":  "sharon",
+                      "lastName":  "",
+                      "name":  "sharon",
+                      "email":  "sharon@loveworld.com",
+                      "role":  "zonal",
+                      "region":  "Global",
+                      "status":  "active",
+                      "joined":  "3/23/2026",
+                      "securityQuestion": null,
+                      "securityAnswer1": null,
+                      "securityAnswer2": null,
+                      "securityAnswer3": null
+                  },
+                  {
+                      "id":  2,
+                      "firstName":  "sister",
+                      "lastName":  "",
+                      "name":  "sister",
+                      "email":  "upasana@loveworld.com",
+                      "role":  "zonal",
+                      "region":  "Global",
+                      "status":  "active",
+                      "joined":  "3/24/2026"
+                  },
+                  {
+                      "id":  3,
+                      "firstName":  "System",
+                      "lastName":  "Administrator",
+                      "name":  "System",
+                      "email":  "admin@loveworld.com",
+                      "role":  "admin",
+                      "region":  "Global",
+                      "status":  "active",
+                      "joined":  "3/24/2026"
+                  },
+                  {
+                      "id":  4,
+                      "firstName":  "sis",
+                      "lastName":  "Nissi",
+                      "name":  "sis",
+                      "email":  "nissi@loveworld.com",
+                      "role":  "zonal",
+                      "region":  "Global",
+                      "status":  "active",
+                      "joined":  "3/24/2026"
+                  },
+                  {
+                      "id":  5,
+                      "firstName":  "Global",
+                      "lastName":  "Partnership Manager",
+                      "name":  "Global",
+                      "email":  "global@loveworld.com",
+                      "role":  "global",
+                      "region":  "Global",
+                      "status":  "active",
+                      "joined":  "3/26/2026"
+                  },
+                  {
+                      "id":  6,
+                      "firstName":  "Zonal",
+                      "lastName":  "Partnership Manager",
+                      "name":  "Zonal",
+                      "email":  "zonal@loveworld.com",
+                      "role":  "zonal",
+                      "region":  "North America",
+                      "status":  "active",
+                      "joined":  "3/26/2026"
+                  }
+              ],
+    "Count":  6
+}
