@@ -15,7 +15,10 @@ export default function Signup({ onSwitch }) {
     name: '',
     email: '',
     phone: '',
-    password: ''
+    password: '',
+    answer1: '',
+    answer2: '',
+    answer3: ''
   });
   
   const [error, setError] = useState('');
@@ -81,12 +84,37 @@ export default function Signup({ onSwitch }) {
 
     const finalEmail = type === 'email' ? email : `${phone}@phone.portal`;
     
-    const err = await signup(name, finalEmail, password, phone);
-    setLoading(false);
-    if (err) {
-      setError(err);
-    } else {
-      setSuccess(true);
+    // Create payload with security answers
+    const payload = {
+        name,
+        email: finalEmail,
+        password,
+        phone,
+        firstName: name.split(' ')[0],
+        lastName: name.includes(' ') ? name.split(' ').slice(1).join(' ') : '',
+        answer1: formData.answer1,
+        answer2: formData.answer2,
+        answer3: formData.answer3
+    };
+
+    try {
+        const apiUrl = window.ENV?.API_PATH || process.env.REACT_APP_API_URL || 'http://65.1.248.88:8080';
+        const res = await fetch(`${apiUrl}/api/auth/signup`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        
+        setLoading(false);
+        if (!res.ok) {
+            const errText = await res.text();
+            setError(errText || 'Registration failed.');
+        } else {
+            setSuccess(true);
+        }
+    } catch (err) {
+        setLoading(false);
+        setError('Network error during registration.');
     }
   };
 
@@ -157,6 +185,19 @@ export default function Signup({ onSwitch }) {
                       <Lock size={16} />
                       <input type="password" name="password" placeholder="Create Password" value={formData.password} onChange={handleInputChange} required />
                     </div>
+                    
+                    <div className="sec-questions-signup">
+                        <p className="sec-title-signup">Security Questions (for recovery)</p>
+                        <div className="input-group">
+                            <input type="text" name="answer1" placeholder="1. Mother's maiden name?" value={formData.answer1} onChange={handleInputChange} required />
+                        </div>
+                        <div className="input-group">
+                            <input type="text" name="answer2" placeholder="2. First school name?" value={formData.answer2} onChange={handleInputChange} required />
+                        </div>
+                        <div className="input-group">
+                            <input type="text" name="answer3" placeholder="3. Favorite pet name?" value={formData.answer3} onChange={handleInputChange} required />
+                        </div>
+                    </div>
                     <button className="submit-signup-btn" type="submit" disabled={loading}>
                       {loading ? 'Processing...' : 'Register with Email'}
                     </button>
@@ -192,6 +233,19 @@ export default function Signup({ onSwitch }) {
                     <div className="input-group">
                       <Lock size={16} />
                       <input type="password" name="password" placeholder="Create Password" value={formData.password} onChange={handleInputChange} required />
+                    </div>
+                    
+                    <div className="sec-questions-signup">
+                        <p className="sec-title-signup">Security Questions (for recovery)</p>
+                        <div className="input-group">
+                            <input type="text" name="answer1" placeholder="1. Mother's maiden name?" value={formData.answer1} onChange={handleInputChange} required />
+                        </div>
+                        <div className="input-group">
+                            <input type="text" name="answer2" placeholder="2. First school name?" value={formData.answer2} onChange={handleInputChange} required />
+                        </div>
+                        <div className="input-group">
+                            <input type="text" name="answer3" placeholder="3. Favorite pet name?" value={formData.answer3} onChange={handleInputChange} required />
+                        </div>
                     </div>
                     <button className="submit-signup-btn phone-submit" type="submit" disabled={loading}>
                       {loading ? 'Processing...' : 'Register with Phone'}

@@ -301,3 +301,18 @@
 .kc-reg-hint:hover span {
   text-decoration: underline;
 }
+
+.sec-questions-signup {
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px dashed #e2e8f0;
+}
+
+.sec-title-signup {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #64748b;
+  margin-bottom: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
