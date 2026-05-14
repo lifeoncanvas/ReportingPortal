@@ -129,7 +129,6 @@ export default function ForgotPassword({ onBack }) {
                     }
                 }
             }
-// ...
 
             const res = await fetch(url, {
                 method: "POST",
@@ -179,7 +178,7 @@ export default function ForgotPassword({ onBack }) {
                         <p style={styles.text}>
                             {recoveryMethod === 'otp' 
                                 ? "Enter your email to receive a 6-digit OTP." 
-                                : "Enter your email to retrieve your security question."}
+                                : "Enter your email to retrieve your security question. If you haven't set one yet, we'll help you set it up."}
                         </p>
                         <input
                             type="email"
@@ -190,7 +189,7 @@ export default function ForgotPassword({ onBack }) {
                             required
                         />
                         <button type="submit" disabled={loading} style={styles.button}>
-                            {loading ? "Processing..." : (recoveryMethod === 'otp' ? "Send OTP" : "Get Security Question")}
+                            {loading ? "Processing..." : (recoveryMethod === 'otp' ? "Send OTP" : "Get Question / Start Setup")}
                         </button>
                     </form>
                 )}
