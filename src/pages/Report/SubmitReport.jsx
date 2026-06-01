@@ -17,7 +17,6 @@ const initialForm = {
   zonalPastorAttendance: "",
   zonalManagerDirectorMeeting: "",
   zonalManagerStrategyMeeting: "",
-  sponsorshipHealingCrusade: "",
   notes: "",
 };
 
@@ -58,10 +57,9 @@ const FIELDS = [
     ]
   },
   {
-    section: "Healing Crusade & Comments",
-    icon: "✨",
+    section: "Comments & Feedback",
+    icon: "📝",
     fields: [
-      { key: "sponsorshipHealingCrusade", label: "How much Sponsorship was given for the Healing Crusade this week?", type: "number", required: true, hint: "Amount in Espees" },
       { key: "notes", label: "Any Testimony, Clarification or Concern?", type: "textarea", required: false }
     ]
   }
@@ -104,7 +102,6 @@ export default function SubmitReport() {
         httnmTranslations: parseInt(form.httnmTranslations) || 0,
         httnmOutreaches: parseInt(form.httnmOutreaches) || 0,
         httnmMediaSubmitted: parseInt(form.httnmMediaSubmitted) || 0,
-        sponsorshipHealingCrusade: parseFloat(form.sponsorshipHealingCrusade) || 0,
         submittedBy: user?.displayName || 'User',
         submitterEmail: user?.email || '',
         submittedDate: new Date().toISOString().split('T')[0],

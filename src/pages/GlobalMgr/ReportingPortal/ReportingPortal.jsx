@@ -293,10 +293,12 @@ function ZonalReportForm({ onClose, onSubmit: parentSubmit }) {
     pastoralAttendanceDirector: '',
     managerAttendanceDirector: '',
     managerAttendanceStrategy: '',
-    healingCrusadeSponsorship: '',
     testimonyClarificationConcern: '',
     media: [],
     mediaFiles: [],
+    participationPrayWithMe: '',
+    totalRegistrationHslhs: '',
+    heraldConference: '',
   };
   const [form, setForm] = useState(EMPTY);
   const [errors, setErrors] = useState({});
@@ -345,12 +347,14 @@ function ZonalReportForm({ onClose, onSubmit: parentSubmit }) {
       zonalPastorDirectorsMeeting:  form.pastoralAttendanceDirector,
       zonalManagerDirectorsMeeting: form.managerAttendanceDirector,
       zonalManagerStrategyMeeting:  form.managerAttendanceStrategy,
-      healingCrusadeSponsorship:    Number(form.healingCrusadeSponsorship) || 0,
       testimonyClarificationConcern: form.testimonyClarificationConcern,
       remittancePurpose:            form.remittancePurpose,
       trumpetsBlown:                Number(form.trumpetsBlown) || 0,
       popMediaUrl:                  null,
       regionName:                   user?.region || 'Global',
+      participationPrayWithMe:      form.participationPrayWithMe,
+      totalRegistrationHslhs:       Number(form.totalRegistrationHslhs) || 0,
+      heraldConference:             form.heraldConference,
     };
     try {
       await fetch(`${window.ENV?.API_PATH || process.env.REACT_APP_API_URL || 'http://65.1.248.88:8081'}/api/reports`, {
@@ -472,13 +476,26 @@ function ZonalReportForm({ onClose, onSubmit: parentSubmit }) {
             <ChevronDown size={13} className="kf-select-chevron" />
           </div>
         </Field>
-        <Field label="How much Sponsorship was given for the Healing Crusade this week?">
-          <input className="kf-input" type="text" placeholder="Amount"
-            value={form.healingCrusadeSponsorship} onChange={e => set('healingCrusadeSponsorship', e.target.value)} />
-        </Field>
         <Field label="Any Testimony, Clarification or Concern?">
           <textarea className="kf-textarea" rows={3} placeholder="Provide details..."
             value={form.testimonyClarificationConcern} onChange={e => set('testimonyClarificationConcern', e.target.value)} />
+        </Field>
+      </div>
+
+      {/* Pray With Me & HSLHS & Herald Conference */}
+      <div className="popup-section-head">📣 Programs & Campaigns</div>
+      <div className="popup-fields">
+        <Field label="Participation in Pray With Me">
+          <textarea className="kf-textarea" rows={2} placeholder="Enter details..."
+            value={form.participationPrayWithMe} onChange={e => set('participationPrayWithMe', e.target.value)} />
+        </Field>
+        <Field label="Total Registration for HSLHS">
+          <input className="kf-input" type="number" min="0" placeholder="0"
+            value={form.totalRegistrationHslhs} onChange={e => set('totalRegistrationHslhs', e.target.value)} />
+        </Field>
+        <Field label="Have you had your Herald Conference?">
+          <input className="kf-input" placeholder="Enter status/details..."
+            value={form.heraldConference} onChange={e => set('heraldConference', e.target.value)} />
         </Field>
       </div>
 
@@ -530,8 +547,11 @@ function PartnershipForm({ onClose, onSubmit: parentSubmit }) {
     churchesPartnership: '',
     cellPartnership: '',
     totalRemittance: '',
+    healingCrusadeSponsorship: '',
     blaaast: {},
     notes: '',
+    groupPastorsMilestones: '',
+    sponsoredTeenspirationKidsspiration: '',
   });
   const [errors, setErrors] = useState({});
   const [submitting, setSubmitting] = useState(false);
@@ -555,9 +575,12 @@ function PartnershipForm({ onClose, onSubmit: parentSubmit }) {
       churchesPartnership: form.churchesPartnership,
       cellPartnership: form.cellPartnership,
       totalRemittance: form.totalRemittance,
+      healingCrusadeSponsorship: Number(form.healingCrusadeSponsorship) || 0,
       notes: form.notes,
       status: 'submitted',
       rawDate: new Date().toISOString().split('T')[0],
+      groupPastorsMilestones: form.groupPastorsMilestones,
+      sponsoredTeenspirationKidsspiration: form.sponsoredTeenspirationKidsspiration,
     });
     setSubmitting(false);
   };
@@ -601,6 +624,10 @@ function PartnershipForm({ onClose, onSubmit: parentSubmit }) {
           <input className={`kf-input${errors.totalRemittance ? ' kf-input-err' : ''}`} type="number" min="0" placeholder="0"
             value={form.totalRemittance} onChange={e => setForm(p => ({ ...p, totalRemittance: e.target.value }))} />
         </Field>
+        <Field label="How much Sponsorship was given for the Healing Crusade this week?">
+          <input className="kf-input" type="number" min="0" placeholder="0"
+            value={form.healingCrusadeSponsorship} onChange={e => setForm(p => ({ ...p, healingCrusadeSponsorship: e.target.value }))} />
+        </Field>
       </div>
 
       <div className="popup-section-head">🎺 BLAAAST Partnership Categories</div>
@@ -627,6 +654,18 @@ function PartnershipForm({ onClose, onSubmit: parentSubmit }) {
         </div>
       </div>
 
+      <div className="popup-section-head">🏆 Milestones & Campaigns</div>
+      <div className="popup-fields">
+        <Field label="Names of group Pastors that have advanced in the BLAAAST Milestones">
+          <textarea className="kf-textarea" rows={2} placeholder="Enter names..."
+            value={form.groupPastorsMilestones} onChange={e => setForm(p => ({ ...p, groupPastorsMilestones: e.target.value }))} />
+        </Field>
+        <Field label="Zones/Groups that have sponsored Teenspiration and Kidsspiration 300 espees Campaign">
+          <textarea className="kf-textarea" rows={2} placeholder="Enter zones/groups..."
+            value={form.sponsoredTeenspirationKidsspiration} onChange={e => setForm(p => ({ ...p, sponsoredTeenspirationKidsspiration: e.target.value }))} />
+        </Field>
+      </div>
+
       <div className="popup-section-head">📝 Additional Notes</div>
       <div className="popup-fields">
         <Field label="Recruitment notes or special mentions">
@@ -649,6 +688,9 @@ function TestimonialsForm({ onClose, onSubmit: parentSubmit }) {
     beforeImages: [],
     afterImages: [],
     documents: [],   // video, PDF, Word
+    prayWithMeTestimonies: '',
+    translationTestimonies: '',
+    partnershipTestimonies: '',
   });
   const [errors, setErrors] = useState({});
   const [submitting, setSubmitting] = useState(false);
@@ -679,6 +721,9 @@ function TestimonialsForm({ onClose, onSubmit: parentSubmit }) {
       documents:        form.documents.length,
       status:           'PENDING',
       rawDate:          new Date().toISOString().split('T')[0],
+      prayWithMeTestimonies: form.prayWithMeTestimonies,
+      translationTestimonies: form.translationTestimonies,
+      partnershipTestimonies: form.partnershipTestimonies,
     });
     setSubmitting(false);
   };
@@ -703,6 +748,23 @@ function TestimonialsForm({ onClose, onSubmit: parentSubmit }) {
           <textarea className="kf-textarea" rows={6}
             placeholder="Write your testimony here — what happened, how you were impacted, what God did…"
             value={form.testimony} onChange={e => setForm(p => ({ ...p, testimony: e.target.value }))} />
+        </Field>
+      </div>
+
+      {/* Testimony Categories */}
+      <div className="popup-section-head">✍️ Testimony Categories</div>
+      <div className="popup-fields">
+        <Field label="Pray With Me Testimonies">
+          <textarea className="kf-textarea" rows={3} placeholder="Share Pray With Me testimonies..."
+            value={form.prayWithMeTestimonies} onChange={e => setForm(p => ({ ...p, prayWithMeTestimonies: e.target.value }))} />
+        </Field>
+        <Field label="Translation Testimonies">
+          <textarea className="kf-textarea" rows={3} placeholder="Share Translation testimonies..."
+            value={form.translationTestimonies} onChange={e => setForm(p => ({ ...p, translationTestimonies: e.target.value }))} />
+        </Field>
+        <Field label="Partnership Testimonies">
+          <textarea className="kf-textarea" rows={3} placeholder="Share Partnership testimonies..."
+            value={form.partnershipTestimonies} onChange={e => setForm(p => ({ ...p, partnershipTestimonies: e.target.value }))} />
         </Field>
       </div>
 
@@ -754,6 +816,8 @@ function MagazineForm({ onClose, onSubmit: parentSubmit }) {
     isAdult: false,
     isTeevolution: false,
     isKidsMagazine: false,
+    monthlyMinimumOrder: '',
+    amountPaidMagazine: '',
   });
   const [errors, setErrors] = useState({});
   const [submitting, setSubmitting] = useState(false);
@@ -783,6 +847,8 @@ function MagazineForm({ onClose, onSubmit: parentSubmit }) {
       isKidsMagazine:   form.isKidsMagazine,
       status:           'PENDING',
       rawDate:          new Date().toISOString().split('T')[0],
+      monthlyMinimumOrder: Number(form.monthlyMinimumOrder) || 0,
+      amountPaidMagazine:  Number(form.amountPaidMagazine) || 0,
     });
     setSubmitting(false);
   };
@@ -849,6 +915,19 @@ function MagazineForm({ onClose, onSubmit: parentSubmit }) {
         </Field>
       </div>
 
+      {/* Monthly Ordering & Payments */}
+      <div className="popup-section-head">📦 Monthly Ordering & Payments</div>
+      <div className="popup-fields">
+        <Field label="Monthly Minimum Magazine Order">
+          <input className="kf-input" type="number" min="0" placeholder="0"
+            value={form.monthlyMinimumOrder} onChange={e => setForm(p => ({ ...p, monthlyMinimumOrder: e.target.value }))} />
+        </Field>
+        <Field label="Amount paid for monthly magazine">
+          <input className="kf-input" type="number" min="0" placeholder="0.00"
+            value={form.amountPaidMagazine} onChange={e => setForm(p => ({ ...p, amountPaidMagazine: e.target.value }))} />
+        </Field>
+      </div>
+
       {/* Healing Outreaches */}
       <div className="popup-section-head">💊 Healing Outreaches</div>
       <div className="popup-fields">
@@ -900,6 +979,7 @@ function OutreachForm({ onClose, onSubmit: parentSubmit }) {
     locations: '',
     story: '',
     images: [],
+    httnMagazineTestimoniesOutreaches: '',
   });
   const [errors, setErrors] = useState({});
   const [submitting, setSubmitting] = useState(false);
@@ -923,6 +1003,7 @@ function OutreachForm({ onClose, onSubmit: parentSubmit }) {
       mediaCount:    form.images.length,
       status:        'PENDING',
       rawDate:       form.date,
+      httnMagazineTestimoniesOutreaches: form.httnMagazineTestimoniesOutreaches,
     });
     setSubmitting(false);
   };
@@ -967,6 +1048,15 @@ function OutreachForm({ onClose, onSubmit: parentSubmit }) {
         </Field>
       </div>
 
+      {/* HTTN Magazine Testimonies & Outreaches */}
+      <div className="popup-section-head">📖 HTTN Magazine Outreaches & Testimonies</div>
+      <div className="popup-fields">
+        <Field label="Healing to the Nations (HTTN) Magazine Testimonies & Outreaches">
+          <textarea className="kf-textarea" rows={4} placeholder="Enter testimonies & outreaches details..."
+            value={form.httnMagazineTestimoniesOutreaches} onChange={e => setForm(p => ({ ...p, httnMagazineTestimoniesOutreaches: e.target.value }))} />
+        </Field>
+      </div>
+
       {/* Story */}
       <div className="popup-section-head">📝 Outreach Story</div>
       <div className="popup-fields">
@@ -1004,7 +1094,9 @@ const TABS_CONFIG = [
     columns: [
       { key: 'id', label: 'Report ID' }, { key: 'rawDate', label: 'Date' },
       { key: 'zone', label: 'Zone' }, { key: 'submittedBy', label: 'Submitted By' },
-      { key: 'partners', label: 'New Partners' }, { key: 'status', label: 'Status' },
+      { key: 'partners', label: 'New Partners' }, 
+      { key: 'totalRegistrationHslhs', label: 'HSLHS Reg' },
+      { key: 'status', label: 'Status' },
     ],
     FormComponent: ZonalReportForm, btnLabel: 'Upload a New Zonal Report',
   },
@@ -1014,6 +1106,8 @@ const TABS_CONFIG = [
       { key: 'id', label: 'Report ID' }, { key: 'rawDate', label: 'Date' },
       { key: 'zonalPartnership', label: 'Zonal (Espees)' },
       { key: 'totalRemittance', label: 'Total (Espees)' },
+      { key: 'healingCrusadeSponsorship', label: 'Healing Crusade' },
+      { key: 'groupPastorsMilestones', label: 'BLAAAST Milestones' },
       { key: 'status', label: 'Status' },
     ],
     FormComponent: PartnershipForm, btnLabel: 'Upload a New Partnership Report',
@@ -1023,6 +1117,7 @@ const TABS_CONFIG = [
     columns: [
       { key: 'id', label: 'Report ID' }, { key: 'rawDate', label: 'Date' },
       { key: 'testimoniesCount', label: 'Count' },
+      { key: 'prayWithMeTestimonies', label: 'Pray With Me' },
       { key: 'testimony', label: 'Testimony (preview)' }, { key: 'status', label: 'Status' },
     ],
     FormComponent: TestimonialsForm, btnLabel: 'Upload a New Testimony',
@@ -1032,8 +1127,9 @@ const TABS_CONFIG = [
     columns: [
       { key: 'id', label: 'Report ID' }, { key: 'rawDate', label: 'Date' },
       { key: 'language', label: 'Language' },
-      { key: 'magazineType', label: 'Type' },
       { key: 'ordered', label: 'Ordered' },
+      { key: 'monthlyMinimumOrder', label: 'Min Order' },
+      { key: 'amountPaidMagazine', label: 'Amt Paid' },
       { key: 'status', label: 'Status' },
     ],
     FormComponent: MagazineForm, btnLabel: 'Upload a New Magazine Report',
@@ -1043,7 +1139,8 @@ const TABS_CONFIG = [
     columns: [
       { key: 'id', label: 'Report ID' }, { key: 'rawDate', label: 'Date' },
       { key: 'category', label: 'Category' },
-      { key: 'locations', label: 'Location(s)' }, { key: 'story', label: 'Story (preview)' },
+      { key: 'locations', label: 'Location(s)' },
+      { key: 'httnMagazineTestimoniesOutreaches', label: 'HTTN details' },
       { key: 'status', label: 'Status' },
     ],
     FormComponent: OutreachForm, btnLabel: 'Upload a New Outreach Report',
