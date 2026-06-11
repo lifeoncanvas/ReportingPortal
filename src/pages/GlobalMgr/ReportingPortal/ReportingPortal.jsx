@@ -182,6 +182,82 @@ function ReportTable({ reports, loading, columns, onView, onDownload, onApprove,
   );
 }
 
+const KEY_LABELS = {
+  // Zonal Report / Zone Info
+  zoneName: "Name of Zone",
+  zonalManager: "Zonal Manager",
+  partnershipRemittance: "Total Partnership Remittance",
+  remittancePurpose: "Purpose for each remittance",
+  trumpetsBlown: "Trumpets Blown this week",
+  newPartners: "New partners recruited",
+  testimoniesSubmitted: "Testimonies submitted to the Department",
+  healingTranslations: "Total number of Healing translations achieved",
+  healingOutreaches: "Healing outreaches held this week",
+  healingPicturesVideos: "Pictures/videos from Healing outreaches submitted",
+  pastoralAttendanceDirector: "Zonal Pastor attendance in Executive Minister's meeting",
+  managerAttendanceDirector: "Zonal Manager attendance in Executive Minister's meeting",
+  managerAttendanceStrategy: "Zonal Manager attendance in strategy meeting",
+  testimonyClarificationConcern: "Testimony, Clarification or Concern",
+  submittedByEmail: "Submitted By Email",
+  participationPrayWithMe: "Participation in Pray With Me",
+  totalRegistrationHslhs: "Total Registration for HSLHS",
+  heraldConference: "Herald Conference",
+  totalPartnershipRemittance: "Total Partnership Remittance",
+  newPartnersRecruited: "New Partners Recruited",
+  httnmTranslations: "HTTNM Translations",
+  httnmOutreachesHeld: "HTTNM Outreaches Held",
+  httnmMediaSubmitted: "HTTNM Media Submitted",
+  zonalPastorExecutiveMinistersMeeting: "Zonal Pastor attendance in Executive Minister's meeting",
+  zonalManagerExecutiveMinistersMeeting: "Zonal Manager attendance in Executive Minister's meeting",
+  zonalManagerStrategyMeeting: "Zonal Manager attendance in strategy meeting",
+  zonalManagerStrategyMeetingAttendance: "Zonal Manager attendance in strategy meeting",
+  regionName: "Region Name",
+  submittedBy: "Submitted By",
+
+  // Partnership Report
+  zonalPartnership: "Zonal Partnership (Espees)",
+  zonalPartnershipDetails: "Zonal Partnership Details",
+  groupsPartnership: "Groups Partnership (Espees)",
+  churchesPartnership: "Churches Partnership (Espees)",
+  cellPartnership: "Cell Partnership (Espees)",
+  totalRemittance: "Total Partnership Remittance (Espees)",
+  healingCrusadeSponsorship: "Healing Crusade Sponsorship (Espees)",
+  groupPastorsMilestones: "Milestones: Group Pastors Advanced in BLAAAST",
+  sponsoredTeenspirationKidspiration: "Zones/Groups that have sponsored Teenspiration and Kidspiration 300 espees Campaign",
+  notes: "State what the partnership funds/remittance were given for",
+
+  // Testimonials
+  testimony: "Share a testimony",
+  testimoniesCount: "Testimonies received this week",
+  prayWithMeTestimonies: "Pray With Me Testimonies",
+  translationTestimonies: "Translation Testimonies",
+  partnershipTestimonies: "Partnership Testimonies",
+
+  // Magazine Report
+  adultCopies: "Adult Copies Ordered",
+  adultLanguages: "Adult Language(s)",
+  teensCopies: "Teens Copies Ordered",
+  teensLanguages: "Teens Language(s)",
+  kidsCopies: "Kids Copies Ordered",
+  kidsLanguages: "Kids Language(s)",
+  ordered: "Total Ordered Copies",
+  language: "Languages",
+  received: "Total Received Copies",
+  receiptStatus: "Receipt Status",
+  reason: "Not received reason",
+  sponsoredCopies: "Sponsored Copies",
+  monthlyMinimumOrder: "Monthly Minimum Magazine Order",
+  monthlyCopiesOrdered: "Number of monthly copies ordered",
+  praiseReports: "Praise Reports",
+
+  // Outreach Report
+  date: "Date of Outreach",
+  category: "Outreach Category",
+  locations: "Outreach Location(s)",
+  story: "Outreach Story",
+  images: "Outreach Images Count"
+};
+
 // ── View Modal ─────────────────────────────────────────
 function ViewModal({ report, onClose }) {
   if (!report) return null;
@@ -200,7 +276,7 @@ function ViewModal({ report, onClose }) {
         <div className="rp-modal-body">
           {entries.map(([k, v]) => (
             <div className="rp-view-row" key={k}>
-              <span className="rp-view-label">{k.replace(/([A-Z])/g, ' $1').replace(/^./, s => s.toUpperCase())}</span>
+              <span className="rp-view-label">{KEY_LABELS[k] || k.replace(/([A-Z])/g, ' $1').replace(/^./, s => s.toUpperCase())}</span>
               <span className="rp-view-value">{String(v)}</span>
             </div>
           ))}
@@ -344,8 +420,8 @@ function ZonalReportForm({ onClose, onSubmit: parentSubmit }) {
       httnmTranslations:            Number(form.healingTranslations) || 0,
       httnmOutreachesHeld:          Number(form.healingOutreaches) || 0,
       httnmMediaSubmitted:          Number(form.healingPicturesVideos) || 0,
-      zonalPastorDirectorsMeeting:  form.pastoralAttendanceDirector,
-      zonalManagerDirectorsMeeting: form.managerAttendanceDirector,
+      zonalPastorExecutiveMinistersMeeting:  form.pastoralAttendanceDirector,
+      zonalManagerExecutiveMinistersMeeting: form.managerAttendanceDirector,
       zonalManagerStrategyMeeting:  form.managerAttendanceStrategy,
       testimonyClarificationConcern: form.testimonyClarificationConcern,
       remittancePurpose:            form.remittancePurpose,
@@ -449,7 +525,7 @@ function ZonalReportForm({ onClose, onSubmit: parentSubmit }) {
       {/* Attendance & Sponsorship */}
       <div className="popup-section-head">📅 Meetings & Sponsorship</div>
       <div className="popup-fields">
-        <Field label="Zonal Pastor's attendance in the Esteemed Director's weekly meeting?" required error={errors.pastoralAttendanceDirector}>
+        <Field label="Zonal Pastor's attendance in the Executive Minister's weekly meeting?" required error={errors.pastoralAttendanceDirector}>
           <div className="kf-select-wrap">
             <select className={`kf-select${errors.pastoralAttendanceDirector ? ' kf-input-err' : ''}`} value={form.pastoralAttendanceDirector} onChange={e => set('pastoralAttendanceDirector', e.target.value)}>
               <option value="">Please select</option>
@@ -458,7 +534,7 @@ function ZonalReportForm({ onClose, onSubmit: parentSubmit }) {
             <ChevronDown size={13} className="kf-select-chevron" />
           </div>
         </Field>
-        <Field label="Zonal Manager's attendance in the Esteemed Director's weekly meeting?" required error={errors.managerAttendanceDirector}>
+        <Field label="Zonal Manager's attendance in the Executive Minister's weekly meeting?" required error={errors.managerAttendanceDirector}>
           <div className="kf-select-wrap">
             <select className={`kf-select${errors.managerAttendanceDirector ? ' kf-input-err' : ''}`} value={form.managerAttendanceDirector} onChange={e => set('managerAttendanceDirector', e.target.value)}>
               <option value="">Please select</option>
@@ -551,7 +627,7 @@ function PartnershipForm({ onClose, onSubmit: parentSubmit }) {
     blaaast: {},
     notes: '',
     groupPastorsMilestones: '',
-    sponsoredTeenspirationKidsspiration: '',
+    sponsoredTeenspirationKidspiration: '',
   });
   const [errors, setErrors] = useState({});
   const [submitting, setSubmitting] = useState(false);
@@ -580,7 +656,7 @@ function PartnershipForm({ onClose, onSubmit: parentSubmit }) {
       status: 'submitted',
       rawDate: new Date().toISOString().split('T')[0],
       groupPastorsMilestones: form.groupPastorsMilestones,
-      sponsoredTeenspirationKidsspiration: form.sponsoredTeenspirationKidsspiration,
+      sponsoredTeenspirationKidspiration: form.sponsoredTeenspirationKidspiration,
     });
     setSubmitting(false);
   };
@@ -660,16 +736,16 @@ function PartnershipForm({ onClose, onSubmit: parentSubmit }) {
           <textarea className="kf-textarea" rows={2} placeholder="Enter names..."
             value={form.groupPastorsMilestones} onChange={e => setForm(p => ({ ...p, groupPastorsMilestones: e.target.value }))} />
         </Field>
-        <Field label="Zones/Groups that have sponsored Teenspiration and Kidsspiration 300 espees Campaign">
+        <Field label="Zones/Groups that have sponsored Teenspiration and Kidspiration 300 espees Campaign">
           <textarea className="kf-textarea" rows={2} placeholder="Enter zones/groups..."
-            value={form.sponsoredTeenspirationKidsspiration} onChange={e => setForm(p => ({ ...p, sponsoredTeenspirationKidsspiration: e.target.value }))} />
+            value={form.sponsoredTeenspirationKidspiration} onChange={e => setForm(p => ({ ...p, sponsoredTeenspirationKidspiration: e.target.value }))} />
         </Field>
       </div>
 
       <div className="popup-section-head">📝 Additional Notes</div>
       <div className="popup-fields">
-        <Field label="Recruitment notes or special mentions">
-          <textarea className="kf-textarea" rows={3} placeholder="Any recruitment notes or special mentions…"
+        <Field label="State what the partnership funds/remittance were given for">
+          <textarea className="kf-textarea" rows={3} placeholder="Provide details/breakdown of what the funds were given for…"
             value={form.notes} onChange={e => setForm(p => ({ ...p, notes: e.target.value }))} />
         </Field>
       </div>
@@ -804,95 +880,128 @@ const LANGUAGES = ['English', 'French', 'Spanish', 'Portuguese', 'Arabic', 'Chin
 
 function MagazineForm({ onClose, onSubmit: parentSubmit }) {
   const [form, setForm] = useState({
-    language: '',
-    orderedCopies: '',
+    adultCopies: '',
+    adultLanguages: '',
+    teensCopies: '',
+    teensLanguages: '',
+    kidsCopies: '',
+    kidsLanguages: '',
     receivedCopies: '',
-    received: '',
     notReceivedReason: '',
     sponsoredCopies: '',
     healingOutreaches: '',
     healingMedia: [],
-    notes: '',
-    isAdult: false,
-    isTeevolution: false,
-    isKidsMagazine: false,
+    praiseReports: '',
     monthlyMinimumOrder: '',
-    amountPaidMagazine: '',
+    monthlyCopiesOrdered: '',
   });
   const [errors, setErrors] = useState({});
   const [submitting, setSubmitting] = useState(false);
 
-  const handleSubmit = async () => {
+  const validate = () => {
     const e = {};
-    if (!form.language) e.language = 'Required';
-    if (!form.orderedCopies) e.orderedCopies = 'Required';
+    const totalOrdered = (Number(form.adultCopies) || 0) + (Number(form.teensCopies) || 0) + (Number(form.kidsCopies) || 0);
+    
+    if (totalOrdered <= 0) {
+      e.adultCopies = 'At least one magazine type must have copies ordered';
+    }
+    if (Number(form.adultCopies) > 0 && !form.adultLanguages.trim()) {
+      e.adultLanguages = 'Required when copies are specified';
+    }
+    if (Number(form.teensCopies) > 0 && !form.teensLanguages.trim()) {
+      e.teensLanguages = 'Required when copies are specified';
+    }
+    if (Number(form.kidsCopies) > 0 && !form.kidsLanguages.trim()) {
+      e.kidsLanguages = 'Required when copies are specified';
+    }
+    
     if (!String(form.receivedCopies).trim()) e.receivedCopies = 'Required';
-    if (Number(form.receivedCopies) < Number(form.orderedCopies) && !form.notReceivedReason.trim()) {
+    if (Number(form.receivedCopies) < totalOrdered && !form.notReceivedReason.trim()) {
       e.notReceivedReason = 'Please provide a reason';
     }
-    setErrors(e);
+    return e;
+  };
+
+  const handleSubmit = async () => {
+    const e = validate(); setErrors(e);
     if (Object.keys(e).length) return;
     setSubmitting(true);
     await new Promise(r => setTimeout(r, 500));
+    
+    const totalOrdered = (Number(form.adultCopies) || 0) + (Number(form.teensCopies) || 0) + (Number(form.kidsCopies) || 0);
+    const combinedLanguages = [
+      form.adultLanguages && `Adult: ${form.adultLanguages}`,
+      form.teensLanguages && `Teens: ${form.teensLanguages}`,
+      form.kidsLanguages && `Kids: ${form.kidsLanguages}`
+    ].filter(Boolean).join('; ');
+
     parentSubmit({
-      language:         form.language,
-      ordered:          Number(form.orderedCopies) || 0,
-      received:         Number(form.receivedCopies) || 0,
-      receiptStatus:    Number(form.receivedCopies) === 0 ? 'No' : (Number(form.receivedCopies) < Number(form.orderedCopies) ? 'Partial' : 'Yes'),
-      reason:           form.notReceivedReason,
-      sponsoredCopies:  Number(form.sponsoredCopies) || 0,
-      healingOutreaches: Number(form.healingOutreaches) || 0,
-      isAdult:          form.isAdult,
-      isTeevolution:    form.isTeevolution,
-      isKidsMagazine:   form.isKidsMagazine,
-      status:           'PENDING',
-      rawDate:          new Date().toISOString().split('T')[0],
-      monthlyMinimumOrder: Number(form.monthlyMinimumOrder) || 0,
-      amountPaidMagazine:  Number(form.amountPaidMagazine) || 0,
+      adultCopies:          Number(form.adultCopies) || 0,
+      adultLanguages:       form.adultLanguages,
+      teensCopies:          Number(form.teensCopies) || 0,
+      teensLanguages:       form.teensLanguages,
+      kidsCopies:           Number(form.kidsCopies) || 0,
+      kidsLanguages:        form.kidsLanguages,
+      ordered:              totalOrdered,
+      language:             combinedLanguages,
+      received:             Number(form.receivedCopies) || 0,
+      receiptStatus:        Number(form.receivedCopies) === 0 ? 'No' : (Number(form.receivedCopies) < totalOrdered ? 'Partial' : 'Yes'),
+      reason:               form.notReceivedReason,
+      sponsoredCopies:      Number(form.sponsoredCopies) || 0,
+      healingOutreaches:     Number(form.healingOutreaches) || 0,
+      isAdult:              (Number(form.adultCopies) || 0) > 0,
+      isTeevolution:        (Number(form.teensCopies) || 0) > 0,
+      isKidsMagazine:       (Number(form.kidsCopies) || 0) > 0,
+      status:               'PENDING',
+      rawDate:              new Date().toISOString().split('T')[0],
+      monthlyMinimumOrder:  Number(form.monthlyMinimumOrder) || 0,
+      monthlyCopiesOrdered: Number(form.monthlyCopiesOrdered) || 0,
+      praiseReports:        form.praiseReports,
     });
     setSubmitting(false);
   };
+
+  const totalOrdered = (Number(form.adultCopies) || 0) + (Number(form.teensCopies) || 0) + (Number(form.kidsCopies) || 0);
 
   return (
     <FormPopup title="Magazine Order Report" eyebrow="KingsForms · Magazine" icon="📚"
       onClose={onClose} onSubmit={handleSubmit} submitting={submitting} submitLabel="Submit Magazine Report">
 
       {/* Magazine Types */}
-      <div className="popup-section-head">📚 Magazine Type</div>
+      <div className="popup-section-head">📚 Please state number of magazines required for each type (adult, teens, kids)</div>
       <div className="popup-fields">
-        <div style={{ display: 'flex', gap: '2rem', flexWrap: 'wrap', padding: '0.5rem 0' }}>
-          <label className="kf-checkbox-label">
-            <input type="checkbox" checked={form.isAdult} onChange={e => setForm(p => ({ ...p, isAdult: e.target.checked }))} />
-            <span>Adult</span>
-          </label>
-          <label className="kf-checkbox-label">
-            <input type="checkbox" checked={form.isTeevolution} onChange={e => setForm(p => ({ ...p, isTeevolution: e.target.checked }))} />
-            <span>Teevolution</span>
-          </label>
-          <label className="kf-checkbox-label">
-            <input type="checkbox" checked={form.isKidsMagazine} onChange={e => setForm(p => ({ ...p, isKidsMagazine: e.target.checked }))} />
-            <span>Kids Magazine</span>
-          </label>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+          <Field label="Adult Copies" error={errors.adultCopies}>
+            <input className="kf-input" type="number" min="0" placeholder="0"
+              value={form.adultCopies} onChange={e => setForm(p => ({ ...p, adultCopies: e.target.value }))} />
+          </Field>
+          <Field label="Adult Language(s)" error={errors.adultLanguages}>
+            <input className="kf-input" placeholder="e.g. English, French"
+              value={form.adultLanguages} onChange={e => setForm(p => ({ ...p, adultLanguages: e.target.value }))} />
+          </Field>
         </div>
-      </div>
 
-      {/* Order Details */}
-      <div className="popup-section-head">🌍 Language & Quantity</div>
-      <div className="popup-fields">
-        <Field label="Language" required error={errors.language}>
-          <div className="kf-select-wrap">
-            <select className={`kf-select${errors.language ? ' kf-input-err' : ''}`} value={form.language}
-              onChange={e => setForm(p => ({ ...p, language: e.target.value }))}>
-              <option value="">Select language…</option>
-              {LANGUAGES.map(l => <option key={l} value={l}>{l}</option>)}
-            </select>
-            <ChevronDown size={13} className="kf-select-chevron" />
-          </div>
-        </Field>
-        <Field label="Number of magazines ordered" required error={errors.orderedCopies}>
-          <input className={`kf-input${errors.orderedCopies ? ' kf-input-err' : ''}`} type="number" min="0" placeholder="0"
-            value={form.orderedCopies} onChange={e => setForm(p => ({ ...p, orderedCopies: e.target.value }))} />
-        </Field>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginTop: '1rem' }}>
+          <Field label="Teens Copies" error={errors.teensCopies}>
+            <input className="kf-input" type="number" min="0" placeholder="0"
+              value={form.teensCopies} onChange={e => setForm(p => ({ ...p, teensCopies: e.target.value }))} />
+          </Field>
+          <Field label="Teens Language(s)" error={errors.teensLanguages}>
+            <input className="kf-input" placeholder="e.g. English, Spanish"
+              value={form.teensLanguages} onChange={e => setForm(p => ({ ...p, teensLanguages: e.target.value }))} />
+          </Field>
+        </div>
+
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginTop: '1rem' }}>
+          <Field label="Kids Copies" error={errors.kidsCopies}>
+            <input className="kf-input" type="number" min="0" placeholder="0"
+              value={form.kidsCopies} onChange={e => setForm(p => ({ ...p, kidsCopies: e.target.value }))} />
+          </Field>
+          <Field label="Kids Language(s)" error={errors.kidsLanguages}>
+            <input className="kf-input" placeholder="e.g. English, Portuguese"
+              value={form.kidsLanguages} onChange={e => setForm(p => ({ ...p, kidsLanguages: e.target.value }))} />
+          </Field>
+        </div>
       </div>
 
       {/* Receipt Status */}
@@ -902,7 +1011,7 @@ function MagazineForm({ onClose, onSubmit: parentSubmit }) {
           <input className={`kf-input${errors.receivedCopies ? ' kf-input-err' : ''}`} type="number" min="0" placeholder="0"
             value={form.receivedCopies} onChange={e => setForm(p => ({ ...p, receivedCopies: e.target.value }))} />
         </Field>
-        {Number(form.receivedCopies) < Number(form.orderedCopies) && form.orderedCopies !== '' && (
+        {Number(form.receivedCopies) < totalOrdered && (
           <Field label="If not received — provide reason" required error={errors.notReceivedReason}>
             <textarea className={`kf-textarea${errors.notReceivedReason ? ' kf-input-err' : ''}`} rows={3}
               placeholder="Explain why copies were not received…"
@@ -915,23 +1024,23 @@ function MagazineForm({ onClose, onSubmit: parentSubmit }) {
         </Field>
       </div>
 
-      {/* Monthly Ordering & Payments */}
-      <div className="popup-section-head">📦 Monthly Ordering & Payments</div>
+      {/* Monthly Ordering */}
+      <div className="popup-section-head">📦 Monthly Ordering</div>
       <div className="popup-fields">
         <Field label="Monthly Minimum Magazine Order">
           <input className="kf-input" type="number" min="0" placeholder="0"
             value={form.monthlyMinimumOrder} onChange={e => setForm(p => ({ ...p, monthlyMinimumOrder: e.target.value }))} />
         </Field>
-        <Field label="Amount paid for monthly magazine">
-          <input className="kf-input" type="number" min="0" placeholder="0.00"
-            value={form.amountPaidMagazine} onChange={e => setForm(p => ({ ...p, amountPaidMagazine: e.target.value }))} />
+        <Field label="Number of monthly copies ordered">
+          <input className="kf-input" type="number" min="0" placeholder="0"
+            value={form.monthlyCopiesOrdered} onChange={e => setForm(p => ({ ...p, monthlyCopiesOrdered: e.target.value }))} />
         </Field>
       </div>
 
       {/* Healing Outreaches */}
       <div className="popup-section-head">💊 Healing Outreaches</div>
       <div className="popup-fields">
-        <Field label="How many Healing Outreaches (not HTTNM outreaches) were carried out?">
+        <Field label="How many Healing Outreaches were carried out?">
           <input className="kf-input" type="number" min="0" placeholder="0"
             value={form.healingOutreaches} onChange={e => setForm(p => ({ ...p, healingOutreaches: e.target.value }))} />
         </Field>
@@ -944,7 +1053,7 @@ function MagazineForm({ onClose, onSubmit: parentSubmit }) {
                 url: (f.type.startsWith('image') || f.type.startsWith('video')) ? URL.createObjectURL(f) : null,
                 size: f.size,
               }));
-              setForm(p => ({ ...p, healingMedia: [...p.healingMedia, ...prev] }));
+              setForm(p => ({ ...p, healingMedia: [...form.healingMedia, ...prev] }));
             }}
             onRemove={i => setForm(p => ({ ...p, healingMedia: p.healingMedia.filter((_,j) => j !== i) }))}
             label="Upload Healing Outreach Photos & Videos"
@@ -953,12 +1062,12 @@ function MagazineForm({ onClose, onSubmit: parentSubmit }) {
         </Field>
       </div>
 
-      {/* Notes */}
-      <div className="popup-section-head">📝 Additional Notes</div>
+      {/* Praise Reports */}
+      <div className="popup-section-head">📝 Praise Reports</div>
       <div className="popup-fields">
-        <Field label="Any other notes">
-          <textarea className="kf-textarea" rows={2} placeholder="Any other notes…"
-            value={form.notes} onChange={e => setForm(p => ({ ...p, notes: e.target.value }))} />
+        <Field label="Praise reports">
+          <textarea className="kf-textarea" rows={2} placeholder="Share praise reports from the magazine distribution…"
+            value={form.praiseReports} onChange={e => setForm(p => ({ ...p, praiseReports: e.target.value }))} />
         </Field>
       </div>
     </FormPopup>
@@ -1129,7 +1238,7 @@ const TABS_CONFIG = [
       { key: 'language', label: 'Language' },
       { key: 'ordered', label: 'Ordered' },
       { key: 'monthlyMinimumOrder', label: 'Min Order' },
-      { key: 'amountPaidMagazine', label: 'Amt Paid' },
+      { key: 'monthlyCopiesOrdered', label: 'Monthly Ordered' },
       { key: 'status', label: 'Status' },
     ],
     FormComponent: MagazineForm, btnLabel: 'Upload a New Magazine Report',

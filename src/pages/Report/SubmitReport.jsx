@@ -14,8 +14,8 @@ const initialForm = {
   httnmTranslations: "",
   httnmOutreaches: "",
   httnmMediaSubmitted: "",
-  zonalPastorAttendance: "",
-  zonalManagerDirectorMeeting: "",
+  zonalPastorExecutiveMinistersMeeting: "",
+  zonalManagerExecutiveMinistersMeeting: "",
   zonalManagerStrategyMeeting: "",
   notes: "",
 };
@@ -51,8 +51,8 @@ const FIELDS = [
     section: "Attendance",
     icon: "✅",
     fields: [
-      { key: "zonalPastorAttendance", label: "Zonal Pastor's attendance in the Esteemed Director's weekly meeting?", type: "select", required: true },
-      { key: "zonalManagerDirectorMeeting", label: "Zonal Manager's attendance in the Esteemed Director's weekly meeting?", type: "select", required: true },
+      { key: "zonalPastorExecutiveMinistersMeeting", label: "Zonal Pastor's attendance in the Executive Minister's weekly meeting?", type: "select", required: true },
+      { key: "zonalManagerExecutiveMinistersMeeting", label: "Zonal Manager's attendance in the Executive Minister's weekly meeting?", type: "select", required: true },
       { key: "zonalManagerStrategyMeeting", label: "Zonal Manager's attendance in the weekly Managers strategy meeting?", type: "select", required: true }
     ]
   },
