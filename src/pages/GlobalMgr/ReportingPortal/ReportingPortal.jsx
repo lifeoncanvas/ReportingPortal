@@ -250,7 +250,7 @@ const KEY_LABELS = {
   reason: "Not received reason",
   sponsoredCopies: "Sponsored Copies",
   monthlyMinimumOrder: "Monthly Minimum Magazine Order",
-  monthlyCopiesOrdered: "Number of monthly copies ordered",
+  monthlyCopiesOrdered: "Cumulative number of copies sponsored for the month",
   praiseReports: "Praise Reports",
   datesReceived: "Dates Received",
   outreachLocations: "Outreach Locations",
@@ -643,11 +643,7 @@ function PartnershipForm({ onClose, onSubmit: parentSubmit }) {
     setSubmitting(true);
     await new Promise(r => setTimeout(r, 500));
     
-    // Concatenate notes and others for the notes column
-    const finalNotes = [
-      form.notes && `Given for: ${form.notes}`,
-      form.others && `Others / Any other things: ${form.others}`
-    ].filter(Boolean).join('\n\n');
+    const finalNotes = form.others || '';
 
     parentSubmit({
       zonalPartnership: form.zonalPartnership,
@@ -742,10 +738,6 @@ function PartnershipForm({ onClose, onSubmit: parentSubmit }) {
 
       <div className="popup-section-head">📝 Additional Notes</div>
       <div className="popup-fields">
-        <Field label="State what the partnership funds/remittance were given for">
-          <textarea className="kf-textarea" rows={2} placeholder="Provide details/breakdown of what the funds were given for…"
-            value={form.notes} onChange={e => setForm(p => ({ ...p, notes: e.target.value }))} />
-        </Field>
         <Field label="Others / Any other things to report">
           <textarea className="kf-textarea" rows={2} placeholder="Enter other remarks or comments..."
             value={form.others} onChange={e => setForm(p => ({ ...p, others: e.target.value }))} />
@@ -770,8 +762,8 @@ const TESTIMONY_CATEGORIES = [
 
 function TestimonialsForm({ onClose, onSubmit: parentSubmit }) {
   const [testimoniesCount, setTestimoniesCount] = useState('');
-  const [addedCategories, setAddedCategories] = useState([]);
-  const [activeCategoryTab, setActiveCategoryTab] = useState('');
+  const [addedCategories] = useState(['prayWithMe', 'translation', 'partnership', 'salvation', 'healing', 'others']);
+  const [activeCategoryTab, setActiveCategoryTab] = useState('prayWithMe');
   const [submitting, setSubmitting] = useState(false);
 
   const [categoryData, setCategoryData] = useState({
@@ -838,6 +830,7 @@ function TestimonialsForm({ onClose, onSubmit: parentSubmit }) {
       parts.push(`Attachments:\n- ` + filesList.join('\n- '));
     }
     
+    if (parts.length === 0) return null;
     return parts.join('\n\n');
   };
 
@@ -887,30 +880,6 @@ function TestimonialsForm({ onClose, onSubmit: parentSubmit }) {
         </Field>
       </div>
 
-      {/* Category Dropdown */}
-      <div className="popup-section-head">➕ Add Testimony Categories</div>
-      <div className="popup-fields">
-        <div className="kf-select-wrap" style={{ marginBottom: addedCategories.length > 0 ? '1rem' : '0' }}>
-          <select 
-            className="kf-select" 
-            value="" 
-            onChange={e => {
-              const val = e.target.value;
-              if (val && !addedCategories.includes(val)) {
-                setAddedCategories([...addedCategories, val]);
-                setActiveCategoryTab(val);
-              }
-            }}
-          >
-            <option value="">-- Choose a category to add testimony fields --</option>
-            {TESTIMONY_CATEGORIES.filter(cat => !addedCategories.includes(cat.key)).map(cat => (
-              <option key={cat.key} value={cat.key}>{cat.label}</option>
-            ))}
-          </select>
-          <ChevronDown size={13} className="kf-select-chevron" />
-        </div>
-      </div>
-
       {/* Categories sub-tabs */}
       {addedCategories.length > 0 && (
         <>
@@ -919,46 +888,24 @@ function TestimonialsForm({ onClose, onSubmit: parentSubmit }) {
               const cat = TESTIMONY_CATEGORIES.find(c => c.key === catKey);
               const isActive = activeCategoryTab === catKey;
               return (
-                <div key={catKey} style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                  <button
-                    type="button"
-                    onClick={() => setActiveCategoryTab(catKey)}
-                    style={{
-                      padding: '6px 12px',
-                      borderRadius: '4px',
-                      border: '1px solid',
-                      borderColor: isActive ? '#d97706' : '#cbd5e1',
-                      background: isActive ? '#fffbeb' : '#fff',
-                      color: isActive ? '#b45309' : '#475569',
-                      fontSize: '12px',
-                      fontWeight: 600,
-                      cursor: 'pointer'
-                    }}
-                  >
-                    {cat.label}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      const updated = addedCategories.filter(k => k !== catKey);
-                      setAddedCategories(updated);
-                      if (activeCategoryTab === catKey) {
-                        setActiveCategoryTab(updated[0] || '');
-                      }
-                    }}
-                    style={{
-                      background: 'none',
-                      border: 'none',
-                      color: '#ef4444',
-                      fontSize: '14px',
-                      cursor: 'pointer',
-                      padding: '0 4px'
-                    }}
-                    title="Remove this category"
-                  >
-                    ✕
-                  </button>
-                </div>
+                <button
+                  key={catKey}
+                  type="button"
+                  onClick={() => setActiveCategoryTab(catKey)}
+                  style={{
+                    padding: '6px 12px',
+                    borderRadius: '4px',
+                    border: '1px solid',
+                    borderColor: isActive ? '#d97706' : '#cbd5e1',
+                    background: isActive ? '#fffbeb' : '#fff',
+                    color: isActive ? '#b45309' : '#475569',
+                    fontSize: '12px',
+                    fontWeight: 600,
+                    cursor: 'pointer'
+                  }}
+                >
+                  {cat.label}
+                </button>
               );
             })}
           </div>
@@ -971,7 +918,7 @@ function TestimonialsForm({ onClose, onSubmit: parentSubmit }) {
               </div>
               
               <div className="popup-fields" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                <Field label="State number of testimonies received in this category (text and numbers allowed)">
+                <Field label="State number of testimonies received in this category">
                   <input
                     className="kf-input"
                     type="text"
@@ -1219,11 +1166,11 @@ function MagazineForm({ onClose, onSubmit: parentSubmit }) {
       {/* Monthly Ordering */}
       <div className="popup-section-head">📦 Monthly Ordering</div>
       <div className="popup-fields">
-        <Field label="Cumulative Monthly Minimum Magazine Order">
+        <Field label="Monthly Minimum Magazine Order">
           <input className="kf-input" type="number" min="0" placeholder="0"
             value={form.monthlyMinimumOrder} onChange={e => setForm(p => ({ ...p, monthlyMinimumOrder: e.target.value }))} />
         </Field>
-        <Field label="Cumulative number of copies ordered for the month (please update the total number of magazine zone has ordered)">
+        <Field label="Cumulative number of copies sponsored for the month (please update the total number of copies the zone has sponsored for the month)">
           <input className="kf-input" type="number" min="0" placeholder="0"
             value={form.monthlyCopiesOrdered} onChange={e => setForm(p => ({ ...p, monthlyCopiesOrdered: e.target.value }))} />
         </Field>
@@ -1364,7 +1311,7 @@ function OutreachForm({ onClose, onSubmit: parentSubmit }) {
         </Field>
 
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginTop: '1rem' }}>
-          <Field label="HOW MANY COPIES OF MAGAZINE WERE USED for the outreach?">
+          <Field label="How many copies of magazine were used for the outreach?">
             <input className="kf-input" type="number" min="0" placeholder="0"
               value={form.magazinesUsed} onChange={e => setForm(p => ({ ...p, magazinesUsed: e.target.value }))} />
           </Field>
@@ -1479,7 +1426,7 @@ const TABS_CONFIG = [
       { key: 'datesReceived', label: 'Dates Received' },
       { key: 'sponsoredCopies', label: 'Sponsored' },
       { key: 'monthlyMinimumOrder', label: 'Min Order' },
-      { key: 'monthlyCopiesOrdered', label: 'Monthly Ordered' },
+      { key: 'monthlyCopiesOrdered', label: 'Monthly Sponsored' },
       { key: 'healingOutreaches', label: 'Healing Outreaches' },
       { key: 'outreachLocations', label: 'Outreach Locations' },
       { key: 'status', label: 'Status' },
