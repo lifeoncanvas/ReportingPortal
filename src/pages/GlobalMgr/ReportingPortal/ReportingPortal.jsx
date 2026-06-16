@@ -214,17 +214,7 @@ const KEY_LABELS = {
   regionName: "Region Name",
   submittedBy: "Submitted By",
 
-  // Partnership Report
-  zonalPartnership: "Zonal Partnership (Espees)",
-  zonalPartnershipDetails: "Zonal Partnership Details",
-  groupsPartnership: "Groups Partnership (Espees)",
-  churchesPartnership: "Churches Partnership (Espees)",
-  cellPartnership: "Cell Partnership (Espees)",
-  totalRemittance: "Total Partnership Remittance (Espees)",
-  healingCrusadeSponsorship: "Healing Crusade Sponsorship (Espees)",
-  groupPastorsMilestones: "Milestones: Group Pastors Advanced in BLAAAST",
-  sponsoredTeenspirationKidspiration: "Zones/Groups that have sponsored Teenspiration and Kidspiration 300 espees Campaign",
-  notes: "State what the partnership funds/remittance were given for",
+
 
   // Testimonials
   testimony: "Share a testimony",
@@ -232,6 +222,19 @@ const KEY_LABELS = {
   prayWithMeTestimonies: "Pray With Me Testimonies",
   translationTestimonies: "Translation Testimonies",
   partnershipTestimonies: "Partnership Testimonies",
+  salvationTestimonies: "Salvation Testimonies",
+  healingTestimonies: "Healing Testimonies",
+  othersTestimonies: "Others Testimonies",
+
+  // Partnership fields
+  zonalPartnership: "Zonal Partnership",
+  zonalPartnershipDetails: "Zonal Partnership Details",
+  groupsPartnership: "Group Partnership",
+  churchesPartnership: "Church Partnership",
+  cellPartnership: "Cell Partnership",
+  sponsoredTeenspiration: "Teenspiration 300 Sponsored",
+  sponsoredKidspiration: "Kidspiration 300 Sponsored",
+
 
   // Magazine Report
   adultCopies: "Adult Copies Ordered",
@@ -622,14 +625,12 @@ function PartnershipForm({ onClose, onSubmit: parentSubmit }) {
     groupsPartnership: '',
     churchesPartnership: '',
     cellPartnership: '',
-    totalRemittance: '',
-    healingCrusadeSponsorship: '',
     blaaast: {},
     notes: '',
+    others: '',
     groupPastorsMilestones: '',
-    sponsoredTeenspirationKidspiration: '',
-  });
-  const [errors, setErrors] = useState({});
+    sponsoredTeenspiration: '',
+    sponsoredKidspiration: '',
   const [submitting, setSubmitting] = useState(false);
 
   const setBlaaast = (key, val) => {
@@ -638,25 +639,29 @@ function PartnershipForm({ onClose, onSubmit: parentSubmit }) {
   };
 
   const handleSubmit = async () => {
-    const e = {};
-    if (!form.totalRemittance.trim()) e.totalRemittance = 'Required';
-    setErrors(e);
-    if (Object.keys(e).length) return;
     setSubmitting(true);
     await new Promise(r => setTimeout(r, 500));
+    
+    // Concatenate notes and others for the notes column
+    const finalNotes = [
+      form.notes && `Given for: ${form.notes}`,
+      form.others && `Others / Any other things: ${form.others}`
+    ].filter(Boolean).join('\n\n');
+
     parentSubmit({
       zonalPartnership: form.zonalPartnership,
       zonalPartnershipDetails: form.zonalPartnershipDetails,
       groupsPartnership: form.groupsPartnership,
       churchesPartnership: form.churchesPartnership,
       cellPartnership: form.cellPartnership,
-      totalRemittance: form.totalRemittance,
-      healingCrusadeSponsorship: Number(form.healingCrusadeSponsorship) || 0,
-      notes: form.notes,
+      totalRemittance: 0.00,
+      healingCrusadeSponsorship: 0.00,
+      notes: finalNotes,
       status: 'submitted',
       rawDate: new Date().toISOString().split('T')[0],
       groupPastorsMilestones: form.groupPastorsMilestones,
-      sponsoredTeenspirationKidspiration: form.sponsoredTeenspirationKidspiration,
+      sponsoredTeenspiration: form.sponsoredTeenspiration,
+      sponsoredKidspiration: form.sponsoredKidspiration,
     });
     setSubmitting(false);
   };
@@ -668,41 +673,29 @@ function PartnershipForm({ onClose, onSubmit: parentSubmit }) {
       <div className="popup-section-head">💼 Partnership Breakdown (Espees)</div>
       <div className="popup-fields">
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '1rem', alignItems: 'start' }}>
-          <Field label="Zonal Partnership">
-            <input className="kf-input" type="number" min="0" placeholder="0"
+          <Field label="Zonal Partnership for this week">
+            <input className="kf-input" type="text" placeholder="Enter zonal partnership (e.g. 5000 espees)..."
               value={form.zonalPartnership} onChange={e => setForm(p => ({ ...p, zonalPartnership: e.target.value }))} />
           </Field>
-          <Field label="Zonal Partnership Details">
+          <Field label="Zonal Partnership Details (kindly state how much was given for each arms eg hslhs,httnm,craudes etc )">
             <textarea className="kf-textarea" rows={1} placeholder="Enter details..."
               value={form.zonalPartnershipDetails} onChange={e => setForm(p => ({ ...p, zonalPartnershipDetails: e.target.value }))} />
           </Field>
         </div>
         
-        <Field label="Groups Partnership">
-          <input className="kf-input" type="number" min="0" placeholder="0"
+        <Field label="Group Partnership (state how much was remitted by each group)">
+          <input className="kf-input" type="text" placeholder="Enter group partnership..."
             value={form.groupsPartnership} onChange={e => setForm(p => ({ ...p, groupsPartnership: e.target.value }))} />
         </Field>
         
-        <Field label="Churches Partnership">
-          <input className="kf-input" type="number" min="0" placeholder="0"
+        <Field label="Church Partnership (state how much came within each church)">
+          <input className="kf-input" type="text" placeholder="Enter church partnership..."
             value={form.churchesPartnership} onChange={e => setForm(p => ({ ...p, churchesPartnership: e.target.value }))} />
         </Field>
         
-        <Field label="Cell Partnership">
-          <input className="kf-input" type="number" min="0" placeholder="0"
+        <Field label="Cell Partnership (state how much came within each cell)">
+          <input className="kf-input" type="text" placeholder="Enter cell partnership..."
             value={form.cellPartnership} onChange={e => setForm(p => ({ ...p, cellPartnership: e.target.value }))} />
-        </Field>
-      </div>
-
-      <div className="popup-section-head">📊 Summary</div>
-      <div className="popup-fields">
-        <Field label="Total Partnership Remittance (Espees)" required error={errors.totalRemittance}>
-          <input className={`kf-input${errors.totalRemittance ? ' kf-input-err' : ''}`} type="number" min="0" placeholder="0"
-            value={form.totalRemittance} onChange={e => setForm(p => ({ ...p, totalRemittance: e.target.value }))} />
-        </Field>
-        <Field label="How much Sponsorship was given for the Healing Crusade this week?">
-          <input className="kf-input" type="number" min="0" placeholder="0"
-            value={form.healingCrusadeSponsorship} onChange={e => setForm(p => ({ ...p, healingCrusadeSponsorship: e.target.value }))} />
         </Field>
       </div>
 
@@ -732,21 +725,29 @@ function PartnershipForm({ onClose, onSubmit: parentSubmit }) {
 
       <div className="popup-section-head">🏆 Milestones & Campaigns</div>
       <div className="popup-fields">
-        <Field label="Names of group Pastors that have advanced in the BLAAAST Milestones">
+        <Field label="Names of group Pastors that have advanced in the BLAAAST Milestones (please state name and current milestones)">
           <textarea className="kf-textarea" rows={2} placeholder="Enter names..."
             value={form.groupPastorsMilestones} onChange={e => setForm(p => ({ ...p, groupPastorsMilestones: e.target.value }))} />
         </Field>
-        <Field label="Zones/Groups that have sponsored Teenspiration and Kidspiration 300 espees Campaign">
-          <textarea className="kf-textarea" rows={2} placeholder="Enter zones/groups..."
-            value={form.sponsoredTeenspirationKidspiration} onChange={e => setForm(p => ({ ...p, sponsoredTeenspirationKidspiration: e.target.value }))} />
+        <Field label="pastors and members that have sponsored Teenspiration 300 espees this week">
+          <textarea className="kf-textarea" rows={2} placeholder="Enter names..."
+            value={form.sponsoredTeenspiration} onChange={e => setForm(p => ({ ...p, sponsoredTeenspiration: e.target.value }))} />
+        </Field>
+        <Field label="pastors and members that have sponsored Kidspiration 300 espees this week">
+          <textarea className="kf-textarea" rows={2} placeholder="Enter names..."
+            value={form.sponsoredKidspiration} onChange={e => setForm(p => ({ ...p, sponsoredKidspiration: e.target.value }))} />
         </Field>
       </div>
 
       <div className="popup-section-head">📝 Additional Notes</div>
       <div className="popup-fields">
         <Field label="State what the partnership funds/remittance were given for">
-          <textarea className="kf-textarea" rows={3} placeholder="Provide details/breakdown of what the funds were given for…"
+          <textarea className="kf-textarea" rows={2} placeholder="Provide details/breakdown of what the funds were given for…"
             value={form.notes} onChange={e => setForm(p => ({ ...p, notes: e.target.value }))} />
+        </Field>
+        <Field label="Others / Any other things to report">
+          <textarea className="kf-textarea" rows={2} placeholder="Enter other remarks or comments..."
+            value={form.others} onChange={e => setForm(p => ({ ...p, others: e.target.value }))} />
         </Field>
       </div>
     </FormPopup>
@@ -757,49 +758,117 @@ function PartnershipForm({ onClose, onSubmit: parentSubmit }) {
 // ══════════════════════════════════════════════════════
 // TESTIMONIALS FORM
 // ══════════════════════════════════════════════════════
+const TESTIMONY_CATEGORIES = [
+  { key: 'prayWithMe', label: 'Pray With Me Testimonies' },
+  { key: 'translation', label: 'Translation Testimonies' },
+  { key: 'partnership', label: 'Partnership Testimonies' },
+  { key: 'salvation', label: 'Salvation Testimonies' },
+  { key: 'healing', label: 'Healing Testimonies' },
+  { key: 'others', label: 'Others' }
+];
+
 function TestimonialsForm({ onClose, onSubmit: parentSubmit }) {
-  const [form, setForm] = useState({
-    testimony: '',
-    testimoniesCount: '',
-    beforeImages: [],
-    afterImages: [],
-    documents: [],   // video, PDF, Word
-    prayWithMeTestimonies: '',
-    translationTestimonies: '',
-    partnershipTestimonies: '',
-  });
-  const [errors, setErrors] = useState({});
+  const [testimoniesCount, setTestimoniesCount] = useState('');
+  const [addedCategories, setAddedCategories] = useState([]);
+  const [activeCategoryTab, setActiveCategoryTab] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
-  const addFiles = (field, files) => {
+  const [categoryData, setCategoryData] = useState({
+    prayWithMe: { count: '', text: '', documents: [], videos: [], beforeImages: [], afterImages: [] },
+    translation: { count: '', text: '', documents: [], videos: [], beforeImages: [], afterImages: [] },
+    partnership: { count: '', text: '', documents: [], videos: [], beforeImages: [], afterImages: [] },
+    salvation: { count: '', text: '', documents: [], videos: [], beforeImages: [], afterImages: [] },
+    healing: { count: '', text: '', documents: [], videos: [], beforeImages: [], afterImages: [] },
+    others: { count: '', text: '', documents: [], videos: [], beforeImages: [], afterImages: [] }
+  });
+
+  const addCategoryFiles = (catKey, field, files) => {
     const prev = files.map(f => ({
       name: f.name, type: f.type,
-      url: f.type.startsWith('image') ? URL.createObjectURL(f) : f.type.startsWith('video') ? URL.createObjectURL(f) : null,
+      url: (f.type.startsWith('image') || f.type.startsWith('video')) ? URL.createObjectURL(f) : null,
       size: f.size,
     }));
-    setForm(p => ({ ...p, [field]: [...p[field], ...prev] }));
+    setCategoryData(prevData => ({
+      ...prevData,
+      [catKey]: {
+        ...prevData[catKey],
+        [field]: [...prevData[catKey][field], ...prev]
+      }
+    }));
   };
-  const removeFile = (field, i) => setForm(p => ({ ...p, [field]: p[field].filter((_,j) => j !== i) }));
+
+  const removeCategoryFile = (catKey, field, idx) => {
+    setCategoryData(prevData => ({
+      ...prevData,
+      [catKey]: {
+        ...prevData[catKey],
+        [field]: prevData[catKey][field].filter((_, i) => i !== idx)
+      }
+    }));
+  };
+
+  const formatCategoryContent = (catKey, label) => {
+    const data = categoryData[catKey];
+    if (!addedCategories.includes(catKey)) return null;
+    
+    let parts = [];
+    if (data.count) {
+      parts.push(`Count: ${data.count}`);
+    }
+    if (data.text) {
+      parts.push(`Details: ${data.text}`);
+    }
+    
+    const filesList = [];
+    if (data.documents.length > 0) {
+      filesList.push(`Documents (${data.documents.length}): ${data.documents.map(f => f.name).join(', ')}`);
+    }
+    if (data.videos.length > 0) {
+      filesList.push(`Videos (${data.videos.length}): ${data.videos.map(f => f.name).join(', ')}`);
+    }
+    if (data.beforeImages.length > 0) {
+      filesList.push(`Before Images (${data.beforeImages.length}): ${data.beforeImages.map(f => f.name).join(', ')}`);
+    }
+    if (data.afterImages.length > 0) {
+      filesList.push(`After Images (${data.afterImages.length}): ${data.afterImages.map(f => f.name).join(', ')}`);
+    }
+    
+    if (filesList.length > 0) {
+      parts.push(`Attachments:\n- ` + filesList.join('\n- '));
+    }
+    
+    return parts.join('\n\n');
+  };
 
   const handleSubmit = async () => {
-    const e = {};
-    // testimony is now NOT mandatory
-    setErrors(e);
-    if (Object.keys(e).length) return;
     setSubmitting(true);
     await new Promise(r => setTimeout(r, 500));
-    // Payload matches testimonial_reports table columns
+
+    let totalBefore = 0;
+    let totalAfter = 0;
+    let totalDocs = 0;
+
+    addedCategories.forEach(catKey => {
+      const data = categoryData[catKey];
+      totalBefore += data.beforeImages.length;
+      totalAfter += data.afterImages.length;
+      totalDocs += data.documents.length + data.videos.length;
+    });
+
     parentSubmit({
-      testimony:        form.testimony || '(No written testimony)',
-      testimoniesCount: Number(form.testimoniesCount) || 0,
-      beforeImages:     form.beforeImages.length,
-      afterImages:      form.afterImages.length,
-      documents:        form.documents.length,
-      status:           'PENDING',
-      rawDate:          new Date().toISOString().split('T')[0],
-      prayWithMeTestimonies: form.prayWithMeTestimonies,
-      translationTestimonies: form.translationTestimonies,
-      partnershipTestimonies: form.partnershipTestimonies,
+      testimony: '(Categorized testimonies submitted)',
+      testimoniesCount: Number(testimoniesCount) || 0,
+      beforeImages: totalBefore,
+      afterImages: totalAfter,
+      documents: totalDocs,
+      status: 'PENDING',
+      rawDate: new Date().toISOString().split('T')[0],
+      prayWithMeTestimonies: formatCategoryContent('prayWithMe', 'Pray With Me Testimonies'),
+      translationTestimonies: formatCategoryContent('translation', 'Translation Testimonies'),
+      partnershipTestimonies: formatCategoryContent('partnership', 'Partnership Testimonies'),
+      salvationTestimonies: formatCategoryContent('salvation', 'Salvation Testimonies'),
+      healingTestimonies: formatCategoryContent('healing', 'Healing Testimonies'),
+      othersTestimonies: formatCategoryContent('others', 'Others'),
     });
     setSubmitting(false);
   };
@@ -809,65 +878,179 @@ function TestimonialsForm({ onClose, onSubmit: parentSubmit }) {
       onClose={onClose} onSubmit={handleSubmit} submitting={submitting} submitLabel="Submit Testimony">
 
       {/* Count */}
-      <div className="popup-section-head">📊 Testimonies Count</div>
+      <div className="popup-section-head">📊 Overall Count</div>
       <div className="popup-fields">
-        <Field label="How many testimonies were received this week?" hint="(e.g. partnership, healing, salvation, etc.)">
+        <Field label="1. How many testimonies were received this week from your zone">
           <input className="kf-input" type="number" min="0" placeholder="0"
-            value={form.testimoniesCount} onChange={e => setForm(p => ({ ...p, testimoniesCount: e.target.value }))} />
+            value={testimoniesCount} onChange={e => setTestimoniesCount(e.target.value)} />
         </Field>
       </div>
 
-      {/* Written testimony — no longer mandatory */}
-      <div className="popup-section-head">✍️ Written Testimony</div>
+      {/* Category Dropdown */}
+      <div className="popup-section-head">➕ Add Testimony Categories</div>
       <div className="popup-fields">
-        <Field label="Share a testimony" hint="(optional)">
-          <textarea className="kf-textarea" rows={6}
-            placeholder="Write your testimony here — what happened, how you were impacted, what God did…"
-            value={form.testimony} onChange={e => setForm(p => ({ ...p, testimony: e.target.value }))} />
-        </Field>
+        <div className="kf-select-wrap" style={{ marginBottom: addedCategories.length > 0 ? '1rem' : '0' }}>
+          <select 
+            className="kf-select" 
+            value="" 
+            onChange={e => {
+              const val = e.target.value;
+              if (val && !addedCategories.includes(val)) {
+                setAddedCategories([...addedCategories, val]);
+                setActiveCategoryTab(val);
+              }
+            }}
+          >
+            <option value="">-- Choose a category to add testimony fields --</option>
+            {TESTIMONY_CATEGORIES.filter(cat => !addedCategories.includes(cat.key)).map(cat => (
+              <option key={cat.key} value={cat.key}>{cat.label}</option>
+            ))}
+          </select>
+          <ChevronDown size={13} className="kf-select-chevron" />
+        </div>
       </div>
 
-      {/* Testimony Categories */}
-      <div className="popup-section-head">✍️ Testimony Categories</div>
-      <div className="popup-fields">
-        <Field label="Pray With Me Testimonies">
-          <textarea className="kf-textarea" rows={3} placeholder="Share Pray With Me testimonies..."
-            value={form.prayWithMeTestimonies} onChange={e => setForm(p => ({ ...p, prayWithMeTestimonies: e.target.value }))} />
-        </Field>
-        <Field label="Translation Testimonies">
-          <textarea className="kf-textarea" rows={3} placeholder="Share Translation testimonies..."
-            value={form.translationTestimonies} onChange={e => setForm(p => ({ ...p, translationTestimonies: e.target.value }))} />
-        </Field>
-        <Field label="Partnership Testimonies">
-          <textarea className="kf-textarea" rows={3} placeholder="Share Partnership testimonies..."
-            value={form.partnershipTestimonies} onChange={e => setForm(p => ({ ...p, partnershipTestimonies: e.target.value }))} />
-        </Field>
-      </div>
+      {/* Categories sub-tabs */}
+      {addedCategories.length > 0 && (
+        <>
+          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', padding: '12px 32px', background: '#f8fafc', borderBottom: '1px solid #e2e8f0' }}>
+            {addedCategories.map(catKey => {
+              const cat = TESTIMONY_CATEGORIES.find(c => c.key === catKey);
+              const isActive = activeCategoryTab === catKey;
+              return (
+                <div key={catKey} style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                  <button
+                    type="button"
+                    onClick={() => setActiveCategoryTab(catKey)}
+                    style={{
+                      padding: '6px 12px',
+                      borderRadius: '4px',
+                      border: '1px solid',
+                      borderColor: isActive ? '#d97706' : '#cbd5e1',
+                      background: isActive ? '#fffbeb' : '#fff',
+                      color: isActive ? '#b45309' : '#475569',
+                      fontSize: '12px',
+                      fontWeight: 600,
+                      cursor: 'pointer'
+                    }}
+                  >
+                    {cat.label}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const updated = addedCategories.filter(k => k !== catKey);
+                      setAddedCategories(updated);
+                      if (activeCategoryTab === catKey) {
+                        setActiveCategoryTab(updated[0] || '');
+                      }
+                    }}
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      color: '#ef4444',
+                      fontSize: '14px',
+                      cursor: 'pointer',
+                      padding: '0 4px'
+                    }}
+                    title="Remove this category"
+                  >
+                    ✕
+                  </button>
+                </div>
+              );
+            })}
+          </div>
 
-      {/* Before & After */}
-      <div className="popup-section-head">🖼️ Before &amp; After Images</div>
-      <div className="popup-fields">
-        <Field label="Before Images (optional)">
-          <MediaUploader files={form.beforeImages} onAdd={f => addFiles('beforeImages', f)} onRemove={i => removeFile('beforeImages', i)} label="Upload Before Images" accept="image/*" />
-        </Field>
-        <Field label="After Images (optional)">
-          <MediaUploader files={form.afterImages} onAdd={f => addFiles('afterImages', f)} onRemove={i => removeFile('afterImages', i)} label="Upload After Images" accept="image/*" />
-        </Field>
-      </div>
+          {/* Sub-tab content */}
+          {activeCategoryTab && (
+            <div style={{ padding: '20px 32px', borderBottom: '1px solid #e8edf2' }}>
+              <div style={{ fontSize: '14px', fontWeight: 'bold', color: '#b45309', marginBottom: '16px', textTransform: 'uppercase' }}>
+                ✏️ {TESTIMONY_CATEGORIES.find(c => c.key === activeCategoryTab).label} Details
+              </div>
+              
+              <div className="popup-fields" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                <Field label="State number of testimonies received in this category (text and numbers allowed)">
+                  <input
+                    className="kf-input"
+                    type="text"
+                    placeholder="e.g. 5, or 'Five healing testimonies'..."
+                    value={categoryData[activeCategoryTab].count}
+                    onChange={e => {
+                      const val = e.target.value;
+                      setCategoryData(prev => ({
+                        ...prev,
+                        [activeCategoryTab]: { ...prev[activeCategoryTab], count: val }
+                      }));
+                    }}
+                  />
+                </Field>
 
-      {/* Video / Document upload */}
-      <div className="popup-section-head">🎥 Video &amp; Written Testimonies</div>
-      <div className="popup-fields">
-        <Field label="Upload video, PDF, or Word document testimonies (optional)">
-          <MediaUploader
-            files={form.documents}
-            onAdd={f => addFiles('documents', f)}
-            onRemove={i => removeFile('documents', i)}
-            label="Upload Video / PDF / Word Files"
-            accept="video/*,.pdf,.doc,.docx"
-          />
-        </Field>
-      </div>
+                <Field label="Testimony Text / Details">
+                  <textarea
+                    className="kf-textarea"
+                    rows={4}
+                    placeholder="Enter written testimony details..."
+                    value={categoryData[activeCategoryTab].text}
+                    onChange={e => {
+                      const val = e.target.value;
+                      setCategoryData(prev => ({
+                        ...prev,
+                        [activeCategoryTab]: { ...prev[activeCategoryTab], text: val }
+                      }));
+                    }}
+                  />
+                </Field>
+
+                {/* Uploads */}
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                  <Field label="Upload PDF or Word files (optional)">
+                    <MediaUploader
+                      files={categoryData[activeCategoryTab].documents}
+                      onAdd={files => addCategoryFiles(activeCategoryTab, 'documents', files)}
+                      onRemove={i => removeCategoryFile(activeCategoryTab, 'documents', i)}
+                      label="Upload PDF / Word"
+                      accept=".pdf,.doc,.docx"
+                    />
+                  </Field>
+
+                  <Field label="Upload Video testimony (optional)">
+                    <MediaUploader
+                      files={categoryData[activeCategoryTab].videos}
+                      onAdd={files => addCategoryFiles(activeCategoryTab, 'videos', files)}
+                      onRemove={i => removeCategoryFile(activeCategoryTab, 'videos', i)}
+                      label="Upload Video"
+                      accept="video/*"
+                    />
+                  </Field>
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginTop: '8px' }}>
+                  <Field label="Before Images (optional)">
+                    <MediaUploader
+                      files={categoryData[activeCategoryTab].beforeImages}
+                      onAdd={files => addCategoryFiles(activeCategoryTab, 'beforeImages', files)}
+                      onRemove={i => removeCategoryFile(activeCategoryTab, 'beforeImages', i)}
+                      label="Upload Before Images"
+                      accept="image/*"
+                    />
+                  </Field>
+
+                  <Field label="After Images (optional)">
+                    <MediaUploader
+                      files={categoryData[activeCategoryTab].afterImages}
+                      onAdd={files => addCategoryFiles(activeCategoryTab, 'afterImages', files)}
+                      onRemove={i => removeCategoryFile(activeCategoryTab, 'afterImages', i)}
+                      label="Upload After Images"
+                      accept="image/*"
+                    />
+                  </Field>
+                </div>
+              </div>
+            </div>
+          )}
+        </>
+      )}
     </FormPopup>
   );
 }
@@ -1213,10 +1396,13 @@ const TABS_CONFIG = [
     id: 'partnership', label: 'Partnership Report', icon: <Heart size={14} />, emoji: '🤝', color: '#16a34a',
     columns: [
       { key: 'id', label: 'Report ID' }, { key: 'rawDate', label: 'Date' },
-      { key: 'zonalPartnership', label: 'Zonal (Espees)' },
-      { key: 'totalRemittance', label: 'Total (Espees)' },
-      { key: 'healingCrusadeSponsorship', label: 'Healing Crusade' },
+      { key: 'zonalPartnership', label: 'Zonal Partnership' },
+      { key: 'groupsPartnership', label: 'Groups' },
+      { key: 'churchesPartnership', label: 'Churches' },
+      { key: 'cellPartnership', label: 'Cell' },
       { key: 'groupPastorsMilestones', label: 'BLAAAST Milestones' },
+      { key: 'sponsoredTeenspiration', label: 'Teenspiration 300' },
+      { key: 'sponsoredKidspiration', label: 'Kidspiration 300' },
       { key: 'status', label: 'Status' },
     ],
     FormComponent: PartnershipForm, btnLabel: 'Upload a New Partnership Report',
@@ -1227,7 +1413,12 @@ const TABS_CONFIG = [
       { key: 'id', label: 'Report ID' }, { key: 'rawDate', label: 'Date' },
       { key: 'testimoniesCount', label: 'Count' },
       { key: 'prayWithMeTestimonies', label: 'Pray With Me' },
-      { key: 'testimony', label: 'Testimony (preview)' }, { key: 'status', label: 'Status' },
+      { key: 'translationTestimonies', label: 'Translation' },
+      { key: 'partnershipTestimonies', label: 'Partnership' },
+      { key: 'salvationTestimonies', label: 'Salvation' },
+      { key: 'healingTestimonies', label: 'Healing' },
+      { key: 'othersTestimonies', label: 'Others' },
+      { key: 'status', label: 'Status' },
     ],
     FormComponent: TestimonialsForm, btnLabel: 'Upload a New Testimony',
   },
