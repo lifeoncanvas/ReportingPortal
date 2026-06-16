@@ -252,13 +252,21 @@ const KEY_LABELS = {
   monthlyMinimumOrder: "Monthly Minimum Magazine Order",
   monthlyCopiesOrdered: "Number of monthly copies ordered",
   praiseReports: "Praise Reports",
+  datesReceived: "Dates Received",
+  outreachLocations: "Outreach Locations",
 
   // Outreach Report
   date: "Date of Outreach",
   category: "Outreach Category",
   locations: "Outreach Location(s)",
   story: "Outreach Story",
-  images: "Outreach Images Count"
+  images: "Outreach Images Count",
+  magazinesUsed: "Magazines Used",
+  peopleInvolved: "People Involved",
+  totalAttendance: "Total Attendance",
+  soulsSaved: "Souls Saved",
+  outreachTestimonies: "Outreach Testimonies",
+  followUpPlan: "Follow-up Plan",
 };
 
 // ── View Modal ─────────────────────────────────────────
@@ -597,15 +605,7 @@ function ZonalReportForm({ onClose, onSubmit: parentSubmit }) {
 // ══════════════════════════════════════════════════════
 // PARTNERSHIP REPORT FORM
 // ══════════════════════════════════════════════════════
-const PARTNERSHIP_ARMS = [
-  { key: 'rhapsody',       label: 'Rhapsody of Realities', icon: '📖' },
-  { key: 'healingSchool',  label: 'The Healing School',    icon: '🏥' },
-  { key: 'lbn',            label: 'LBN',                   icon: '📡' },
-  { key: 'loveworldTV',    label: 'Loveworld TV Ministry', icon: '📺' },
-  { key: 'bibleSponsorship', label: 'Bible Sponsorship',   icon: '✝️' },
-  { key: 'innercity',      label: 'Innercity Mission',     icon: '🏙️' },
-  { key: 'internetMultimedia', label: 'Internet Multimedia', icon: '🌐' },
-];
+
 
 const BLAAAST_CATEGORIES = [
   { key: 'joyfulSound',      label: 'Make a Joyful Sound',        amount: '30 Espees' },
@@ -631,6 +631,7 @@ function PartnershipForm({ onClose, onSubmit: parentSubmit }) {
     groupPastorsMilestones: '',
     sponsoredTeenspiration: '',
     sponsoredKidspiration: '',
+  });
   const [submitting, setSubmitting] = useState(false);
 
   const setBlaaast = (key, val) => {
@@ -1059,7 +1060,7 @@ function TestimonialsForm({ onClose, onSubmit: parentSubmit }) {
 // ══════════════════════════════════════════════════════
 // MAGAZINE FORM
 // ══════════════════════════════════════════════════════
-const LANGUAGES = ['English', 'French', 'Spanish', 'Portuguese', 'Arabic', 'Chinese', 'Swahili', 'Hausa', 'Yoruba', 'Igbo', 'Other'];
+
 
 function MagazineForm({ onClose, onSubmit: parentSubmit }) {
   const [form, setForm] = useState({
@@ -1077,6 +1078,8 @@ function MagazineForm({ onClose, onSubmit: parentSubmit }) {
     praiseReports: '',
     monthlyMinimumOrder: '',
     monthlyCopiesOrdered: '',
+    datesReceived: '',
+    outreachLocations: '',
   });
   const [errors, setErrors] = useState({});
   const [submitting, setSubmitting] = useState(false);
@@ -1140,6 +1143,8 @@ function MagazineForm({ onClose, onSubmit: parentSubmit }) {
       monthlyMinimumOrder:  Number(form.monthlyMinimumOrder) || 0,
       monthlyCopiesOrdered: Number(form.monthlyCopiesOrdered) || 0,
       praiseReports:        form.praiseReports,
+      datesReceived:        form.datesReceived,
+      outreachLocations:    form.outreachLocations,
     });
     setSubmitting(false);
   };
@@ -1194,6 +1199,10 @@ function MagazineForm({ onClose, onSubmit: parentSubmit }) {
           <input className={`kf-input${errors.receivedCopies ? ' kf-input-err' : ''}`} type="number" min="0" placeholder="0"
             value={form.receivedCopies} onChange={e => setForm(p => ({ ...p, receivedCopies: e.target.value }))} />
         </Field>
+        <Field label="Dates received">
+          <input className="kf-input" placeholder="e.g. 12th Oct, 14th Oct..."
+            value={form.datesReceived} onChange={e => setForm(p => ({ ...p, datesReceived: e.target.value }))} />
+        </Field>
         {Number(form.receivedCopies) < totalOrdered && (
           <Field label="If not received — provide reason" required error={errors.notReceivedReason}>
             <textarea className={`kf-textarea${errors.notReceivedReason ? ' kf-input-err' : ''}`} rows={3}
@@ -1201,7 +1210,7 @@ function MagazineForm({ onClose, onSubmit: parentSubmit }) {
               value={form.notReceivedReason} onChange={e => setForm(p => ({ ...p, notReceivedReason: e.target.value }))} />
           </Field>
         )}
-        <Field label="How many copies were sponsored for the week?">
+        <Field label="How many copies were sponsored this week? (please state no. of copies received and sponsored for the week)">
           <input className="kf-input" type="number" min="0" placeholder="0"
             value={form.sponsoredCopies} onChange={e => setForm(p => ({ ...p, sponsoredCopies: e.target.value }))} />
         </Field>
@@ -1210,11 +1219,11 @@ function MagazineForm({ onClose, onSubmit: parentSubmit }) {
       {/* Monthly Ordering */}
       <div className="popup-section-head">📦 Monthly Ordering</div>
       <div className="popup-fields">
-        <Field label="Monthly Minimum Magazine Order">
+        <Field label="Cumulative Monthly Minimum Magazine Order">
           <input className="kf-input" type="number" min="0" placeholder="0"
             value={form.monthlyMinimumOrder} onChange={e => setForm(p => ({ ...p, monthlyMinimumOrder: e.target.value }))} />
         </Field>
-        <Field label="Number of monthly copies ordered">
+        <Field label="Cumulative number of copies ordered for the month (please update the total number of magazine zone has ordered)">
           <input className="kf-input" type="number" min="0" placeholder="0"
             value={form.monthlyCopiesOrdered} onChange={e => setForm(p => ({ ...p, monthlyCopiesOrdered: e.target.value }))} />
         </Field>
@@ -1223,9 +1232,13 @@ function MagazineForm({ onClose, onSubmit: parentSubmit }) {
       {/* Healing Outreaches */}
       <div className="popup-section-head">💊 Healing Outreaches</div>
       <div className="popup-fields">
-        <Field label="How many Healing Outreaches were carried out?">
+        <Field label="How many Healing Outreaches were carried out this week?">
           <input className="kf-input" type="number" min="0" placeholder="0"
             value={form.healingOutreaches} onChange={e => setForm(p => ({ ...p, healingOutreaches: e.target.value }))} />
+        </Field>
+        <Field label="State the location of outreaches (e.g. market, hospitals, school, etc.)">
+          <input className="kf-input" placeholder="e.g. local market, community school..."
+            value={form.outreachLocations} onChange={e => setForm(p => ({ ...p, outreachLocations: e.target.value }))} />
         </Field>
         <Field label="Upload pictures and videos from the Healing Outreach">
           <MediaUploader
@@ -1248,7 +1261,7 @@ function MagazineForm({ onClose, onSubmit: parentSubmit }) {
       {/* Praise Reports */}
       <div className="popup-section-head">📝 Praise Reports</div>
       <div className="popup-fields">
-        <Field label="Praise reports">
+        <Field label="Praise reports from outreaches this week">
           <textarea className="kf-textarea" rows={2} placeholder="Share praise reports from the magazine distribution…"
             value={form.praiseReports} onChange={e => setForm(p => ({ ...p, praiseReports: e.target.value }))} />
         </Field>
@@ -1271,7 +1284,12 @@ function OutreachForm({ onClose, onSubmit: parentSubmit }) {
     locations: '',
     story: '',
     images: [],
-    httnMagazineTestimoniesOutreaches: '',
+    magazinesUsed: '',
+    peopleInvolved: '',
+    totalAttendance: '',
+    soulsSaved: '',
+    outreachTestimonies: '',
+    followUpPlan: '',
   });
   const [errors, setErrors] = useState({});
   const [submitting, setSubmitting] = useState(false);
@@ -1295,7 +1313,13 @@ function OutreachForm({ onClose, onSubmit: parentSubmit }) {
       mediaCount:    form.images.length,
       status:        'PENDING',
       rawDate:       form.date,
-      httnMagazineTestimoniesOutreaches: form.httnMagazineTestimoniesOutreaches,
+      httnMagazineTestimoniesOutreaches: '',
+      magazinesUsed:   parseInt(form.magazinesUsed) || 0,
+      peopleInvolved:  parseInt(form.peopleInvolved) || 0,
+      totalAttendance: parseInt(form.totalAttendance) || 0,
+      soulsSaved:      parseInt(form.soulsSaved) || 0,
+      outreachTestimonies: form.outreachTestimonies,
+      followUpPlan:    form.followUpPlan,
     });
     setSubmitting(false);
   };
@@ -1338,14 +1362,37 @@ function OutreachForm({ onClose, onSubmit: parentSubmit }) {
             placeholder="e.g. Lagos Island, Surulere Market"
             value={form.locations} onChange={e => setForm(p => ({ ...p, locations: e.target.value }))} />
         </Field>
-      </div>
 
-      {/* HTTN Magazine Testimonies & Outreaches */}
-      <div className="popup-section-head">📖 HTTN Magazine Outreaches & Testimonies</div>
-      <div className="popup-fields">
-        <Field label="Healing to the Nations (HTTN) Magazine Testimonies & Outreaches">
-          <textarea className="kf-textarea" rows={4} placeholder="Enter testimonies & outreaches details..."
-            value={form.httnMagazineTestimoniesOutreaches} onChange={e => setForm(p => ({ ...p, httnMagazineTestimoniesOutreaches: e.target.value }))} />
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginTop: '1rem' }}>
+          <Field label="HOW MANY COPIES OF MAGAZINE WERE USED for the outreach?">
+            <input className="kf-input" type="number" min="0" placeholder="0"
+              value={form.magazinesUsed} onChange={e => setForm(p => ({ ...p, magazinesUsed: e.target.value }))} />
+          </Field>
+          <Field label="How many people involved in the outreach?">
+            <input className="kf-input" type="number" min="0" placeholder="0"
+              value={form.peopleInvolved} onChange={e => setForm(p => ({ ...p, peopleInvolved: e.target.value }))} />
+          </Field>
+        </div>
+
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginTop: '1rem' }}>
+          <Field label="What was the total attendance of outreach?">
+            <input className="kf-input" type="number" min="0" placeholder="0"
+              value={form.totalAttendance} onChange={e => setForm(p => ({ ...p, totalAttendance: e.target.value }))} />
+          </Field>
+          <Field label="How many souls were saved in the outreach?">
+            <input className="kf-input" type="number" min="0" placeholder="0"
+              value={form.soulsSaved} onChange={e => setForm(p => ({ ...p, soulsSaved: e.target.value }))} />
+          </Field>
+        </div>
+
+        <Field label="Outreach testimonies">
+          <textarea className="kf-textarea" rows={3} placeholder="Give outreach testimonies..."
+            value={form.outreachTestimonies} onChange={e => setForm(p => ({ ...p, outreachTestimonies: e.target.value }))} />
+        </Field>
+
+        <Field label="What is the plan for souls won in that particular location?">
+          <textarea className="kf-textarea" rows={3} placeholder="State follow-up plan..."
+            value={form.followUpPlan} onChange={e => setForm(p => ({ ...p, followUpPlan: e.target.value }))} />
         </Field>
       </div>
 
@@ -1359,16 +1406,16 @@ function OutreachForm({ onClose, onSubmit: parentSubmit }) {
         </Field>
       </div>
 
-      {/* Images */}
-      <div className="popup-section-head">📸 Outreach Images</div>
+      {/* Images & Videos */}
+      <div className="popup-section-head">📸 Outreach Images & Videos</div>
       <div className="popup-fields">
         <MediaUploader files={form.images}
           onAdd={files => {
-            const prev = files.map(f => ({ name: f.name, type: f.type, url: f.type.startsWith('image') ? URL.createObjectURL(f) : null, size: f.size }));
+            const prev = files.map(f => ({ name: f.name, type: f.type, url: (f.type.startsWith('image') || f.type.startsWith('video')) ? URL.createObjectURL(f) : null, size: f.size }));
             setForm(p => ({ ...p, images: [...p.images, ...prev] }));
           }}
           onRemove={i => setForm(p => ({ ...p, images: p.images.filter((_,j) => j !== i) }))}
-          label="Upload Outreach Photos"
+          label="Upload Outreach Photos & Videos"
           accept="image/*,video/*"
         />
       </div>
@@ -1428,8 +1475,13 @@ const TABS_CONFIG = [
       { key: 'id', label: 'Report ID' }, { key: 'rawDate', label: 'Date' },
       { key: 'language', label: 'Language' },
       { key: 'ordered', label: 'Ordered' },
+      { key: 'received', label: 'Received' },
+      { key: 'datesReceived', label: 'Dates Received' },
+      { key: 'sponsoredCopies', label: 'Sponsored' },
       { key: 'monthlyMinimumOrder', label: 'Min Order' },
       { key: 'monthlyCopiesOrdered', label: 'Monthly Ordered' },
+      { key: 'healingOutreaches', label: 'Healing Outreaches' },
+      { key: 'outreachLocations', label: 'Outreach Locations' },
       { key: 'status', label: 'Status' },
     ],
     FormComponent: MagazineForm, btnLabel: 'Upload a New Magazine Report',
@@ -1440,7 +1492,10 @@ const TABS_CONFIG = [
       { key: 'id', label: 'Report ID' }, { key: 'rawDate', label: 'Date' },
       { key: 'category', label: 'Category' },
       { key: 'locations', label: 'Location(s)' },
-      { key: 'httnMagazineTestimoniesOutreaches', label: 'HTTN details' },
+      { key: 'magazinesUsed', label: 'Magazines Used' },
+      { key: 'peopleInvolved', label: 'Involved' },
+      { key: 'totalAttendance', label: 'Attendance' },
+      { key: 'soulsSaved', label: 'Saved' },
       { key: 'status', label: 'Status' },
     ],
     FormComponent: OutreachForm, btnLabel: 'Upload a New Outreach Report',
@@ -1459,10 +1514,11 @@ export default function ReportingPortal() {
   const [viewReport, setViewReport]     = useState(null);
   const [clarifyReport, setClarifyReport] = useState(null);
   const [toast, setToast]               = useState('');
-  const [counters, setCounters]         = useState({ zonal: 1, partnership: 1, testimonials: 1, magazine: 1, outreach: 1 });
+
 
   useEffect(() => {
     if (user) fetchAllReports();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
   const fetchAllReports = async () => {
