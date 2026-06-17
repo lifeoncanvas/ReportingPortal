@@ -232,8 +232,8 @@ const KEY_LABELS = {
   groupsPartnership: "Group Partnership",
   churchesPartnership: "Church Partnership",
   cellPartnership: "Cell Partnership",
-  sponsoredTeenspiration: "Teenspiration 300 Sponsored",
-  sponsoredKidspiration: "Kidspiration 300 Sponsored",
+  sponsoredTeenspiration: "Teenspiration (300 espees) Sponsored",
+  sponsoredKidspiration: "Kidspiration (300 espees) Sponsored",
 
 
   // Magazine Report
@@ -265,8 +265,8 @@ const KEY_LABELS = {
   peopleInvolved: "People Involved",
   totalAttendance: "Total Attendance",
   soulsSaved: "Souls Saved",
-  outreachTestimonies: "Outreach Testimonies",
-  followUpPlan: "Follow-up Plan",
+  outreachTestimonies: "Testimonies from the outreach(es)",
+  followUpPlan: "Further plans for soul retention",
 };
 
 // ── View Modal ─────────────────────────────────────────
@@ -674,7 +674,7 @@ function PartnershipForm({ onClose, onSubmit: parentSubmit }) {
             <input className="kf-input" type="text" placeholder="Enter zonal partnership (e.g. 5000 espees)..."
               value={form.zonalPartnership} onChange={e => setForm(p => ({ ...p, zonalPartnership: e.target.value }))} />
           </Field>
-          <Field label="Zonal Partnership Details (kindly state how much was given for each arms eg hslhs,httnm,craudes etc )">
+          <Field label="Zonal Partnership Details (kindly state how much was given for each arm eg hslhs,httnm,crusade etc )">
             <textarea className="kf-textarea" rows={1} placeholder="Enter details..."
               value={form.zonalPartnershipDetails} onChange={e => setForm(p => ({ ...p, zonalPartnershipDetails: e.target.value }))} />
           </Field>
@@ -685,12 +685,12 @@ function PartnershipForm({ onClose, onSubmit: parentSubmit }) {
             value={form.groupsPartnership} onChange={e => setForm(p => ({ ...p, groupsPartnership: e.target.value }))} />
         </Field>
         
-        <Field label="Church Partnership (state how much came within each church)">
+        <Field label="Church Partnership (State how much was remitted by each Church)">
           <input className="kf-input" type="text" placeholder="Enter church partnership..."
             value={form.churchesPartnership} onChange={e => setForm(p => ({ ...p, churchesPartnership: e.target.value }))} />
         </Field>
         
-        <Field label="Cell Partnership (state how much came within each cell)">
+        <Field label="Cell Partnership (State how much was remitted by each Cell)">
           <input className="kf-input" type="text" placeholder="Enter cell partnership..."
             value={form.cellPartnership} onChange={e => setForm(p => ({ ...p, cellPartnership: e.target.value }))} />
         </Field>
@@ -722,15 +722,15 @@ function PartnershipForm({ onClose, onSubmit: parentSubmit }) {
 
       <div className="popup-section-head">🏆 Milestones & Campaigns</div>
       <div className="popup-fields">
-        <Field label="Names of group Pastors that have advanced in the BLAAAST Milestones (please state name and current milestones)">
+        <Field label="Names of group Pastors that have advanced in the BLAAAST Milestones (please state name and new milestones)">
           <textarea className="kf-textarea" rows={2} placeholder="Enter names..."
             value={form.groupPastorsMilestones} onChange={e => setForm(p => ({ ...p, groupPastorsMilestones: e.target.value }))} />
         </Field>
-        <Field label="pastors and members that have sponsored Teenspiration 300 espees this week">
+        <Field label="Pastors and members that have sponsored Teenspiration (300 espees) this week">
           <textarea className="kf-textarea" rows={2} placeholder="Enter names..."
             value={form.sponsoredTeenspiration} onChange={e => setForm(p => ({ ...p, sponsoredTeenspiration: e.target.value }))} />
         </Field>
-        <Field label="pastors and members that have sponsored Kidspiration 300 espees this week">
+        <Field label="Pastors and members that have sponsored Kidspiration (300 espees) this week">
           <textarea className="kf-textarea" rows={2} placeholder="Enter names..."
             value={form.sponsoredKidspiration} onChange={e => setForm(p => ({ ...p, sponsoredKidspiration: e.target.value }))} />
         </Field>
@@ -738,7 +738,7 @@ function PartnershipForm({ onClose, onSubmit: parentSubmit }) {
 
       <div className="popup-section-head">📝 Additional Notes</div>
       <div className="popup-fields">
-        <Field label="Others / Any other things to report">
+        <Field label="Additional notes">
           <textarea className="kf-textarea" rows={2} placeholder="Enter other remarks or comments..."
             value={form.others} onChange={e => setForm(p => ({ ...p, others: e.target.value }))} />
         </Field>
@@ -918,7 +918,7 @@ function TestimonialsForm({ onClose, onSubmit: parentSubmit }) {
               </div>
               
               <div className="popup-fields" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                <Field label="State number of testimonies received in this category">
+                <Field label="Share your testimony here or upload in word or video format.">
                   <input
                     className="kf-input"
                     type="text"
@@ -1237,6 +1237,7 @@ function OutreachForm({ onClose, onSubmit: parentSubmit }) {
     soulsSaved: '',
     outreachTestimonies: '',
     followUpPlan: '',
+    testimonyFiles: [],
   });
   const [errors, setErrors] = useState({});
   const [submitting, setSubmitting] = useState(false);
@@ -1265,7 +1266,17 @@ function OutreachForm({ onClose, onSubmit: parentSubmit }) {
       peopleInvolved:  parseInt(form.peopleInvolved) || 0,
       totalAttendance: parseInt(form.totalAttendance) || 0,
       soulsSaved:      parseInt(form.soulsSaved) || 0,
-      outreachTestimonies: form.outreachTestimonies,
+      outreachTestimonies: (() => {
+        let finalTestimonies = form.outreachTestimonies;
+        if (form.testimonyFiles && form.testimonyFiles.length > 0) {
+          const filesList = form.testimonyFiles.map(f => f.name).join(', ');
+          finalTestimonies = [
+            form.outreachTestimonies,
+            `Attachments: ${filesList}`
+          ].filter(Boolean).join('\n\n');
+        }
+        return finalTestimonies;
+      })(),
       followUpPlan:    form.followUpPlan,
     });
     setSubmitting(false);
@@ -1315,7 +1326,7 @@ function OutreachForm({ onClose, onSubmit: parentSubmit }) {
             <input className="kf-input" type="number" min="0" placeholder="0"
               value={form.magazinesUsed} onChange={e => setForm(p => ({ ...p, magazinesUsed: e.target.value }))} />
           </Field>
-          <Field label="How many people involved in the outreach?">
+          <Field label="How many people are involved in the outreach?">
             <input className="kf-input" type="number" min="0" placeholder="0"
               value={form.peopleInvolved} onChange={e => setForm(p => ({ ...p, peopleInvolved: e.target.value }))} />
           </Field>
@@ -1332,12 +1343,25 @@ function OutreachForm({ onClose, onSubmit: parentSubmit }) {
           </Field>
         </div>
 
-        <Field label="Outreach testimonies">
+        <Field label="Kindly submit testimonies from the outreach(es)">
           <textarea className="kf-textarea" rows={3} placeholder="Give outreach testimonies..."
             value={form.outreachTestimonies} onChange={e => setForm(p => ({ ...p, outreachTestimonies: e.target.value }))} />
         </Field>
 
-        <Field label="What is the plan for souls won in that particular location?">
+        <Field label="Upload testimony files (Word, PDF, videos, pictures)">
+          <MediaUploader
+            files={form.testimonyFiles}
+            onAdd={files => {
+              const prev = files.map(f => ({ name: f.name, type: f.type, url: (f.type.startsWith('image') || f.type.startsWith('video')) ? URL.createObjectURL(f) : null, size: f.size }));
+              setForm(p => ({ ...p, testimonyFiles: [...p.testimonyFiles, ...prev] }));
+            }}
+            onRemove={i => setForm(p => ({ ...p, testimonyFiles: p.testimonyFiles.filter((_,j) => j !== i) }))}
+            label="Upload Testimony Files"
+            accept="image/*,video/*,.pdf,.doc,.docx"
+          />
+        </Field>
+
+        <Field label="Kindly state further plans for soul retention">
           <textarea className="kf-textarea" rows={3} placeholder="State follow-up plan..."
             value={form.followUpPlan} onChange={e => setForm(p => ({ ...p, followUpPlan: e.target.value }))} />
         </Field>
@@ -1395,8 +1419,8 @@ const TABS_CONFIG = [
       { key: 'churchesPartnership', label: 'Churches' },
       { key: 'cellPartnership', label: 'Cell' },
       { key: 'groupPastorsMilestones', label: 'BLAAAST Milestones' },
-      { key: 'sponsoredTeenspiration', label: 'Teenspiration 300' },
-      { key: 'sponsoredKidspiration', label: 'Kidspiration 300' },
+      { key: 'sponsoredTeenspiration', label: 'Teenspiration (300 espees)' },
+      { key: 'sponsoredKidspiration', label: 'Kidspiration (300 espees)' },
       { key: 'status', label: 'Status' },
     ],
     FormComponent: PartnershipForm, btnLabel: 'Upload a New Partnership Report',
