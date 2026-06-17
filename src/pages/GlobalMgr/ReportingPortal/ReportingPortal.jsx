@@ -265,7 +265,7 @@ const KEY_LABELS = {
   peopleInvolved: "People Involved",
   totalAttendance: "Total Attendance",
   soulsSaved: "Souls Saved",
-  outreachTestimonies: "Testimonies from the outreach(es)",
+  outreachTestimonies: "Testimonies from the outreaches",
   followUpPlan: "Further plans for soul retention",
 };
 
@@ -918,26 +918,10 @@ function TestimonialsForm({ onClose, onSubmit: parentSubmit }) {
               
               <div className="popup-fields" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                 <Field label="Share your testimony here or upload in word or video format.">
-                  <input
-                    className="kf-input"
-                    type="text"
-                    placeholder="e.g. 5, or 'Five healing testimonies'..."
-                    value={categoryData[activeCategoryTab].count}
-                    onChange={e => {
-                      const val = e.target.value;
-                      setCategoryData(prev => ({
-                        ...prev,
-                        [activeCategoryTab]: { ...prev[activeCategoryTab], count: val }
-                      }));
-                    }}
-                  />
-                </Field>
-
-                <Field label="Testimony Text / Details">
                   <textarea
                     className="kf-textarea"
-                    rows={4}
-                    placeholder="Enter written testimony details..."
+                    rows={8}
+                    placeholder="Enter your testimony details..."
                     value={categoryData[activeCategoryTab].text}
                     onChange={e => {
                       const val = e.target.value;
@@ -1342,28 +1326,30 @@ function OutreachForm({ onClose, onSubmit: parentSubmit }) {
           </Field>
         </div>
 
-        <Field label="Kindly submit testimonies from the outreach(es)">
+        <Field label="Kindly submit testimonies from the outreaches">
           <textarea className="kf-textarea" rows={3} placeholder="Give outreach testimonies..."
             value={form.outreachTestimonies} onChange={e => setForm(p => ({ ...p, outreachTestimonies: e.target.value }))} />
-        </Field>
-
-        <Field label="Upload testimony files (Word, PDF, videos, pictures)">
-          <MediaUploader
-            files={form.testimonyFiles}
-            onAdd={files => {
-              const prev = files.map(f => ({ name: f.name, type: f.type, url: (f.type.startsWith('image') || f.type.startsWith('video')) ? URL.createObjectURL(f) : null, size: f.size }));
-              setForm(p => ({ ...p, testimonyFiles: [...p.testimonyFiles, ...prev] }));
-            }}
-            onRemove={i => setForm(p => ({ ...p, testimonyFiles: p.testimonyFiles.filter((_,j) => j !== i) }))}
-            label="Upload Testimony Files"
-            accept="image/*,video/*,.pdf,.doc,.docx"
-          />
         </Field>
 
         <Field label="Kindly state further plans for soul retention">
           <textarea className="kf-textarea" rows={3} placeholder="State follow-up plan..."
             value={form.followUpPlan} onChange={e => setForm(p => ({ ...p, followUpPlan: e.target.value }))} />
         </Field>
+      </div>
+
+      {/* Testimony Uploads */}
+      <div className="popup-section-head">📎 Testimony Uploads (Word, PDF, videos, pictures)</div>
+      <div className="popup-fields">
+        <MediaUploader
+          files={form.testimonyFiles}
+          onAdd={files => {
+            const prev = files.map(f => ({ name: f.name, type: f.type, url: (f.type.startsWith('image') || f.type.startsWith('video')) ? URL.createObjectURL(f) : null, size: f.size }));
+            setForm(p => ({ ...p, testimonyFiles: [...p.testimonyFiles, ...prev] }));
+          }}
+          onRemove={i => setForm(p => ({ ...p, testimonyFiles: p.testimonyFiles.filter((_,j) => j !== i) }))}
+          label="Upload Testimony Files"
+          accept="image/*,video/*,.pdf,.doc,.docx"
+        />
       </div>
 
       {/* Story */}
