@@ -265,7 +265,7 @@ const KEY_LABELS = {
   peopleInvolved: "People Involved",
   totalAttendance: "Total Attendance",
   soulsSaved: "Souls Saved",
-  outreachTestimonies: "Testimonies from the outreaches",
+  outreachTestimonies: "Testimonies from the outreach(es)",
   followUpPlan: "Further plans for soul retention",
 };
 
@@ -1326,7 +1326,7 @@ function OutreachForm({ onClose, onSubmit: parentSubmit }) {
           </Field>
         </div>
 
-        <Field label="Kindly submit testimonies from the outreaches">
+        <Field label="Kindly submit testimonies from the outreach(es)">
           <textarea className="kf-textarea" rows={3} placeholder="Give outreach testimonies..."
             value={form.outreachTestimonies} onChange={e => setForm(p => ({ ...p, outreachTestimonies: e.target.value }))} />
         </Field>
