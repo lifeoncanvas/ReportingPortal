@@ -736,7 +736,6 @@ function PartnershipForm({ onClose, onSubmit: parentSubmit }) {
         </Field>
       </div>
 
-      <div className="popup-section-head">📝 Additional Notes</div>
       <div className="popup-fields">
         <Field label="Additional notes">
           <textarea className="kf-textarea" rows={2} placeholder="Enter other remarks or comments..."
