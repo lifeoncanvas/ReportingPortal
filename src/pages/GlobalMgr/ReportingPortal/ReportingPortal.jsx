@@ -464,21 +464,6 @@ function ZonalReportForm({ onClose, onSubmit: parentSubmit }) {
         </Field>
       </div>
 
-      {/* Proof of Payment */}
-      <div className="popup-section-head">📎 Supporting Media</div>
-      <div className="popup-fields">
-        <Field label="Proof of Payment (POP)" hint="Upload POP for the transactions">
-          <MediaUploader files={form.popMedia}
-            onAdd={files => {
-              const prev = files.map(f => ({ name: f.name, type: f.type, url: (f.type.startsWith('image') || f.type.startsWith('video')) ? URL.createObjectURL(f) : null, size: f.size }));
-              set('popMedia', [...form.popMedia, ...prev]); set('popMediaFiles', [...form.popMediaFiles, ...files]);
-            }}
-            onRemove={i => { set('popMedia', form.popMedia.filter((_,j)=>j!==i)); set('popMediaFiles', form.popMediaFiles.filter((_,j)=>j!==i)); }}
-            label="Upload POP"
-          />
-        </Field>
-      </div>
-
       {/* Attendance & Sponsorship */}
       <div className="popup-section-head">📅 Meetings & Sponsorship</div>
       <div className="popup-fields">
@@ -577,6 +562,10 @@ function PartnershipForm({ onClose, onSubmit: parentSubmit }) {
     groupPastorsMilestones: '',
     sponsoredTeenspiration: '',
     sponsoredKidspiration: '',
+    popMedia: [],
+    popMediaFiles: [],
+    trumpetsBlown: '',
+    testimoniesSubmitted: ''
   });
   const [submitting, setSubmitting] = useState(false);
 
@@ -601,12 +590,15 @@ function PartnershipForm({ onClose, onSubmit: parentSubmit }) {
       healingCrusadeSponsorship: 0.00,
       newPartnersRecruited: Number(form.newPartnersRecruited) || 0,
       remittancePurpose: form.remittancePurpose,
+      trumpetsBlown: Number(form.trumpetsBlown) || 0,
+      testimoniesSubmitted: Number(form.testimoniesSubmitted) || 0,
       notes: finalNotes,
       status: 'submitted',
       rawDate: new Date().toISOString().split('T')[0],
       groupPastorsMilestones: form.groupPastorsMilestones,
       sponsoredTeenspiration: form.sponsoredTeenspiration,
       sponsoredKidspiration: form.sponsoredKidspiration,
+      popMedia: form.popMedia
     });
     setSubmitting(false);
   };
@@ -625,6 +617,27 @@ function PartnershipForm({ onClose, onSubmit: parentSubmit }) {
         <Field label="State purpose for each remittance (e.g. HSLHS, Healing, DOME, etc.)">
           <textarea className="kf-textarea" rows={2} placeholder="Provide details..."
             value={form.remittancePurpose} onChange={e => setForm(p => ({ ...p, remittancePurpose: e.target.value }))} />
+        </Field>
+
+        <Field label="Proof of Payment (POP)" hint="Upload POP for the transactions">
+          <MediaUploader files={form.popMedia}
+            onAdd={files => {
+              const prev = files.map(f => ({ name: f.name, type: f.type, url: (f.type.startsWith('image') || f.type.startsWith('video')) ? URL.createObjectURL(f) : null, size: f.size }));
+              setForm(p => ({ ...p, popMedia: [...p.popMedia, ...prev], popMediaFiles: [...p.popMediaFiles, ...files] }));
+            }}
+            onRemove={i => { setForm(p => ({ ...p, popMedia: p.popMedia.filter((_,j)=>j!==i), popMediaFiles: p.popMediaFiles.filter((_,j)=>j!==i) })); }}
+            label="Upload POP"
+          />
+        </Field>
+
+        <Field label="How many Trumpets were blown this week?" hint="Each Zone has a target of 1000 trumpets">
+          <input className="kf-input" type="number" min="0" placeholder="0"
+            value={form.trumpetsBlown} onChange={e => setForm(p => ({ ...p, trumpetsBlown: e.target.value }))} />
+        </Field>
+
+        <Field label="How many Testimonies were submitted to the Department?">
+          <input className="kf-input" type="number" min="0" placeholder="0"
+            value={form.testimoniesSubmitted} onChange={e => setForm(p => ({ ...p, testimoniesSubmitted: e.target.value }))} />
         </Field>
 
         <Field label="How many new partners were recruited?">
