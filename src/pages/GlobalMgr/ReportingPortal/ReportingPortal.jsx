@@ -189,24 +189,22 @@ const KEY_LABELS = {
   partnershipRemittance: "Total Partnership Remittance",
   remittancePurpose: "Purpose for each remittance",
   trumpetsBlown: "Trumpets Blown this week",
+  greatShouts: "Great Shouts made this week",
   newPartners: "New partners recruited",
   testimoniesSubmitted: "Testimonies submitted to the Department",
-  healingTranslations: "Total number of Healing translations achieved",
+  healingTranslations: "Total number of outreaches done this week",
   healingOutreaches: "Healing outreaches held this week",
-  healingPicturesVideos: "Pictures/videos from Healing outreaches submitted",
+  healingPicturesVideos: "Pictures and videos from Healing outreaches submitted",
   pastoralAttendanceDirector: "Zonal Pastor attendance in Executive Minister's meeting",
   managerAttendanceDirector: "Zonal Manager attendance in Executive Minister's meeting",
   managerAttendanceStrategy: "Zonal Manager attendance in strategy meeting",
   testimonyClarificationConcern: "Testimony, Clarification or Concern",
   submittedByEmail: "Submitted By Email",
-  participationPrayWithMe: "Participation in Pray With Me",
+  participationPrayWithMe: "Total number of participation pray with me",
   totalRegistrationHslhs: "Total Registration for HSLHS",
-  heraldConference: "Herald Conference",
+  heraldConference: "Brief report for Herald Conference",
   totalPartnershipRemittance: "Total Partnership Remittance",
   newPartnersRecruited: "New Partners Recruited",
-  httnmTranslations: "HTTNM Translations",
-  httnmOutreachesHeld: "HTTNM Outreaches Held",
-  httnmMediaSubmitted: "HTTNM Media Submitted",
   zonalPastorExecutiveMinistersMeeting: "Zonal Pastor attendance in Executive Minister's meeting",
   zonalManagerExecutiveMinistersMeeting: "Zonal Manager attendance in Executive Minister's meeting",
   zonalManagerStrategyMeeting: "Zonal Manager attendance in strategy meeting",
@@ -372,6 +370,7 @@ function ZonalReportForm({ onClose, onSubmit: parentSubmit }) {
     popMediaFiles: [],
     remittancePurpose: '',
     trumpetsBlown: '',
+    greatShouts: '',
     newPartners: '',
     testimoniesSubmitted: '',
     healingTranslations: '',
@@ -397,14 +396,6 @@ function ZonalReportForm({ onClose, onSubmit: parentSubmit }) {
     const e = {};
     if (!form.zoneName.trim()) e.zoneName = 'Required';
     if (!form.zonalManager.trim()) e.zonalManager = 'Required';
-    if (!String(form.partnershipRemittance).trim()) e.partnershipRemittance = 'Required';
-    if (!form.remittancePurpose.trim()) e.remittancePurpose = 'Required';
-    if (!String(form.trumpetsBlown).trim()) e.trumpetsBlown = 'Required';
-    if (!String(form.newPartners).trim()) e.newPartners = 'Required';
-    if (!String(form.testimoniesSubmitted).trim()) e.testimoniesSubmitted = 'Required';
-    if (!String(form.healingTranslations).trim()) e.healingTranslations = 'Required';
-    if (!String(form.healingOutreaches).trim()) e.healingOutreaches = 'Required';
-    if (!String(form.healingPicturesVideos).trim()) e.healingPicturesVideos = 'Required';
     if (!form.pastoralAttendanceDirector) e.pastoralAttendanceDirector = 'Required';
     if (!form.managerAttendanceDirector) e.managerAttendanceDirector = 'Required';
     if (!form.managerAttendanceStrategy) e.managerAttendanceStrategy = 'Required';
@@ -425,18 +416,10 @@ function ZonalReportForm({ onClose, onSubmit: parentSubmit }) {
       weekStartDate:                today,
       zoneName:                     form.zoneName,
       zonalManager:                 form.zonalManager,
-      totalPartnershipRemittance:   Number(form.partnershipRemittance) || 0,
-      newPartnersRecruited:         Number(form.newPartners) || 0,
-      testimoniesSubmitted:         Number(form.testimoniesSubmitted) || 0,
-      httnmTranslations:            Number(form.healingTranslations) || 0,
-      httnmOutreachesHeld:          Number(form.healingOutreaches) || 0,
-      httnmMediaSubmitted:          Number(form.healingPicturesVideos) || 0,
       zonalPastorExecutiveMinistersMeeting:  form.pastoralAttendanceDirector,
       zonalManagerExecutiveMinistersMeeting: form.managerAttendanceDirector,
       zonalManagerStrategyMeeting:  form.managerAttendanceStrategy,
       testimonyClarificationConcern: form.testimonyClarificationConcern,
-      remittancePurpose:            form.remittancePurpose,
-      trumpetsBlown:                Number(form.trumpetsBlown) || 0,
       popMediaUrl:                  null,
       regionName:                   user?.region || 'Global',
       participationPrayWithMe:      form.participationPrayWithMe,
@@ -481,17 +464,9 @@ function ZonalReportForm({ onClose, onSubmit: parentSubmit }) {
         </Field>
       </div>
 
-      {/* Partnership */}
-      <div className="popup-section-head">🤝 Partnership & Recruitment</div>
+      {/* Proof of Payment */}
+      <div className="popup-section-head">📎 Supporting Media</div>
       <div className="popup-fields">
-        <Field label="Total Partnership Remittance for this week" required hint="Weekly Target of 10,000 Espees" error={errors.partnershipRemittance}>
-          <input className={`kf-input${errors.partnershipRemittance ? ' kf-input-err' : ''}`} type="number" min="0" placeholder="0"
-            value={form.partnershipRemittance} onChange={e => set('partnershipRemittance', e.target.value)} />
-        </Field>
-        <Field label="State purpose for each remittance" required hint="e.g. HSLHS, Healing, DOME, etc." error={errors.remittancePurpose}>
-          <textarea className={`kf-textarea${errors.remittancePurpose ? ' kf-input-err' : ''}`} rows={2} placeholder="Provide details..."
-            value={form.remittancePurpose} onChange={e => set('remittancePurpose', e.target.value)} />
-        </Field>
         <Field label="Proof of Payment (POP)" hint="Upload POP for the transactions">
           <MediaUploader files={form.popMedia}
             onAdd={files => {
@@ -501,35 +476,6 @@ function ZonalReportForm({ onClose, onSubmit: parentSubmit }) {
             onRemove={i => { set('popMedia', form.popMedia.filter((_,j)=>j!==i)); set('popMediaFiles', form.popMediaFiles.filter((_,j)=>j!==i)); }}
             label="Upload POP"
           />
-        </Field>
-        <Field label="How many Trumpets were blown this week?" required hint="Each Zone has a target of 1000 trumpets" error={errors.trumpetsBlown}>
-          <input className={`kf-input${errors.trumpetsBlown ? ' kf-input-err' : ''}`} type="number" min="0" placeholder="0"
-            value={form.trumpetsBlown} onChange={e => set('trumpetsBlown', e.target.value)} />
-        </Field>
-        <Field label="How many new partners were recruited?" required hint="Target of 10 new partners weekly" error={errors.newPartners}>
-          <input className={`kf-input${errors.newPartners ? ' kf-input-err' : ''}`} type="number" min="0" placeholder="0"
-            value={form.newPartners} onChange={e => set('newPartners', e.target.value)} />
-        </Field>
-        <Field label="How many Testimonies were submitted to the Department?" required hint="Target of 50 weekly" error={errors.testimoniesSubmitted}>
-          <input className={`kf-input${errors.testimoniesSubmitted ? ' kf-input-err' : ''}`} type="number" min="0" placeholder="0"
-            value={form.testimoniesSubmitted} onChange={e => set('testimoniesSubmitted', e.target.value)} />
-        </Field>
-      </div>
-
-      {/* Healing Outreach */}
-      <div className="popup-section-head">📖 Healing Outreach</div>
-      <div className="popup-fields">
-        <Field label="Total number of Healing translations achieved?" required hint="Target of 2 weekly" error={errors.healingTranslations}>
-          <input className={`kf-input${errors.healingTranslations ? ' kf-input-err' : ''}`} type="number" min="0" placeholder="0"
-            value={form.healingTranslations} onChange={e => set('healingTranslations', e.target.value)} />
-        </Field>
-        <Field label="How many Healing outreaches held this week?" required hint="Target of 10 weekly" error={errors.healingOutreaches}>
-          <input className={`kf-input${errors.healingOutreaches ? ' kf-input-err' : ''}`} type="number" min="0" placeholder="0"
-            value={form.healingOutreaches} onChange={e => set('healingOutreaches', e.target.value)} />
-        </Field>
-        <Field label="How many pictures of videos from the Healing outreaches were submitted?" required hint="Target of 10 weekly" error={errors.healingPicturesVideos}>
-          <input className={`kf-input${errors.healingPicturesVideos ? ' kf-input-err' : ''}`} type="number" min="0" placeholder="0"
-            value={form.healingPicturesVideos} onChange={e => set('healingPicturesVideos', e.target.value)} />
         </Field>
       </div>
 
@@ -572,7 +518,7 @@ function ZonalReportForm({ onClose, onSubmit: parentSubmit }) {
       {/* Pray With Me & HSLHS & Herald Conference */}
       <div className="popup-section-head">📣 Programs & Campaigns</div>
       <div className="popup-fields">
-        <Field label="Participation in Pray With Me">
+        <Field label="Total number of participation pray with me">
           <textarea className="kf-textarea" rows={2} placeholder="Enter details..."
             value={form.participationPrayWithMe} onChange={e => set('participationPrayWithMe', e.target.value)} />
         </Field>
@@ -580,7 +526,7 @@ function ZonalReportForm({ onClose, onSubmit: parentSubmit }) {
           <input className="kf-input" type="number" min="0" placeholder="0"
             value={form.totalRegistrationHslhs} onChange={e => set('totalRegistrationHslhs', e.target.value)} />
         </Field>
-        <Field label="Have you had your Herald Conference?">
+        <Field label="Brief report for Herald Conference">
           <input className="kf-input" placeholder="Enter status/details..."
             value={form.heraldConference} onChange={e => set('heraldConference', e.target.value)} />
         </Field>
@@ -651,8 +597,10 @@ function PartnershipForm({ onClose, onSubmit: parentSubmit }) {
       groupsPartnership: form.groupsPartnership,
       churchesPartnership: form.churchesPartnership,
       cellPartnership: form.cellPartnership,
-      totalRemittance: 0.00,
+      totalRemittance: Number(form.totalRemittance) || 0,
       healingCrusadeSponsorship: 0.00,
+      newPartnersRecruited: Number(form.newPartnersRecruited) || 0,
+      remittancePurpose: form.remittancePurpose,
       notes: finalNotes,
       status: 'submitted',
       rawDate: new Date().toISOString().split('T')[0],
@@ -669,6 +617,21 @@ function PartnershipForm({ onClose, onSubmit: parentSubmit }) {
 
       <div className="popup-section-head">💼 Partnership Breakdown (Espees)</div>
       <div className="popup-fields">
+        <Field label="Total Partnership Remittance for this week">
+          <input className="kf-input" type="number" min="0" placeholder="0"
+            value={form.totalRemittance} onChange={e => setForm(p => ({ ...p, totalRemittance: e.target.value }))} />
+        </Field>
+        
+        <Field label="State purpose for each remittance (e.g. HSLHS, Healing, DOME, etc.)">
+          <textarea className="kf-textarea" rows={2} placeholder="Provide details..."
+            value={form.remittancePurpose} onChange={e => setForm(p => ({ ...p, remittancePurpose: e.target.value }))} />
+        </Field>
+
+        <Field label="How many new partners were recruited?">
+          <input className="kf-input" type="number" min="0" placeholder="0"
+            value={form.newPartnersRecruited} onChange={e => setForm(p => ({ ...p, newPartnersRecruited: e.target.value }))} />
+        </Field>
+
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '1rem', alignItems: 'start' }}>
           <Field label="Zonal Partnership for this week">
             <input className="kf-input" type="text" placeholder="Enter zonal partnership (e.g. 5000 espees)..."
@@ -1221,6 +1184,9 @@ function OutreachForm({ onClose, onSubmit: parentSubmit }) {
     outreachTestimonies: '',
     followUpPlan: '',
     testimonyFiles: [],
+    outreachesDone: '',
+    healingOutreachesHeld: '',
+    healingMediaSubmitted: '',
   });
   const [errors, setErrors] = useState({});
   const [submitting, setSubmitting] = useState(false);
@@ -1261,6 +1227,9 @@ function OutreachForm({ onClose, onSubmit: parentSubmit }) {
         return finalTestimonies;
       })(),
       followUpPlan:    form.followUpPlan,
+      outreachesDone:  Number(form.outreachesDone) || 0,
+      healingOutreachesHeld: Number(form.healingOutreachesHeld) || 0,
+      healingMediaSubmitted: Number(form.healingMediaSubmitted) || 0,
     });
     setSubmitting(false);
   };
@@ -1329,6 +1298,22 @@ function OutreachForm({ onClose, onSubmit: parentSubmit }) {
         <Field label="Kindly submit testimonies from the outreach(es)">
           <textarea className="kf-textarea" rows={3} placeholder="Give outreach testimonies..."
             value={form.outreachTestimonies} onChange={e => setForm(p => ({ ...p, outreachTestimonies: e.target.value }))} />
+        </Field>
+
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginTop: '1rem' }}>
+          <Field label="Total number of outreaches done this week?">
+            <input className="kf-input" type="number" min="0" placeholder="0"
+              value={form.outreachesDone} onChange={e => setForm(p => ({ ...p, outreachesDone: e.target.value }))} />
+          </Field>
+          <Field label="How many Healing outreaches held this week?">
+            <input className="kf-input" type="number" min="0" placeholder="0"
+              value={form.healingOutreachesHeld} onChange={e => setForm(p => ({ ...p, healingOutreachesHeld: e.target.value }))} />
+          </Field>
+        </div>
+
+        <Field label="How many pictures and videos from the Healing outreaches were submitted?">
+          <input className="kf-input" type="number" min="0" placeholder="0"
+            value={form.healingMediaSubmitted} onChange={e => setForm(p => ({ ...p, healingMediaSubmitted: e.target.value }))} />
         </Field>
 
         <Field label="Kindly state further plans for soul retention">

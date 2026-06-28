@@ -53,7 +53,7 @@ export default function ZonalDashboard() {
   return (
     <div className="zd-page">
       <div className="zd-welcome">
-        <h2>{t.welcomeBack}, Zonal! 👋</h2>
+        <h2>{t.welcomeBack}, {user?.name || 'Zonal'}! 👋</h2>
         <p>{today}</p>
       </div>
 
