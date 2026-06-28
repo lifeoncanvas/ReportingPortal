@@ -714,117 +714,89 @@ function PartnershipForm({ onClose, onSubmit: parentSubmit }) {
 // TESTIMONIALS FORM
 // ══════════════════════════════════════════════════════
 const TESTIMONY_CATEGORIES = [
-  { key: 'prayWithMe', label: 'Pray With Me Testimonies' },
-  { key: 'translation', label: 'Translation Testimonies' },
-  { key: 'partnership', label: 'Partnership Testimonies' },
-  { key: 'salvation', label: 'Salvation Testimonies' },
-  { key: 'healing', label: 'Healing Testimonies' },
-  { key: 'others', label: 'Others' }
+  { key: 'Healing Streams', label: 'Healing Streams' },
+  { key: 'Partnership', label: 'Partnership' },
+  { key: 'Healing to the nations Magazines', label: 'Healing to the nations Magazines' },
+  { key: 'Prayer Clouds', label: 'Prayer Clouds' },
+  { key: 'Crusades', label: 'Crusades' },
+  { key: 'Pray with me', label: 'Pray with me' },
+  { key: 'Heralds', label: 'Heralds' },
+  { key: 'Others', label: 'Others' }
 ];
 
 function TestimonialsForm({ onClose, onSubmit: parentSubmit }) {
-  const [testimoniesCount, setTestimoniesCount] = useState('');
-  const [addedCategories] = useState(['prayWithMe', 'translation', 'partnership', 'salvation', 'healing', 'others']);
-  const [activeCategoryTab, setActiveCategoryTab] = useState('prayWithMe');
+  const [category, setCategory] = useState('');
+  const [documents, setDocuments] = useState([]);
+  const [videos, setVideos] = useState([]);
+  const [beforeImages, setBeforeImages] = useState([]);
+  const [afterImages, setAfterImages] = useState([]);
   const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState('');
 
-  const [categoryData, setCategoryData] = useState({
-    prayWithMe: { count: '', text: '', documents: [], videos: [], beforeImages: [], afterImages: [] },
-    translation: { count: '', text: '', documents: [], videos: [], beforeImages: [], afterImages: [] },
-    partnership: { count: '', text: '', documents: [], videos: [], beforeImages: [], afterImages: [] },
-    salvation: { count: '', text: '', documents: [], videos: [], beforeImages: [], afterImages: [] },
-    healing: { count: '', text: '', documents: [], videos: [], beforeImages: [], afterImages: [] },
-    others: { count: '', text: '', documents: [], videos: [], beforeImages: [], afterImages: [] }
-  });
-
-  const addCategoryFiles = (catKey, field, files) => {
+  const handleAddFiles = (setter) => (files) => {
     const prev = files.map(f => ({
       name: f.name, type: f.type,
       url: (f.type.startsWith('image') || f.type.startsWith('video')) ? URL.createObjectURL(f) : null,
       size: f.size,
     }));
-    setCategoryData(prevData => ({
-      ...prevData,
-      [catKey]: {
-        ...prevData[catKey],
-        [field]: [...prevData[catKey][field], ...prev]
-      }
-    }));
+    setter(p => [...p, ...prev]);
   };
 
-  const removeCategoryFile = (catKey, field, idx) => {
-    setCategoryData(prevData => ({
-      ...prevData,
-      [catKey]: {
-        ...prevData[catKey],
-        [field]: prevData[catKey][field].filter((_, i) => i !== idx)
-      }
-    }));
+  const handleRemoveFile = (setter) => (idx) => {
+    setter(p => p.filter((_, i) => i !== idx));
   };
 
-  const formatCategoryContent = (catKey, label) => {
-    const data = categoryData[catKey];
-    if (!addedCategories.includes(catKey)) return null;
-    
+  const formatTestimonyContent = () => {
     let parts = [];
-    if (data.count) {
-      parts.push(`Count: ${data.count}`);
-    }
-    if (data.text) {
-      parts.push(`Details: ${data.text}`);
-    }
-    
+    parts.push(`Category: ${category}`);
+
     const filesList = [];
-    if (data.documents.length > 0) {
-      filesList.push(`Documents (${data.documents.length}): ${data.documents.map(f => f.name).join(', ')}`);
+    if (documents.length > 0) {
+      filesList.push(`Documents (${documents.length}): ${documents.map(f => f.name).join(', ')}`);
     }
-    if (data.videos.length > 0) {
-      filesList.push(`Videos (${data.videos.length}): ${data.videos.map(f => f.name).join(', ')}`);
+    if (videos.length > 0) {
+      filesList.push(`Videos (${videos.length}): ${videos.map(f => f.name).join(', ')}`);
     }
-    if (data.beforeImages.length > 0) {
-      filesList.push(`Before Images (${data.beforeImages.length}): ${data.beforeImages.map(f => f.name).join(', ')}`);
+    if (beforeImages.length > 0) {
+      filesList.push(`Before Images (${beforeImages.length}): ${beforeImages.map(f => f.name).join(', ')}`);
     }
-    if (data.afterImages.length > 0) {
-      filesList.push(`After Images (${data.afterImages.length}): ${data.afterImages.map(f => f.name).join(', ')}`);
+    if (afterImages.length > 0) {
+      filesList.push(`After Images (${afterImages.length}): ${afterImages.map(f => f.name).join(', ')}`);
     }
     
     if (filesList.length > 0) {
       parts.push(`Attachments:\n- ` + filesList.join('\n- '));
     }
     
-    if (parts.length === 0) return null;
     return parts.join('\n\n');
   };
 
   const handleSubmit = async () => {
+    if (!category) {
+      setError('Please select a category.');
+      return;
+    }
+    setError('');
     setSubmitting(true);
     await new Promise(r => setTimeout(r, 500));
 
-    let totalBefore = 0;
-    let totalAfter = 0;
-    let totalDocs = 0;
-
-    addedCategories.forEach(catKey => {
-      const data = categoryData[catKey];
-      totalBefore += data.beforeImages.length;
-      totalAfter += data.afterImages.length;
-      totalDocs += data.documents.length + data.videos.length;
-    });
-
     parentSubmit({
-      testimony: '(Categorized testimonies submitted)',
-      testimoniesCount: Number(testimoniesCount) || 0,
-      beforeImages: totalBefore,
-      afterImages: totalAfter,
-      documents: totalDocs,
+      testimony: '(Single testimony submitted)',
+      testimoniesCount: 1, // Only one testimony
+      beforeImages: beforeImages.length,
+      afterImages: afterImages.length,
+      documents: documents.length + videos.length,
       status: 'PENDING',
       rawDate: new Date().toISOString().split('T')[0],
-      prayWithMeTestimonies: formatCategoryContent('prayWithMe', 'Pray With Me Testimonies'),
-      translationTestimonies: formatCategoryContent('translation', 'Translation Testimonies'),
-      partnershipTestimonies: formatCategoryContent('partnership', 'Partnership Testimonies'),
-      salvationTestimonies: formatCategoryContent('salvation', 'Salvation Testimonies'),
-      healingTestimonies: formatCategoryContent('healing', 'Healing Testimonies'),
-      othersTestimonies: formatCategoryContent('others', 'Others'),
+      // We send it under the "othersTestimonies" field since it's dynamic now, or we can map it based on category. 
+      // The backend saves these as text fields. We'll map it safely to "othersTestimonies" or just let the backend handle it.
+      // Wait, let's just map it to the closest match or others.
+      prayWithMeTestimonies: category === 'Pray with me' ? formatTestimonyContent() : '',
+      translationTestimonies: category === 'Heralds' ? formatTestimonyContent() : '',
+      partnershipTestimonies: category === 'Partnership' ? formatTestimonyContent() : '',
+      salvationTestimonies: category === 'Crusades' ? formatTestimonyContent() : '',
+      healingTestimonies: (category === 'Healing Streams' || category === 'Healing to the nations Magazines') ? formatTestimonyContent() : '',
+      othersTestimonies: (category === 'Others' || category === 'Prayer Clouds') ? formatTestimonyContent() : '',
     });
     setSubmitting(false);
   };
@@ -833,117 +805,69 @@ function TestimonialsForm({ onClose, onSubmit: parentSubmit }) {
     <FormPopup title="Submit a Testimony" eyebrow="KingsForms · Testimonials" icon="✍️"
       onClose={onClose} onSubmit={handleSubmit} submitting={submitting} submitLabel="Submit Testimony">
 
-      {/* Count */}
-      <div className="popup-section-head">📊 Overall Count</div>
+      {/* Category Dropdown */}
+      <div className="popup-section-head">🏷️ Category</div>
       <div className="popup-fields">
-        <Field label="1. How many testimonies were received this week from your zone">
-          <input className="kf-input" type="number" min="0" placeholder="0"
-            value={testimoniesCount} onChange={e => setTestimoniesCount(e.target.value)} />
+        <Field label="Select a category" error={error}>
+          <select className="kf-input" value={category} onChange={e => setCategory(e.target.value)}>
+            <option value="">Select a category</option>
+            {TESTIMONY_CATEGORIES.map(cat => (
+              <option key={cat.key} value={cat.key}>{cat.label}</option>
+            ))}
+          </select>
         </Field>
       </div>
 
-      {/* Categories sub-tabs */}
-      {addedCategories.length > 0 && (
-        <>
-          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', padding: '12px 32px', background: '#f8fafc', borderBottom: '1px solid #e2e8f0' }}>
-            {addedCategories.map(catKey => {
-              const cat = TESTIMONY_CATEGORIES.find(c => c.key === catKey);
-              const isActive = activeCategoryTab === catKey;
-              return (
-                <button
-                  key={catKey}
-                  type="button"
-                  onClick={() => setActiveCategoryTab(catKey)}
-                  style={{
-                    padding: '6px 12px',
-                    borderRadius: '4px',
-                    border: '1px solid',
-                    borderColor: isActive ? '#d97706' : '#cbd5e1',
-                    background: isActive ? '#fffbeb' : '#fff',
-                    color: isActive ? '#b45309' : '#475569',
-                    fontSize: '12px',
-                    fontWeight: 600,
-                    cursor: 'pointer'
-                  }}
-                >
-                  {cat.label}
-                </button>
-              );
-            })}
-          </div>
+      {category && (
+        <div style={{ padding: '20px 32px' }}>
+          <div className="popup-fields" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            
+            {/* Uploads */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+              <Field label="Upload PDF or Word files">
+                <MediaUploader
+                  files={documents}
+                  onAdd={handleAddFiles(setDocuments)}
+                  onRemove={handleRemoveFile(setDocuments)}
+                  label="Upload PDF / Word"
+                  accept=".pdf,.doc,.docx"
+                />
+              </Field>
 
-          {/* Sub-tab content */}
-          {activeCategoryTab && (
-            <div style={{ padding: '20px 32px', borderBottom: '1px solid #e8edf2' }}>
-              <div style={{ fontSize: '14px', fontWeight: 'bold', color: '#b45309', marginBottom: '16px', textTransform: 'uppercase' }}>
-                ✏️ {TESTIMONY_CATEGORIES.find(c => c.key === activeCategoryTab).label} Details
-              </div>
-              
-              <div className="popup-fields" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                <Field label="Share your testimony here or upload in word or video format.">
-                  <textarea
-                    className="kf-textarea"
-                    rows={8}
-                    placeholder="Enter your testimony details..."
-                    value={categoryData[activeCategoryTab].text}
-                    onChange={e => {
-                      const val = e.target.value;
-                      setCategoryData(prev => ({
-                        ...prev,
-                        [activeCategoryTab]: { ...prev[activeCategoryTab], text: val }
-                      }));
-                    }}
-                  />
-                </Field>
-
-                {/* Uploads */}
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-                  <Field label="Upload PDF or Word files (optional)">
-                    <MediaUploader
-                      files={categoryData[activeCategoryTab].documents}
-                      onAdd={files => addCategoryFiles(activeCategoryTab, 'documents', files)}
-                      onRemove={i => removeCategoryFile(activeCategoryTab, 'documents', i)}
-                      label="Upload PDF / Word"
-                      accept=".pdf,.doc,.docx"
-                    />
-                  </Field>
-
-                  <Field label="Upload Video testimony (optional)">
-                    <MediaUploader
-                      files={categoryData[activeCategoryTab].videos}
-                      onAdd={files => addCategoryFiles(activeCategoryTab, 'videos', files)}
-                      onRemove={i => removeCategoryFile(activeCategoryTab, 'videos', i)}
-                      label="Upload Video"
-                      accept="video/*"
-                    />
-                  </Field>
-                </div>
-
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginTop: '8px' }}>
-                  <Field label="Before Images (optional)">
-                    <MediaUploader
-                      files={categoryData[activeCategoryTab].beforeImages}
-                      onAdd={files => addCategoryFiles(activeCategoryTab, 'beforeImages', files)}
-                      onRemove={i => removeCategoryFile(activeCategoryTab, 'beforeImages', i)}
-                      label="Upload Before Images"
-                      accept="image/*"
-                    />
-                  </Field>
-
-                  <Field label="After Images (optional)">
-                    <MediaUploader
-                      files={categoryData[activeCategoryTab].afterImages}
-                      onAdd={files => addCategoryFiles(activeCategoryTab, 'afterImages', files)}
-                      onRemove={i => removeCategoryFile(activeCategoryTab, 'afterImages', i)}
-                      label="Upload After Images"
-                      accept="image/*"
-                    />
-                  </Field>
-                </div>
-              </div>
+              <Field label="Upload Video testimony">
+                <MediaUploader
+                  files={videos}
+                  onAdd={handleAddFiles(setVideos)}
+                  onRemove={handleRemoveFile(setVideos)}
+                  label="Upload Video"
+                  accept="video/*"
+                />
+              </Field>
             </div>
-          )}
-        </>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginTop: '8px' }}>
+              <Field label="Before Images">
+                <MediaUploader
+                  files={beforeImages}
+                  onAdd={handleAddFiles(setBeforeImages)}
+                  onRemove={handleRemoveFile(setBeforeImages)}
+                  label="Upload Before Images"
+                  accept="image/*"
+                />
+              </Field>
+
+              <Field label="After Images">
+                <MediaUploader
+                  files={afterImages}
+                  onAdd={handleAddFiles(setAfterImages)}
+                  onRemove={handleRemoveFile(setAfterImages)}
+                  label="Upload After Images"
+                  accept="image/*"
+                />
+              </Field>
+            </div>
+          </div>
+        </div>
       )}
     </FormPopup>
   );
