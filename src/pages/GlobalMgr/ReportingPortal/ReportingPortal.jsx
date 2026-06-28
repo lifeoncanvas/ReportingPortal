@@ -1121,7 +1121,7 @@ function OutreachForm({ onClose, onSubmit: parentSubmit }) {
     outreachTestimonies: '',
     followUpPlan: '',
     testimonyFiles: [],
-    outreachesDone: '',
+    healingTranslationsAchieved: '',
     healingOutreachesHeld: '',
     healingMediaSubmitted: '',
   });
@@ -1164,7 +1164,7 @@ function OutreachForm({ onClose, onSubmit: parentSubmit }) {
         return finalTestimonies;
       })(),
       followUpPlan:    form.followUpPlan,
-      outreachesDone:  Number(form.outreachesDone) || 0,
+      healingTranslationsAchieved:  Number(form.healingTranslationsAchieved) || 0,
       healingOutreachesHeld: Number(form.healingOutreachesHeld) || 0,
       healingMediaSubmitted: Number(form.healingMediaSubmitted) || 0,
     });
@@ -1238,9 +1238,9 @@ function OutreachForm({ onClose, onSubmit: parentSubmit }) {
         </Field>
 
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginTop: '1rem' }}>
-          <Field label="Total number of outreaches done this week?">
+          <Field label="Total number of Healing translations achieved?">
             <input className="kf-input" type="number" min="0" placeholder="0"
-              value={form.outreachesDone} onChange={e => setForm(p => ({ ...p, outreachesDone: e.target.value }))} />
+              value={form.healingTranslationsAchieved} onChange={e => setForm(p => ({ ...p, healingTranslationsAchieved: e.target.value }))} />
           </Field>
           <Field label="How many Healing outreaches held this week?">
             <input className="kf-input" type="number" min="0" placeholder="0"
