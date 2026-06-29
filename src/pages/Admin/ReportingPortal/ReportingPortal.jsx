@@ -196,7 +196,7 @@ export default function AdminReportingPortal() {
     switch (activeTab) {
       case 'zonal':       return `${r.zoneName || '—'} · ${r.zonalManager || r.submittedBy || '—'}`;
       case 'partnership': return `Total: ${r.totalRemittance || r.total_remittance || '—'} · Arms: ${r.arms || '—'}`;
-      case 'testimonials':return `Testimonies: ${r.testimoniesCount || '—'} · Media: ${(r.beforeImages||0)+(r.afterImages||0)}`;
+      case 'testimonials':return `Member: ${r.memberName || '—'} · Testimonies: ${r.testimoniesCount || '—'} · Media: ${(r.beforeImages||0)+(r.afterImages||0)}`;
       case 'magazine':    return `${r.language || '—'} · Ordered: ${r.ordered || r.orderedCopies || '—'} · Received: ${r.received || r.receivedCopies || '—'}`;
       case 'outreach':    return `${r.category || '—'} · Locations: ${r.locations || '—'}`;
       default: return '';

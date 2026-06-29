@@ -565,6 +565,7 @@ function PartnershipForm({ onClose, onSubmit: parentSubmit }) {
     popMedia: [],
     popMediaFiles: [],
     trumpetsBlown: '',
+    greatShouts: '',
     testimoniesSubmitted: ''
   });
   const [submitting, setSubmitting] = useState(false);
@@ -591,6 +592,7 @@ function PartnershipForm({ onClose, onSubmit: parentSubmit }) {
       newPartnersRecruited: Number(form.newPartnersRecruited) || 0,
       remittancePurpose: form.remittancePurpose,
       trumpetsBlown: Number(form.trumpetsBlown) || 0,
+      greatShouts: Number(form.greatShouts) || 0,
       testimoniesSubmitted: Number(form.testimoniesSubmitted) || 0,
       notes: finalNotes,
       status: 'submitted',
@@ -633,6 +635,11 @@ function PartnershipForm({ onClose, onSubmit: parentSubmit }) {
         <Field label="How many Trumpets were blown this week?" hint="Each Zone has a target of 1000 trumpets">
           <input className="kf-input" type="number" min="0" placeholder="0"
             value={form.trumpetsBlown} onChange={e => setForm(p => ({ ...p, trumpetsBlown: e.target.value }))} />
+        </Field>
+
+        <Field label="How many great shouts were made this week?">
+          <input className="kf-input" type="number" min="0" placeholder="0"
+            value={form.greatShouts} onChange={e => setForm(p => ({ ...p, greatShouts: e.target.value }))} />
         </Field>
 
         <Field label="How many Testimonies were submitted to the Department?">
@@ -743,6 +750,8 @@ function TestimonialsForm({ onClose, onSubmit: parentSubmit }) {
   const [videos, setVideos] = useState([]);
   const [beforeImages, setBeforeImages] = useState([]);
   const [afterImages, setAfterImages] = useState([]);
+  const [memberName, setMemberName] = useState('');
+  const [categoryDetails, setCategoryDetails] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
 
@@ -762,6 +771,12 @@ function TestimonialsForm({ onClose, onSubmit: parentSubmit }) {
   const formatTestimonyContent = () => {
     let parts = [];
     parts.push(`Category: ${category}`);
+    if (memberName.trim()) {
+      parts.push(`Member Name: ${memberName}`);
+    }
+    if (categoryDetails.trim()) {
+      parts.push(`Testimony Details:\n${categoryDetails}`);
+    }
 
     const filesList = [];
     if (documents.length > 0) {
@@ -796,6 +811,8 @@ function TestimonialsForm({ onClose, onSubmit: parentSubmit }) {
     parentSubmit({
       testimony: '(Single testimony submitted)',
       testimoniesCount: 1, // Only one testimony
+      memberName: memberName,
+      categoryDetails: categoryDetails,
       beforeImages: beforeImages.length,
       afterImages: afterImages.length,
       documents: documents.length + videos.length,
@@ -834,7 +851,17 @@ function TestimonialsForm({ onClose, onSubmit: parentSubmit }) {
       {category && (
         <div style={{ padding: '20px 32px' }}>
           <div className="popup-fields" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            
+
+            <Field label="Member Name" hint="Who does this testimony belong to?">
+              <input className="kf-input" type="text" placeholder="e.g. Sister Anne"
+                value={memberName} onChange={e => setMemberName(e.target.value)} />
+            </Field>
+
+            <Field label={`${category} Details (please write the entire testimony here)`}>
+              <textarea className="kf-textarea" rows={6} placeholder={`Write ${category} testimony here...`}
+                value={categoryDetails} onChange={e => setCategoryDetails(e.target.value)} />
+            </Field>
+
             {/* Uploads */}
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
               <Field label="Upload PDF or Word files">
@@ -902,14 +929,14 @@ function MagazineForm({ onClose, onSubmit: parentSubmit }) {
     kidsLanguages: '',
     receivedCopies: '',
     notReceivedReason: '',
-    sponsoredCopies: '',
-    healingOutreaches: '',
-    healingMedia: [],
+    challengesFaced: '',
     praiseReports: '',
     monthlyMinimumOrder: '',
+    monthlyMinimumOrderAmountPaid: '',
     monthlyCopiesOrdered: '',
+    cumulativeSponsoredAmountPaid: '',
+    proofOfPaymentFiles: [],
     datesReceived: '',
-    outreachLocations: '',
   });
   const [errors, setErrors] = useState({});
   const [submitting, setSubmitting] = useState(false);
@@ -963,18 +990,19 @@ function MagazineForm({ onClose, onSubmit: parentSubmit }) {
       received:             Number(form.receivedCopies) || 0,
       receiptStatus:        Number(form.receivedCopies) === 0 ? 'No' : (Number(form.receivedCopies) < totalOrdered ? 'Partial' : 'Yes'),
       reason:               form.notReceivedReason,
-      sponsoredCopies:      Number(form.sponsoredCopies) || 0,
-      healingOutreaches:     Number(form.healingOutreaches) || 0,
+      challengesFaced:      form.challengesFaced,
       isAdult:              (Number(form.adultCopies) || 0) > 0,
       isTeevolution:        (Number(form.teensCopies) || 0) > 0,
       isKidsMagazine:       (Number(form.kidsCopies) || 0) > 0,
       status:               'PENDING',
       rawDate:              new Date().toISOString().split('T')[0],
       monthlyMinimumOrder:  Number(form.monthlyMinimumOrder) || 0,
+      monthlyMinimumOrderAmountPaid: Number(form.monthlyMinimumOrderAmountPaid) || 0,
       monthlyCopiesOrdered: Number(form.monthlyCopiesOrdered) || 0,
+      cumulativeSponsoredAmountPaid: Number(form.cumulativeSponsoredAmountPaid) || 0,
+      proofOfPayment:       form.proofOfPaymentFiles.length,
       praiseReports:        form.praiseReports,
       datesReceived:        form.datesReceived,
-      outreachLocations:    form.outreachLocations,
     });
     setSubmitting(false);
   };
@@ -986,7 +1014,7 @@ function MagazineForm({ onClose, onSubmit: parentSubmit }) {
       onClose={onClose} onSubmit={handleSubmit} submitting={submitting} submitLabel="Submit Magazine Report">
 
       {/* Magazine Types */}
-      <div className="popup-section-head">📚 Please state number of magazines required for each type (adult, teens, kids)</div>
+      <div className="popup-section-head">📚 Please state number of magazines ordered for each type (adult, teens, kids)</div>
       <div className="popup-fields">
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
           <Field label="Adult Copies" error={errors.adultCopies}>
@@ -994,8 +1022,18 @@ function MagazineForm({ onClose, onSubmit: parentSubmit }) {
               value={form.adultCopies} onChange={e => setForm(p => ({ ...p, adultCopies: e.target.value }))} />
           </Field>
           <Field label="Adult Language(s)" error={errors.adultLanguages}>
-            <input className="kf-input" placeholder="e.g. English, French"
-              value={form.adultLanguages} onChange={e => setForm(p => ({ ...p, adultLanguages: e.target.value }))} />
+            <div className="kf-select-wrap">
+              <select className="kf-select" value={form.adultLanguages} onChange={e => setForm(p => ({ ...p, adultLanguages: e.target.value }))}>
+                <option value="">Select Language</option>
+                <option value="English">English</option><option value="French">French</option><option value="Spanish">Spanish</option><option value="Portuguese">Portuguese</option>
+                <option value="German">German</option><option value="Italian">Italian</option><option value="Russian">Russian</option><option value="Chinese">Chinese</option>
+                <option value="Japanese">Japanese</option><option value="Korean">Korean</option><option value="Arabic">Arabic</option><option value="Hindi">Hindi</option>
+                <option value="Bengali">Bengali</option><option value="Urdu">Urdu</option><option value="Indonesian">Indonesian</option><option value="Swahili">Swahili</option>
+                <option value="Dutch">Dutch</option><option value="Turkish">Turkish</option><option value="Vietnamese">Vietnamese</option><option value="Polish">Polish</option>
+                <option value="Yoruba">Yoruba</option><option value="Igbo">Igbo</option><option value="Hausa">Hausa</option><option value="Other">Other</option>
+              </select>
+              <ChevronDown className="kf-select-chevron" size={16} />
+            </div>
           </Field>
         </div>
 
@@ -1005,8 +1043,18 @@ function MagazineForm({ onClose, onSubmit: parentSubmit }) {
               value={form.teensCopies} onChange={e => setForm(p => ({ ...p, teensCopies: e.target.value }))} />
           </Field>
           <Field label="Teens Language(s)" error={errors.teensLanguages}>
-            <input className="kf-input" placeholder="e.g. English, Spanish"
-              value={form.teensLanguages} onChange={e => setForm(p => ({ ...p, teensLanguages: e.target.value }))} />
+            <div className="kf-select-wrap">
+              <select className="kf-select" value={form.teensLanguages} onChange={e => setForm(p => ({ ...p, teensLanguages: e.target.value }))}>
+                <option value="">Select Language</option>
+                <option value="English">English</option><option value="French">French</option><option value="Spanish">Spanish</option><option value="Portuguese">Portuguese</option>
+                <option value="German">German</option><option value="Italian">Italian</option><option value="Russian">Russian</option><option value="Chinese">Chinese</option>
+                <option value="Japanese">Japanese</option><option value="Korean">Korean</option><option value="Arabic">Arabic</option><option value="Hindi">Hindi</option>
+                <option value="Bengali">Bengali</option><option value="Urdu">Urdu</option><option value="Indonesian">Indonesian</option><option value="Swahili">Swahili</option>
+                <option value="Dutch">Dutch</option><option value="Turkish">Turkish</option><option value="Vietnamese">Vietnamese</option><option value="Polish">Polish</option>
+                <option value="Yoruba">Yoruba</option><option value="Igbo">Igbo</option><option value="Hausa">Hausa</option><option value="Other">Other</option>
+              </select>
+              <ChevronDown className="kf-select-chevron" size={16} />
+            </div>
           </Field>
         </div>
 
@@ -1016,8 +1064,18 @@ function MagazineForm({ onClose, onSubmit: parentSubmit }) {
               value={form.kidsCopies} onChange={e => setForm(p => ({ ...p, kidsCopies: e.target.value }))} />
           </Field>
           <Field label="Kids Language(s)" error={errors.kidsLanguages}>
-            <input className="kf-input" placeholder="e.g. English, Portuguese"
-              value={form.kidsLanguages} onChange={e => setForm(p => ({ ...p, kidsLanguages: e.target.value }))} />
+            <div className="kf-select-wrap">
+              <select className="kf-select" value={form.kidsLanguages} onChange={e => setForm(p => ({ ...p, kidsLanguages: e.target.value }))}>
+                <option value="">Select Language</option>
+                <option value="English">English</option><option value="French">French</option><option value="Spanish">Spanish</option><option value="Portuguese">Portuguese</option>
+                <option value="German">German</option><option value="Italian">Italian</option><option value="Russian">Russian</option><option value="Chinese">Chinese</option>
+                <option value="Japanese">Japanese</option><option value="Korean">Korean</option><option value="Arabic">Arabic</option><option value="Hindi">Hindi</option>
+                <option value="Bengali">Bengali</option><option value="Urdu">Urdu</option><option value="Indonesian">Indonesian</option><option value="Swahili">Swahili</option>
+                <option value="Dutch">Dutch</option><option value="Turkish">Turkish</option><option value="Vietnamese">Vietnamese</option><option value="Polish">Polish</option>
+                <option value="Yoruba">Yoruba</option><option value="Igbo">Igbo</option><option value="Hausa">Hausa</option><option value="Other">Other</option>
+              </select>
+              <ChevronDown className="kf-select-chevron" size={16} />
+            </div>
           </Field>
         </div>
       </div>
@@ -1029,8 +1087,8 @@ function MagazineForm({ onClose, onSubmit: parentSubmit }) {
           <input className={`kf-input${errors.receivedCopies ? ' kf-input-err' : ''}`} type="number" min="0" placeholder="0"
             value={form.receivedCopies} onChange={e => setForm(p => ({ ...p, receivedCopies: e.target.value }))} />
         </Field>
-        <Field label="Dates received">
-          <input className="kf-input" placeholder="e.g. 12th Oct, 14th Oct..."
+        <Field label="Date(s) received">
+          <input className="kf-input" type="date"
             value={form.datesReceived} onChange={e => setForm(p => ({ ...p, datesReceived: e.target.value }))} />
         </Field>
         {Number(form.receivedCopies) < totalOrdered && (
@@ -1040,52 +1098,51 @@ function MagazineForm({ onClose, onSubmit: parentSubmit }) {
               value={form.notReceivedReason} onChange={e => setForm(p => ({ ...p, notReceivedReason: e.target.value }))} />
           </Field>
         )}
-        <Field label="How many copies were sponsored this week? (please state no. of copies received and sponsored for the week)">
-          <input className="kf-input" type="number" min="0" placeholder="0"
-            value={form.sponsoredCopies} onChange={e => setForm(p => ({ ...p, sponsoredCopies: e.target.value }))} />
+        <Field label="State challenges faced or complains">
+          <textarea className="kf-textarea" rows={3} placeholder="Describe any challenges faced..."
+            value={form.challengesFaced} onChange={e => setForm(p => ({ ...p, challengesFaced: e.target.value }))} />
         </Field>
       </div>
 
       {/* Monthly Ordering */}
-      <div className="popup-section-head">📦 Monthly Ordering</div>
+      <div className="popup-section-head">📦 Monthly ordered (local distributions)</div>
       <div className="popup-fields">
-        <Field label="Monthly Minimum Magazine Order">
-          <input className="kf-input" type="number" min="0" placeholder="0"
-            value={form.monthlyMinimumOrder} onChange={e => setForm(p => ({ ...p, monthlyMinimumOrder: e.target.value }))} />
-        </Field>
-        <Field label="Cumulative number of copies sponsored for the month (please update the total number of copies the zone has sponsored for the month)">
-          <input className="kf-input" type="number" min="0" placeholder="0"
-            value={form.monthlyCopiesOrdered} onChange={e => setForm(p => ({ ...p, monthlyCopiesOrdered: e.target.value }))} />
-        </Field>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+          <Field label="Monthly Minimum Magazine Order">
+            <input className="kf-input" type="number" min="0" placeholder="0"
+              value={form.monthlyMinimumOrder} onChange={e => setForm(p => ({ ...p, monthlyMinimumOrder: e.target.value }))} />
+          </Field>
+          <Field label="Amount Paid (Minimum Order)">
+            <input className="kf-input" type="number" min="0" placeholder="0.00" step="0.01"
+              value={form.monthlyMinimumOrderAmountPaid} onChange={e => setForm(p => ({ ...p, monthlyMinimumOrderAmountPaid: e.target.value }))} />
+          </Field>
+        </div>
+
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginTop: '1rem' }}>
+          <Field label="Cumulative number of copies sponsored for the month (please update the total number of copies the zone has sponsored for the month)">
+            <input className="kf-input" type="number" min="0" placeholder="0"
+              value={form.monthlyCopiesOrdered} onChange={e => setForm(p => ({ ...p, monthlyCopiesOrdered: e.target.value }))} />
+          </Field>
+          <Field label="Amount Paid (Cumulative)">
+            <input className="kf-input" type="number" min="0" placeholder="0.00" step="0.01"
+              value={form.cumulativeSponsoredAmountPaid} onChange={e => setForm(p => ({ ...p, cumulativeSponsoredAmountPaid: e.target.value }))} />
+          </Field>
+        </div>
       </div>
 
-      {/* Healing Outreaches */}
-      <div className="popup-section-head">💊 Healing Outreaches</div>
+      {/* POP */}
+      <div className="popup-section-head">🧾 Proof of Payment (POP)</div>
       <div className="popup-fields">
-        <Field label="How many Healing Outreaches were carried out this week?">
-          <input className="kf-input" type="number" min="0" placeholder="0"
-            value={form.healingOutreaches} onChange={e => setForm(p => ({ ...p, healingOutreaches: e.target.value }))} />
-        </Field>
-        <Field label="State the location of outreaches (e.g. market, hospitals, school, etc.)">
-          <input className="kf-input" placeholder="e.g. local market, community school..."
-            value={form.outreachLocations} onChange={e => setForm(p => ({ ...p, outreachLocations: e.target.value }))} />
-        </Field>
-        <Field label="Upload pictures and videos from the Healing Outreach">
-          <MediaUploader
-            files={form.healingMedia}
-            onAdd={files => {
-              const prev = files.map(f => ({
-                name: f.name, type: f.type,
-                url: (f.type.startsWith('image') || f.type.startsWith('video')) ? URL.createObjectURL(f) : null,
-                size: f.size,
-              }));
-              setForm(p => ({ ...p, healingMedia: [...form.healingMedia, ...prev] }));
-            }}
-            onRemove={i => setForm(p => ({ ...p, healingMedia: p.healingMedia.filter((_,j) => j !== i) }))}
-            label="Upload Healing Outreach Photos & Videos"
-            accept="image/*,video/*"
-          />
-        </Field>
+        <MediaUploader
+          files={form.proofOfPaymentFiles}
+          onAdd={files => {
+            const prev = files.map(f => ({ name: f.name, type: f.type, url: (f.type.startsWith('image') || f.type.startsWith('video')) ? URL.createObjectURL(f) : null, size: f.size }));
+            setForm(p => ({ ...p, proofOfPaymentFiles: [...p.proofOfPaymentFiles, ...prev] }));
+          }}
+          onRemove={i => setForm(p => ({ ...p, proofOfPaymentFiles: p.proofOfPaymentFiles.filter((_,j) => j !== i) }))}
+          label="Upload Proof of Payment (POP)"
+          accept="image/*,.pdf,.doc,.docx"
+        />
       </div>
 
       {/* Praise Reports */}
@@ -1123,6 +1180,7 @@ function OutreachForm({ onClose, onSubmit: parentSubmit }) {
     testimonyFiles: [],
     healingTranslationsAchieved: '',
     healingOutreachesHeld: '',
+    healingOutreachLocations: '',
     healingMediaSubmitted: '',
   });
   const [errors, setErrors] = useState({});
@@ -1131,7 +1189,7 @@ function OutreachForm({ onClose, onSubmit: parentSubmit }) {
   const handleSubmit = async () => {
     const e = {};
     if (!form.date) e.date = 'Required';
-    if (!form.category) e.category = 'Please select an outreach category';
+    if (!form.category) e.category = 'Please select a category';
     if (!form.locations.trim()) e.locations = 'Required';
     if (!form.story.trim()) e.story = 'Required';
     setErrors(e);
@@ -1166,19 +1224,20 @@ function OutreachForm({ onClose, onSubmit: parentSubmit }) {
       followUpPlan:    form.followUpPlan,
       healingTranslationsAchieved:  Number(form.healingTranslationsAchieved) || 0,
       healingOutreachesHeld: Number(form.healingOutreachesHeld) || 0,
+      healingOutreachLocations: form.healingOutreachLocations,
       healingMediaSubmitted: Number(form.healingMediaSubmitted) || 0,
     });
     setSubmitting(false);
   };
 
   return (
-    <FormPopup title="Outreach Activity Report" eyebrow="KingsForms · Outreach" icon="📍"
-      onClose={onClose} onSubmit={handleSubmit} submitting={submitting} submitLabel="Submit Outreach Report">
+    <FormPopup title="Outreach / Crusade Activity Report" eyebrow="KingsForms · Outreach" icon="📍"
+      onClose={onClose} onSubmit={handleSubmit} submitting={submitting} submitLabel="Submit Outreach / Crusade Report">
 
       {/* Category */}
-      <div className="popup-section-head">🏷️ Outreach Category</div>
+      <div className="popup-section-head">🏷️ Outreach / Crusade Category</div>
       <div className="popup-fields">
-        <Field label="What type of outreach was this?" required hint="(healing, soul-winning, etc.)" error={errors.category}>
+        <Field label="What type of outreach / crusade was this?" required hint="(healing, soul-winning, etc.)" error={errors.category}>
           <div className="outreach-cat-grid">
             {OUTREACH_CATEGORIES.map(cat => (
               <button key={cat} type="button"
@@ -1190,17 +1249,17 @@ function OutreachForm({ onClose, onSubmit: parentSubmit }) {
           </div>
         </Field>
         {form.category === 'Other' && (
-          <Field label="Please specify outreach type">
-            <input className="kf-input" placeholder="Enter outreach category…"
+          <Field label="Please specify type">
+            <input className="kf-input" placeholder="Enter category…"
               value={form.customCategory} onChange={e => setForm(p => ({ ...p, customCategory: e.target.value }))} />
           </Field>
         )}
       </div>
 
       {/* Outreach Details */}
-      <div className="popup-section-head">📍 Outreach Details</div>
+      <div className="popup-section-head">📍 Outreach / Crusade Details</div>
       <div className="popup-fields">
-        <Field label="Date of Outreach" required error={errors.date}>
+        <Field label="Date of Outreach / Crusade" required error={errors.date}>
           <input className={`kf-input${errors.date ? ' kf-input-err' : ''}`} type="date"
             value={form.date} onChange={e => setForm(p => ({ ...p, date: e.target.value }))} />
         </Field>
@@ -1211,29 +1270,29 @@ function OutreachForm({ onClose, onSubmit: parentSubmit }) {
         </Field>
 
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginTop: '1rem' }}>
-          <Field label="How many copies of magazine were used for the outreach?">
+          <Field label="How many copies of magazine were used?">
             <input className="kf-input" type="number" min="0" placeholder="0"
               value={form.magazinesUsed} onChange={e => setForm(p => ({ ...p, magazinesUsed: e.target.value }))} />
           </Field>
-          <Field label="How many people are involved in the outreach?">
+          <Field label="How many people are involved?">
             <input className="kf-input" type="number" min="0" placeholder="0"
               value={form.peopleInvolved} onChange={e => setForm(p => ({ ...p, peopleInvolved: e.target.value }))} />
           </Field>
         </div>
 
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginTop: '1rem' }}>
-          <Field label="What was the total attendance of outreach?">
+          <Field label="What was the total attendance?">
             <input className="kf-input" type="number" min="0" placeholder="0"
               value={form.totalAttendance} onChange={e => setForm(p => ({ ...p, totalAttendance: e.target.value }))} />
           </Field>
-          <Field label="How many souls were saved in the outreach?">
+          <Field label="How many souls were saved?">
             <input className="kf-input" type="number" min="0" placeholder="0"
               value={form.soulsSaved} onChange={e => setForm(p => ({ ...p, soulsSaved: e.target.value }))} />
           </Field>
         </div>
 
-        <Field label="Kindly submit testimonies from the outreach(es)">
-          <textarea className="kf-textarea" rows={3} placeholder="Give outreach testimonies..."
+        <Field label="Kindly submit testimonies from the outreach(es) / crusade(s)">
+          <textarea className="kf-textarea" rows={3} placeholder="Give testimonies..."
             value={form.outreachTestimonies} onChange={e => setForm(p => ({ ...p, outreachTestimonies: e.target.value }))} />
         </Field>
 
@@ -1242,13 +1301,18 @@ function OutreachForm({ onClose, onSubmit: parentSubmit }) {
             <input className="kf-input" type="number" min="0" placeholder="0"
               value={form.healingTranslationsAchieved} onChange={e => setForm(p => ({ ...p, healingTranslationsAchieved: e.target.value }))} />
           </Field>
-          <Field label="How many Healing outreaches held this week?">
+          <Field label="How many Healing Outreaches / Crusades were carried out this week with the healing to nations magazine?">
             <input className="kf-input" type="number" min="0" placeholder="0"
               value={form.healingOutreachesHeld} onChange={e => setForm(p => ({ ...p, healingOutreachesHeld: e.target.value }))} />
           </Field>
         </div>
 
-        <Field label="How many pictures and videos from the Healing outreaches were submitted?">
+        <Field label="State the location of healing outreaches (e.g. market, hospitals, school, etc.)">
+          <input className="kf-input" placeholder="e.g. local market, community school..."
+            value={form.healingOutreachLocations} onChange={e => setForm(p => ({ ...p, healingOutreachLocations: e.target.value }))} />
+        </Field>
+
+        <Field label="How many pictures and videos from the Healing outreaches / crusades were submitted?">
           <input className="kf-input" type="number" min="0" placeholder="0"
             value={form.healingMediaSubmitted} onChange={e => setForm(p => ({ ...p, healingMediaSubmitted: e.target.value }))} />
         </Field>
@@ -1259,25 +1323,10 @@ function OutreachForm({ onClose, onSubmit: parentSubmit }) {
         </Field>
       </div>
 
-      {/* Testimony Uploads */}
-      <div className="popup-section-head">📎 Testimony Uploads (Word, PDF, videos, pictures)</div>
-      <div className="popup-fields">
-        <MediaUploader
-          files={form.testimonyFiles}
-          onAdd={files => {
-            const prev = files.map(f => ({ name: f.name, type: f.type, url: (f.type.startsWith('image') || f.type.startsWith('video')) ? URL.createObjectURL(f) : null, size: f.size }));
-            setForm(p => ({ ...p, testimonyFiles: [...p.testimonyFiles, ...prev] }));
-          }}
-          onRemove={i => setForm(p => ({ ...p, testimonyFiles: p.testimonyFiles.filter((_,j) => j !== i) }))}
-          label="Upload Testimony Files"
-          accept="image/*,video/*,.pdf,.doc,.docx"
-        />
-      </div>
-
       {/* Story */}
-      <div className="popup-section-head">📝 Outreach Story</div>
+      <div className="popup-section-head">📝 Outreach / Crusade Story</div>
       <div className="popup-fields">
-        <Field label="Tell the outreach story" required error={errors.story}>
+        <Field label="Tell the story" required error={errors.story}>
           <textarea className={`kf-textarea${errors.story ? ' kf-input-err' : ''}`} rows={7}
             placeholder="Describe what happened — souls reached, testimonies heard, challenges, highlights…"
             value={form.story} onChange={e => setForm(p => ({ ...p, story: e.target.value }))} />
@@ -1285,7 +1334,7 @@ function OutreachForm({ onClose, onSubmit: parentSubmit }) {
       </div>
 
       {/* Images & Videos */}
-      <div className="popup-section-head">📸 Outreach Images & Videos</div>
+      <div className="popup-section-head">📸 Outreach / Crusade Images & Videos</div>
       <div className="popup-fields">
         <MediaUploader files={form.images}
           onAdd={files => {
@@ -1293,7 +1342,7 @@ function OutreachForm({ onClose, onSubmit: parentSubmit }) {
             setForm(p => ({ ...p, images: [...p.images, ...prev] }));
           }}
           onRemove={i => setForm(p => ({ ...p, images: p.images.filter((_,j) => j !== i) }))}
-          label="Upload Outreach Photos & Videos"
+          label="Upload Photos & Videos (includes Healing outreaches)"
           accept="image/*,video/*"
         />
       </div>
@@ -1336,6 +1385,7 @@ const TABS_CONFIG = [
     id: 'testimonials', label: 'Testimonials', icon: <BookOpen size={14} />, emoji: '✍️', color: '#d97706',
     columns: [
       { key: 'id', label: 'Report ID' }, { key: 'rawDate', label: 'Date' },
+      { key: 'memberName', label: 'Member Name' },
       { key: 'testimoniesCount', label: 'Count' },
       { key: 'prayWithMeTestimonies', label: 'Pray With Me' },
       { key: 'translationTestimonies', label: 'Translation' },
@@ -1554,6 +1604,7 @@ export default function ReportingPortal() {
           <h2>Reporting Portal {user?.role === 'admin' ? '— Admin View' : ''}</h2>
           <p>{user?.role === 'admin' ? 'Review, approve, and manage all submitted reports' : 'Submit, manage, and track weekly activity reports'}</p>
         </div>
+        <button className="rp-export-btn excel" onClick={handleExport}><ExportIcon /> Export CSV</button>
       </div>
 
       {/* ── Tabs ── */}
@@ -1581,7 +1632,6 @@ export default function ReportingPortal() {
               value={search} onChange={e => setSearch(e.target.value)} />
           </div>
           <div className="rp-toolbar-right">
-            <button className="rp-export-btn excel" onClick={handleExport}><ExportIcon /> Export CSV</button>
             <button className="submit-report-btn" style={{ '--btn-color': tab.color }} onClick={() => setShowForm(true)}>
               <Plus size={14} /> {tab.btnLabel}
             </button>
