@@ -923,10 +923,13 @@ function MagazineForm({ onClose, onSubmit: parentSubmit }) {
   const [form, setForm] = useState({
     adultCopies: '',
     adultLanguages: '',
+    adultLanguagesOther: '',
     teensCopies: '',
     teensLanguages: '',
+    teensLanguagesOther: '',
     kidsCopies: '',
     kidsLanguages: '',
+    kidsLanguagesOther: '',
     receivedCopies: '',
     notReceivedReason: '',
     challengesFaced: '',
@@ -972,10 +975,11 @@ function MagazineForm({ onClose, onSubmit: parentSubmit }) {
     await new Promise(r => setTimeout(r, 500));
     
     const totalOrdered = (Number(form.adultCopies) || 0) + (Number(form.teensCopies) || 0) + (Number(form.kidsCopies) || 0);
+    const getLang = (lang, other) => lang === 'Other' ? (other || 'Other') : lang;
     const combinedLanguages = [
-      form.adultLanguages && `Adult: ${form.adultLanguages}`,
-      form.teensLanguages && `Teens: ${form.teensLanguages}`,
-      form.kidsLanguages && `Kids: ${form.kidsLanguages}`
+      form.adultLanguages && `Adult: ${getLang(form.adultLanguages, form.adultLanguagesOther)}`,
+      form.teensLanguages && `Teens: ${getLang(form.teensLanguages, form.teensLanguagesOther)}`,
+      form.kidsLanguages && `Kids: ${getLang(form.kidsLanguages, form.kidsLanguagesOther)}`
     ].filter(Boolean).join('; ');
 
     parentSubmit({
@@ -1034,6 +1038,10 @@ function MagazineForm({ onClose, onSubmit: parentSubmit }) {
               </select>
               <ChevronDown className="kf-select-chevron" size={16} />
             </div>
+            {form.adultLanguages === 'Other' && (
+              <input className="kf-input" style={{ marginTop: '0.5rem' }} placeholder="Specify language..."
+                value={form.adultLanguagesOther} onChange={e => setForm(p => ({ ...p, adultLanguagesOther: e.target.value }))} />
+            )}
           </Field>
         </div>
 
@@ -1055,6 +1063,10 @@ function MagazineForm({ onClose, onSubmit: parentSubmit }) {
               </select>
               <ChevronDown className="kf-select-chevron" size={16} />
             </div>
+            {form.teensLanguages === 'Other' && (
+              <input className="kf-input" style={{ marginTop: '0.5rem' }} placeholder="Specify language..."
+                value={form.teensLanguagesOther} onChange={e => setForm(p => ({ ...p, teensLanguagesOther: e.target.value }))} />
+            )}
           </Field>
         </div>
 
@@ -1076,6 +1088,10 @@ function MagazineForm({ onClose, onSubmit: parentSubmit }) {
               </select>
               <ChevronDown className="kf-select-chevron" size={16} />
             </div>
+            {form.kidsLanguages === 'Other' && (
+              <input className="kf-input" style={{ marginTop: '0.5rem' }} placeholder="Specify language..."
+                value={form.kidsLanguagesOther} onChange={e => setForm(p => ({ ...p, kidsLanguagesOther: e.target.value }))} />
+            )}
           </Field>
         </div>
       </div>
