@@ -77,7 +77,7 @@ function MediaUploader({ files, onAdd, onRemove, label = "Upload Images / Files"
 function ClarificationModal({ report, endpoint, onClose, onDone }) {
   const [note, setNote] = useState('');
   const [loading, setLoading] = useState(false);
-  const baseUrl = window.ENV?.API_PATH || process.env.REACT_APP_API_URL || 'http://65.2.153.58:8080';
+  const baseUrl = window.ENV?.API_PATH || process.env.REACT_APP_API_URL || 'https://65.2.153.58';
 
   const send = async () => {
     if (!note.trim()) return;
@@ -427,7 +427,7 @@ function ZonalReportForm({ onClose, onSubmit: parentSubmit }) {
       heraldConference:             form.heraldConference,
     };
     try {
-      await fetch(`${window.ENV?.API_PATH || process.env.REACT_APP_API_URL || 'http://65.2.153.58:8080'}/api/reports`, {
+      await fetch(`${window.ENV?.API_PATH || process.env.REACT_APP_API_URL || 'https://65.2.153.58'}/api/reports`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
@@ -1466,7 +1466,7 @@ export default function ReportingPortal() {
   }, [user]);
 
   const fetchAllReports = async () => {
-    const baseUrl = window.ENV?.API_PATH || process.env.REACT_APP_API_URL || 'http://65.2.153.58:8080';
+    const baseUrl = window.ENV?.API_PATH || process.env.REACT_APP_API_URL || 'https://65.2.153.58';
     const emailParam = user?.role === 'admin' ? '' : `?email=${user?.email}`;
     
     try {
@@ -1513,7 +1513,7 @@ export default function ReportingPortal() {
   };
 
   const handleApprove = async (report) => {
-    const baseUrl = window.ENV?.API_PATH || process.env.REACT_APP_API_URL || 'http://65.2.153.58:8080';
+    const baseUrl = window.ENV?.API_PATH || process.env.REACT_APP_API_URL || 'https://65.2.153.58';
     const endpoint = activeTab === 'zonal' ? '/api/reports' : `/api/portal-reports/${activeTab}`;
     const id = report.id.replace(/^[A-Z]+-/, '');
     
@@ -1531,7 +1531,7 @@ export default function ReportingPortal() {
 
   const handleDelete = async (report) => {
     if (!window.confirm('Delete this report? This cannot be undone.')) return;
-    const baseUrl = window.ENV?.API_PATH || process.env.REACT_APP_API_URL || 'http://65.2.153.58:8080';
+    const baseUrl = window.ENV?.API_PATH || process.env.REACT_APP_API_URL || 'https://65.2.153.58';
     const endpoint = activeTab === 'zonal' ? '/api/reports' : `/api/portal-reports/${activeTab}`;
     const id = report.id.replace(/^[A-Z]+-/, '');
 
@@ -1557,7 +1557,7 @@ export default function ReportingPortal() {
   const handleSubmit = async (data) => {
     try {
       if (['partnership', 'testimonials', 'magazine', 'outreach'].includes(activeTab)) {
-        const res = await fetch(`${window.ENV?.API_PATH || process.env.REACT_APP_API_URL || 'http://65.2.153.58:8080'}/api/portal-reports/${activeTab}`, {
+        const res = await fetch(`${window.ENV?.API_PATH || process.env.REACT_APP_API_URL || 'https://65.2.153.58'}/api/portal-reports/${activeTab}`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
