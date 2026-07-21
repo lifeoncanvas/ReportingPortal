@@ -131,7 +131,7 @@ export default function Settings() {
 
     useEffect(() => {
         if (tab === 'security' && user?.email) {
-            const apiUrl = process.env.REACT_APP_API_URL || 'http://65.1.248.88:8081';
+            const apiUrl = process.env.REACT_APP_API_URL || 'https://65.2.153.58:8080';
             fetch(`${apiUrl}/api/auth/security-question?email=${encodeURIComponent(user.email)}`)
                 .then(res => res.json())
                 .then(data => {
@@ -149,7 +149,7 @@ export default function Settings() {
 
         setPwLoading(true);
         try {
-            const apiUrl = process.env.REACT_APP_API_URL || 'http://65.1.248.88:8081';
+            const apiUrl = process.env.REACT_APP_API_URL || 'https://65.2.153.58:8080';
             const res = await fetch(`${apiUrl}/api/auth/change-password`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -180,7 +180,7 @@ export default function Settings() {
         }
         setSecLoading(true);
         try {
-            const apiUrl = process.env.REACT_APP_API_URL || 'http://65.1.248.88:8081';
+            const apiUrl = process.env.REACT_APP_API_URL || 'https://65.2.153.58:8080';
             const res = await fetch(`${apiUrl}/api/auth/update-security-settings`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
