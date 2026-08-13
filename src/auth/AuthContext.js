@@ -18,15 +18,7 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(() => {
     const saved = session.get('lw_user');
     if (saved) return saved;
-    // Auto-login for ALL environments (TEMPORARY FOR TESTING)
-    return {
-      email: 'admin@loveworld.com',
-      role: 'admin',
-      status: 'active',
-      firstName: 'System',
-      lastName: 'Administrator',
-      displayName: 'System Administrator'
-    };
+    return null;
   });
   const [avatar, setAvatar] = useState(() => session.getRaw('lw_avatar') || null);
 
