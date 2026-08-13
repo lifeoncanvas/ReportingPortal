@@ -1467,7 +1467,7 @@ export default function ReportingPortal() {
 
   const fetchAllReports = async () => {
     const baseUrl = window.ENV?.API_PATH || process.env.REACT_APP_API_URL ;
-    const emailParam = user?.role === 'admin' ? '' : `?email=${user?.email}`;
+    const emailParam = (user?.role === 'admin' || user?.role === 'global') ? '' : `?email=${user?.email}`;
     
     try {
       const zRes = await fetch(`${baseUrl}/api/reports${emailParam}`);

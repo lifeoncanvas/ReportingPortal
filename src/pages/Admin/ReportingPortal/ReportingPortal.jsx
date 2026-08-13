@@ -114,8 +114,8 @@ export default function AdminReportingPortal() {
     setLoading(true);
     try {
       const url = activeTab === 'zonal'
-        ? `${API}${tab.endpoint}?email=${user?.email}`
-        : `${API}${tab.endpoint}?email=${user?.email}`;
+        ? `${API}${tab.endpoint}`
+        : `${API}${tab.endpoint}`;
       const res = await fetch(url);
       const data = await res.json();
       setReports(Array.isArray(data) ? data : []);
@@ -149,7 +149,7 @@ export default function AdminReportingPortal() {
 
     if (activeTab === 'zonal') {
       try {
-        const res = await fetch(`${API}/api/reports/export?email=${user?.email}`);
+        const res = await fetch(`${API}/api/reports/export`);
         const blob = await res.blob();
         const url = URL.createObjectURL(blob);
         const dateStr = new Date().toISOString().split('T')[0];
