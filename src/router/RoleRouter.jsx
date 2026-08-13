@@ -84,16 +84,20 @@ export default function RoleRouter() {
     );
   }
 
-  // Default fallback for users with other roles (e.g. 'finance', 'user' or unassigned)
+  // Default fallback for KingsChat users (who get 'user' or unassigned by default)
+  // Map them to the Zonal Manager Layout so they see the Zonal Portal automatically
   return (
     <Routes>
-      <Route path="/portal" element={<GlobalMgrLayout />}>
-        <Route index element={<Navigate to="submit-report" replace />} />
-        <Route path="submit-report" element={<SubmitReport />} />
+      <Route path="/zonal" element={<ZonalMgrLayout />}>
+        <Route index element={<Navigate to="reporting" replace />} />
+        <Route path="dashboard"     element={<ZonalDashboard />} />
+        <Route path="reporting"     element={<ZonalReportingTabs />} />
+        <Route path="analytics"     element={<ZonalAnalytics />} />
         <Route path="notifications" element={<Notifications />} />
         <Route path="settings"      element={<Settings />} />
+        <Route path="submit-report" element={<SubmitReport />} />
       </Route>
-      <Route path="*" element={<Navigate to="/portal/submit-report" replace />} />
+      <Route path="*" element={<Navigate to="/zonal/reporting" replace />} />
     </Routes>
   );
 }

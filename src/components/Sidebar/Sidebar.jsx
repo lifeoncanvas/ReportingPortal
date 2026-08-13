@@ -20,11 +20,9 @@ export default function Sidebar({ isOpen, onClose }) {
   const roleLabel =
     role === 'admin'
       ? 'System Administrator'
-      : role === 'zonal'
-      ? 'Zonal Manager'
       : role === 'global'
       ? 'Global Manager'
-      : 'User';
+      : 'Zonal Manager';
 
   const NAV_CONFIG = {
     global: [
@@ -45,7 +43,8 @@ export default function Sidebar({ isOpen, onClose }) {
       { label: t?.auditLogs || 'Audit Logs', icon: ClipboardList, path: '/admin/audit' },
     ],
     user: [
-      { label: 'Submit Report', icon: FileText, path: '/portal/submit-report' },
+      { label: t?.dashboard || 'Dashboard', icon: LayoutDashboard, path: '/zonal/dashboard' },
+      { label: t?.reportingPortal || 'Reporting Portal', icon: FileText, path: '/zonal/reporting' },
     ],
   };
 
