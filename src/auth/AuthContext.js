@@ -73,6 +73,8 @@ export function AuthProvider({ children }) {
       console.log("KingsChat Login Success. UserData:", userData);
 
       if (userData.status && userData.status !== 'active') {
+        session.remove('lw_user');
+        setUser(null);
         return 'Your account is pending admin approval. Please contact an administrator.';
       }
 
@@ -116,6 +118,8 @@ export function AuthProvider({ children }) {
       const userData = await res.json();
       
       if (userData.status && userData.status !== 'active') {
+        session.remove('lw_user');
+        setUser(null);
         return 'Your account is pending admin approval. Please contact an administrator.';
       }
 
