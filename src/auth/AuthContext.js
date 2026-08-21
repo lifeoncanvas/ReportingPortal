@@ -33,7 +33,10 @@ export function AuthProvider({ children }) {
   };
 
   const getApiUrl = () => {
-    return window.ENV?.API_PATH || process.env.REACT_APP_API_URL ;
+    if (typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+      return '';
+    }
+    return window.ENV?.API_PATH || process.env.REACT_APP_API_URL || 'http://localhost:8081';
   };
 
   const loginWithKingChat = async (accessToken, onPendingToasts, kcUser) => {
@@ -136,7 +139,8 @@ export function AuthProvider({ children }) {
 
   const signup = async (name, email, password, phone) => {
     try {
-      const res = await fetch(`${process.env.REACT_APP_API_URL}/api/auth/signup`, {
+      const apiUrl = getApiUrl();
+      const res = await fetch(`${apiUrl}/api/auth/signup`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, email, password, phone })
