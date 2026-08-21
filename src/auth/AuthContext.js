@@ -33,10 +33,11 @@ export function AuthProvider({ children }) {
   };
 
   const getApiUrl = () => {
-    if (typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
-      return '';
+    const envPath = typeof window !== 'undefined' ? window.ENV?.API_PATH : undefined;
+    if (envPath && envPath.trim() !== '') {
+      return envPath;
     }
-    return window.ENV?.API_PATH || process.env.REACT_APP_API_URL || 'http://localhost:8081';
+    return process.env.REACT_APP_API_URL || 'http://localhost:8081';
   };
 
   const loginWithKingChat = async (accessToken, onPendingToasts, kcUser) => {
