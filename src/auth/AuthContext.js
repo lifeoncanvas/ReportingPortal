@@ -70,7 +70,7 @@ export function AuthProvider({ children }) {
       console.log("KingsChat Login Success. UserData:", userData);
 
       if (userData.status && userData.status !== 'active') {
-        return 'Your account is currently inactive. Please contact your administrator for activation.';
+        return 'Your account is pending admin approval. Please contact an administrator.';
       }
 
       session.set('lw_user', userData);
@@ -111,7 +111,7 @@ export function AuthProvider({ children }) {
       const userData = await res.json();
       
       if (userData.status && userData.status !== 'active') {
-        return 'Your account is currently inactive. Please contact your administrator for activation.';
+        return 'Your account is pending admin approval. Please contact an administrator.';
       }
 
       session.set('lw_user', userData);
