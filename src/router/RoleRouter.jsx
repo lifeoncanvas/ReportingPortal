@@ -34,7 +34,7 @@ export default function RoleRouter() {
     return (
       <Routes>
         <Route path="/global" element={<GlobalMgrLayout />}>
-          <Route index element={<Navigate to="reporting" replace />} />
+          <Route index element={<Navigate to="dashboard" replace />} />
           <Route path="dashboard"     element={<GlobalDashboard />} />
           <Route path="reporting"     element={<ReportingPortal />} />
           <Route path="analytics"     element={<Analytics />} />
@@ -43,7 +43,7 @@ export default function RoleRouter() {
           <Route path="settings"      element={<Settings />} />
           <Route path="submit-report" element={<SubmitReport />} />
         </Route>
-        <Route path="*" element={<Navigate to="/global/reporting" replace />} />
+        <Route path="*" element={<Navigate to="/global/dashboard" replace />} />
       </Routes>
     );
   }
@@ -52,7 +52,7 @@ export default function RoleRouter() {
     return (
       <Routes>
         <Route path="/zonal" element={<ZonalMgrLayout />}>
-          <Route index element={<Navigate to="reporting" replace />} />
+          <Route index element={<Navigate to="dashboard" replace />} />
           <Route path="dashboard"     element={<ZonalDashboard />} />
           <Route path="reporting"     element={<ZonalReportingTabs />} />
           <Route path="analytics"     element={<ZonalAnalytics />} />
@@ -60,7 +60,7 @@ export default function RoleRouter() {
           <Route path="settings"      element={<Settings />} />
           <Route path="submit-report" element={<SubmitReport />} />
         </Route>
-        <Route path="*" element={<Navigate to="/zonal/reporting" replace />} />
+        <Route path="*" element={<Navigate to="/zonal/dashboard" replace />} />
       </Routes>
     );
   }
@@ -69,7 +69,7 @@ export default function RoleRouter() {
     return (
       <Routes>
         <Route path="/admin" element={<AdminLayout />}>
-          <Route index element={<Navigate to="reporting" replace />} />
+          <Route index element={<Navigate to="dashboard" replace />} />
           <Route path="dashboard"      element={<AdminDashboard />} />
           <Route path="users"          element={<UserManagement />} />
           <Route path="reporting"      element={<ReportingPortal />} />
@@ -79,7 +79,7 @@ export default function RoleRouter() {
           <Route path="settings"       element={<Settings />} />
           <Route path="submit-report" element={<SubmitReport />} />
         </Route>
-        <Route path="*" element={<Navigate to="/admin/reporting" replace />} />
+        <Route path="*" element={<Navigate to="/admin/dashboard" replace />} />
       </Routes>
     );
   }
@@ -89,7 +89,7 @@ export default function RoleRouter() {
   return (
     <Routes>
       <Route path="/zonal" element={<ZonalMgrLayout />}>
-        <Route index element={<Navigate to="reporting" replace />} />
+        <Route index element={<Navigate to="dashboard" replace />} />
         <Route path="dashboard"     element={<ZonalDashboard />} />
         <Route path="reporting"     element={<ZonalReportingTabs />} />
         <Route path="analytics"     element={<ZonalAnalytics />} />
@@ -97,7 +97,7 @@ export default function RoleRouter() {
         <Route path="settings"      element={<Settings />} />
         <Route path="submit-report" element={<SubmitReport />} />
       </Route>
-      <Route path="*" element={<Navigate to="/zonal/reporting" replace />} />
+      <Route path="*" element={<Navigate to="/zonal/dashboard" replace />} />
     </Routes>
   );
 }
