@@ -328,7 +328,7 @@ export default function FinancePortal() {
 
   const filtered = records.filter(r => {
     let roleAccess = true;
-    if (user?.role === 'global' || user?.role === 'regional') {
+    if (user?.role === 'global') {
       roleAccess = (r.region === user.region);
     } else if (user?.role === 'zonal') {
       roleAccess = (r.submittedBy === (user?.firstName + ' ' + user?.lastName).trim() || r.submittedBy === user?.name);

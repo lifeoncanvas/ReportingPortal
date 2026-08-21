@@ -14,9 +14,9 @@ const KPI = [
 const LOGS = [
   { dot: '#4f46e5', action: 'Created new user',       module: 'User Mgmt',  moduleBg: '#ede9fe', moduleColor: '#5b21b6', user: 'System Administrator', time: '3/10/2026 2:00 PM'  },
   { dot: '#16a34a', action: 'Submitted weekly report', module: 'Reporting',  moduleBg: '#dcfce7', moduleColor: '#16a34a', user: 'John Smith',           time: '3/8/2026 4:00 PM'   },
-  { dot: '#0284c7', action: 'Downloaded report',       module: 'Analytics',  moduleBg: '#e0f2fe', moduleColor: '#0284c7', user: 'Regional Manager',     time: '3/8/2026 8:50 PM'   },
+  { dot: '#0284c7', action: 'Downloaded report',       module: 'Analytics',  moduleBg: '#e0f2fe', moduleColor: '#0284c7', user: 'Zonal Manager',        time: '3/8/2026 8:50 PM'   },
   { dot: '#a16207', action: 'Updated user role',       module: 'User Mgmt',  moduleBg: '#fef9c3', moduleColor: '#a16207', user: 'System Administrator', time: '3/7/2026 2:45 PM'   },
-  { dot: '#9d174d', action: 'Exported finance data',   module: 'Finance',    moduleBg: '#fce7f3', moduleColor: '#9d174d', user: 'Finance Manager',      time: '3/6/2026 8:15 PM'   },
+  { dot: '#9d174d', action: 'Exported finance data',   module: 'Finance',    moduleBg: '#fce7f3', moduleColor: '#9d174d', user: 'System Administrator', time: '3/6/2026 8:15 PM'   },
 ];
 
 const REGION_STATS = [
@@ -29,7 +29,6 @@ const REGION_STATS = [
 
 const ROLE_DIST = [
   { label: 'Zonal Managers',    count: 86,  pct: 70, color: '#1d4ed8' },
-  { label: 'Finance Managers',  count: 48,  pct: 45, color: '#9d174d' },
   { label: 'Global Managers',   count: 12,  pct: 30, color: '#5b21b6' },
   { label: 'Administrators',    count: 4,   pct: 10, color: '#a16207' },
 ];
@@ -64,7 +63,7 @@ export default function AdminDashboard() {
   const KPI_DATA = [
     { label: 'Total Users',   value: stats?.totalUsers || '0',    pct: '+5%',  iconBg: '#ede9fe', iconColor: '#5b21b6', icon: Users      },
     { label: 'Total Reports', value: stats?.totalReports || '0',  pct: '+12%', iconBg: '#dcfce7', iconColor: '#16a34a', icon: FileText   },
-    { label: 'Active Roles',  value: '3',      pct: '',     iconBg: '#fff7ed', iconColor: '#ea580c', icon: Shield     },
+    { label: 'Active Roles',  value: '2',      pct: '',     iconBg: '#fff7ed', iconColor: '#ea580c', icon: Shield     },
   ];
 
   return (

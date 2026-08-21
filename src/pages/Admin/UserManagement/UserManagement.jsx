@@ -6,7 +6,6 @@ const INITIAL_USERS = [
   { id: 1, firstName: 'Global',  lastName: 'Partnership Manager', email: 'global@loveworld.com',  role: 'global',  region: 'Global',        status: 'active',   joined: '1/10/2024' },
   { id: 2, firstName: 'Zonal',   lastName: 'Partnership Manager', email: 'zonal@loveworld.com',   role: 'zonal',   region: 'North America', status: 'active',   joined: '2/15/2024' },
   { id: 3, firstName: 'System',  lastName: 'Administrator',       email: 'admin@loveworld.com',   role: 'admin',   region: 'Global',        status: 'active',   joined: '1/1/2024'  },
-  { id: 4, firstName: 'Finance', lastName: 'Manager',             email: 'finance@loveworld.com', role: 'finance', region: 'Europe',        status: 'inactive', joined: '3/20/2024' },
   { id: 5, firstName: 'John',    lastName: 'Smith',               email: 'john@loveworld.com',    role: 'zonal',   region: 'Africa',        status: 'active',   joined: '4/5/2024'  },
   { id: 6, firstName: 'Sarah',   lastName: 'Johnson',             email: 'sarah@loveworld.com',   role: 'zonal',   region: 'Asia Pacific',  status: 'active',   joined: '4/12/2024' },
 ];
@@ -15,7 +14,6 @@ const ROLE_COLORS = {
   global:  { bg: '#ede9fe', color: '#5b21b6' },
   zonal:   { bg: '#dbeafe', color: '#1d4ed8' },
   admin:   { bg: '#fef9c3', color: '#a16207' },
-  finance: { bg: '#fce7f3', color: '#9d174d' },
 };
 
 const EMPTY_FORM = {
@@ -131,7 +129,7 @@ export default function UserManagement() {
           { label: 'Total Users',    value: users.length,                               bg: '#ede9fe', color: '#5b21b6' },
           { label: 'Active',         value: users.filter(u => u.status === 'active').length,   bg: '#dcfce7', color: '#16a34a' },
           { label: 'Inactive',       value: users.filter(u => u.status === 'inactive').length, bg: '#fee2e2', color: '#dc2626' },
-          { label: 'Roles',          value: 4,                                          bg: '#fff7ed', color: '#ea580c' },
+          { label: 'Roles',          value: 2,                                          bg: '#fff7ed', color: '#ea580c' },
         ].map(s => (
           <div className="um-stat-card" key={s.label}>
             <div className="um-stat-value" style={{ color: s.color }}>{s.value}</div>
@@ -290,10 +288,8 @@ export default function UserManagement() {
                   <label>Role</label>
                   <select value={form.role || 'zonal'}
                     onChange={e => setForm(p => ({ ...p, role: e.target.value }))}>
-                    <option value="regional">Regional Manager</option>
                     <option value="zonal">Zonal Manager</option>
                     <option value="admin">System Administrator</option>
-                    <option value="finance">Finance Manager</option>
                   </select>
                 </div>
                 <div className="um-field">
