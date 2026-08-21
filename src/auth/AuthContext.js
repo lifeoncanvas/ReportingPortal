@@ -96,8 +96,10 @@ export function AuthProvider({ children }) {
 
   const baseLogin = async (payload, onPendingToasts) => {
     const apiUrl = getApiUrl();
+    const endpoint = `${apiUrl}/api/auth/login`;
+    console.log(`[Auth] Executing login request to: ${endpoint}`);
     try {
-      const res = await fetch(`${apiUrl}/api/auth/login`, {
+      const res = await fetch(endpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
