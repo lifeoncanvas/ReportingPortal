@@ -3,7 +3,7 @@ import { Search, Filter, Plus, Edit2, Trash2, X, Check, Shield } from 'lucide-re
 import './styles.css';
 
 const INITIAL_USERS = [
-  { id: 1, firstName: 'Global',  lastName: 'Partnership Manager', email: 'global@loveworld.com',  role: 'global',  region: 'Global',        status: 'active',   joined: '1/10/2024' },
+  { id: 1, firstName: 'Global',  lastName: 'Partnership Manager', email: 'global@loveworld.com',  role: 'zonal',   region: 'Global',        status: 'active',   joined: '1/10/2024' },
   { id: 2, firstName: 'Zonal',   lastName: 'Partnership Manager', email: 'zonal@loveworld.com',   role: 'zonal',   region: 'North America', status: 'active',   joined: '2/15/2024' },
   { id: 3, firstName: 'System',  lastName: 'Administrator',       email: 'admin@loveworld.com',   role: 'admin',   region: 'Global',        status: 'active',   joined: '1/1/2024'  },
   { id: 5, firstName: 'John',    lastName: 'Smith',               email: 'john@loveworld.com',    role: 'zonal',   region: 'Africa',        status: 'active',   joined: '4/5/2024'  },
@@ -11,14 +11,14 @@ const INITIAL_USERS = [
 ];
 
 const ROLE_COLORS = {
-  global:  { bg: '#ede9fe', color: '#5b21b6' },
+  user:    { bg: '#f3f4f6', color: '#4b5563' },
   zonal:   { bg: '#dbeafe', color: '#1d4ed8' },
   admin:   { bg: '#fef9c3', color: '#a16207' },
 };
 
 const EMPTY_FORM = {
   firstName: '', lastName: '', email: '',
-  role: 'zonal', region: '', status: 'inactive',
+  role: 'user', region: '', status: 'inactive',
 };
 
 export default function UserManagement() {
@@ -56,10 +56,16 @@ export default function UserManagement() {
   const handleSave = async () => {
     if (!form.email || !editUser) return;
 
+    let finalRole = form.role;
+    if (form.role !== 'admin') {
+      finalRole = form.status === 'active' ? 'zonal' : 'user';
+    }
+    const payload = { ...form, role: finalRole };
+
     await fetch(`${process.env.REACT_APP_API_URL}/api/users/${editUser.id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(form)
+      body: JSON.stringify(payload)
     });
     
     setShowModal(false);
@@ -75,10 +81,15 @@ export default function UserManagement() {
   const toggleStatus = async (id) => {
     const user = users.find(u => u.id === id);
     if (!user) return;
+    const newStatus = user.status === 'active' ? 'inactive' : 'active';
+    let newRole = user.role;
+    if (user.role !== 'admin') {
+      newRole = newStatus === 'active' ? 'zonal' : 'user';
+    }
     await fetch(`${process.env.REACT_APP_API_URL}/api/users/${id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ...user, status: user.status === 'active' ? 'inactive' : 'active' })
+      body: JSON.stringify({ ...user, status: newStatus, role: newRole })
     });
     fetchUsers();
   };
@@ -286,8 +297,9 @@ export default function UserManagement() {
                 </div>
                 <div className="um-field">
                   <label>Role</label>
-                  <select value={form.role || 'zonal'}
+                  <select value={form.role || (form.status === 'active' ? 'zonal' : 'user')}
                     onChange={e => setForm(p => ({ ...p, role: e.target.value }))}>
+                    {form.status !== 'active' && <option value="user">User (Inactive)</option>}
                     <option value="zonal">Zonal Manager</option>
                     <option value="admin">System Administrator</option>
                   </select>

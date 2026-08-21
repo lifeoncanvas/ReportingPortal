@@ -28,9 +28,8 @@ const REGION_STATS = [
 ];
 
 const ROLE_DIST = [
-  { label: 'Zonal Managers',    count: 86,  pct: 70, color: '#1d4ed8' },
-  { label: 'Global Managers',   count: 12,  pct: 30, color: '#5b21b6' },
-  { label: 'Administrators',    count: 4,   pct: 10, color: '#a16207' },
+  { label: 'Zonal Managers',    count: 86,  pct: 85, color: '#1d4ed8' },
+  { label: 'Administrators',    count: 4,   pct: 15, color: '#a16207' },
 ];
 
 export default function AdminDashboard() {
