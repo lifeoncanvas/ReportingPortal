@@ -131,7 +131,10 @@ export function AuthProvider({ children }) {
       return null;
     } catch (err) {
       console.error("Login failed:", err);
-      return 'Network error or Invalid credentials.';
+      if (err.name === 'TypeError' || err.message?.includes('fetch')) {
+        return `Connection error: Could not reach backend server at ${endpoint}.`;
+      }
+      return 'Network error occurred during login.';
     }
   };
 
