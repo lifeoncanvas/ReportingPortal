@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState } from 'react';
 import { flushPendingToasts } from '../context/NotificationContext';
+import { getApiUrl } from '../utils/apiConfig';
 
 const AuthContext = createContext(undefined);
 
@@ -30,14 +31,6 @@ export function AuthProvider({ children }) {
 
   const login = async (email, password, onPendingToasts) => {
     return await baseLogin({ email, password, loginMethod: 'password' }, onPendingToasts);
-  };
-
-  const getApiUrl = () => {
-    const envPath = typeof window !== 'undefined' ? window.ENV?.API_PATH : undefined;
-    if (envPath && envPath.trim() !== '') {
-      return envPath;
-    }
-    return process.env.REACT_APP_API_URL || 'http://localhost:8081';
   };
 
   const loginWithKingChat = async (accessToken, onPendingToasts, kcUser) => {
@@ -110,8 +103,13 @@ export function AuthProvider({ children }) {
 
       if (!res.ok) {
         const errText = await res.text();
-        if (errText && errText.length < 150 && !errText.includes('<!DOCTYPE')) {
-          return errText;
+        if (errText && errText.length < 300 && !errText.includes('<!DOCTYPE')) {
+          try {
+            const parsed = JSON.parse(errText);
+            return parsed.message || parsed.error || errText;
+          } catch {
+            return errText;
+          }
         }
         return `Login Failed (${res.status})`;
       }
