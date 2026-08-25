@@ -1,19 +1,14 @@
 export const getApiUrl = () => {
-  // 1. If explicit runtime API_PATH is set in window.ENV (e.g., custom URL or relative "")
-  if (typeof window !== 'undefined' && window.ENV?.API_PATH !== undefined && window.ENV?.API_PATH !== null && window.ENV.API_PATH !== "") {
-    return window.ENV.API_PATH.trim();
+  // 1. If explicit runtime API_PATH is set to a real URL in window.ENV, use it directly
+  const envPath = typeof window !== 'undefined' ? window.ENV?.API_PATH : undefined;
+  if (envPath && envPath.trim() !== '') {
+    return envPath.trim();
   }
 
-  // 2. If running in browser, check if hostname is a remote VPS or server
+  // 2. If running in browser on a remote server (not localhost), auto-target port 8081
   if (typeof window !== 'undefined' && window.location?.hostname) {
     const { protocol, hostname } = window.location;
-    // If running on a remote VPS (not localhost/127.0.0.1)
     if (hostname !== 'localhost' && hostname !== '127.0.0.1') {
-      // If window.ENV.API_PATH is explicitly empty string "", return "" for relative reverse-proxy routing
-      if (window.ENV?.API_PATH === "") {
-        return "";
-      }
-      // Otherwise, automatically target port 8081 on the current VPS host
       return `${protocol}//${hostname}:8081`;
     }
   }
