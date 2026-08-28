@@ -8,6 +8,87 @@ const DARK   = [31, 41, 55];
 const GREEN  = [22, 163, 74];
 const WHITE  = [255, 255, 255];
 
+const KEY_LABELS = {
+  zoneName: "Name of Zone",
+  zonalManager: "Zonal Manager",
+  partnershipRemittance: "Total Partnership Remittance",
+  remittancePurpose: "Purpose for each remittance",
+  trumpetsBlown: "Trumpets Blown this week",
+  greatShouts: "Great Shouts made this week",
+  newPartners: "New partners recruited",
+  testimoniesSubmitted: "Testimonies submitted to the Department",
+  healingTranslations: "Total number of outreaches done this week",
+  healingOutreaches: "Healing outreaches held this week",
+  healingPicturesVideos: "Pictures and videos from Healing outreaches submitted",
+  pastoralAttendanceDirector: "Zonal Pastor attendance in Executive Minister's meeting",
+  managerAttendanceDirector: "Zonal Manager attendance in Executive Minister's meeting",
+  managerAttendanceStrategy: "Zonal Manager attendance in strategy meeting",
+  testimonyClarificationConcern: "Testimony, Clarification or Concern",
+  submittedByEmail: "Submitted By Email",
+  participationPrayWithMe: "Total number of participation pray with me",
+  totalRegistrationHslhs: "Total Registration for HSLHS",
+  heraldConference: "Brief report for Herald Conference",
+  totalPartnershipRemittance: "Total Partnership Remittance",
+  newPartnersRecruited: "New Partners Recruited",
+  zonalPastorExecutiveMinistersMeeting: "Zonal Pastor attendance in Executive Minister's meeting",
+  zonalManagerExecutiveMinistersMeeting: "Zonal Manager attendance in Executive Minister's meeting",
+  zonalManagerStrategyMeeting: "Zonal Manager attendance in strategy meeting",
+  zonalManagerStrategyMeetingAttendance: "Zonal Manager attendance in strategy meeting",
+  regionName: "Region Name",
+  submittedBy: "Submitted By",
+  testimony: "Share a testimony",
+  testimoniesCount: "Testimonies received this week",
+  prayWithMeTestimonies: "Pray With Me Testimonies",
+  translationTestimonies: "Translation Testimonies",
+  partnershipTestimonies: "Partnership Testimonies",
+  salvationTestimonies: "Salvation Testimonies",
+  healingTestimonies: "Healing Testimonies",
+  othersTestimonies: "Others Testimonies",
+  zonalPartnership: "Zonal Partnership",
+  zonalPartnershipDetails: "Zonal Partnership Details",
+  groupsPartnership: "Group Partnership",
+  churchesPartnership: "Church Partnership",
+  cellPartnership: "Cell Partnership",
+  sponsoredTeenspiration: "Teenspiration (300 espees) Sponsored",
+  sponsoredKidspiration: "Kidspiration (300 espees) Sponsored",
+  adultCopies: "Adult Copies Ordered",
+  adultLanguages: "Adult Language(s)",
+  teensCopies: "Teens Copies Ordered",
+  teensLanguages: "Teens Language(s)",
+  kidsCopies: "Kids Copies Ordered",
+  kidsLanguages: "Kids Language(s)",
+  ordered: "Total Ordered Copies",
+  language: "Languages",
+  received: "Total Received Copies",
+  receiptStatus: "Receipt Status",
+  reason: "Not received reason",
+  sponsoredCopies: "Sponsored Copies",
+  monthlyMinimumOrder: "Monthly Minimum Magazine Order",
+  monthlyCopiesOrdered: "Cumulative number of copies sponsored for the month",
+  praiseReports: "Praise Reports",
+  datesReceived: "Dates Received",
+  outreachLocations: "Outreach Locations",
+  date: "Date of Outreach",
+  category: "Outreach Category",
+  locations: "Outreach Location(s)",
+  story: "Outreach Story",
+  images: "Outreach Images Count",
+  magazinesUsed: "Magazines Used",
+  peopleInvolved: "People Involved",
+  totalAttendance: "Total Attendance",
+  soulsSaved: "Souls Saved",
+  outreachTestimonies: "Testimonies from the outreach(es)",
+  followUpPlan: "Further plans for soul retention",
+};
+
+const LONG_TEXT_KEYS = [
+  'notes', 'story', 'outreachTestimonies', 'testimonyClarificationConcern', 
+  'zonalPartnershipDetails', 'others', 'praiseReports', 'challengesFaced', 
+  'notReceivedReason', 'prayWithMeTestimonies', 'translationTestimonies', 
+  'partnershipTestimonies', 'salvationTestimonies', 'healingTestimonies', 
+  'othersTestimonies', 'categoryDetails', 'followUpPlan'
+];
+
 function urlToBase64(url) {
   return new Promise((resolve) => {
     const img = new Image();
@@ -76,16 +157,18 @@ export async function downloadReportPDF(report, formatDate) {
   doc.text('REPORT DETAILS', 18, y + 5.5);
   y += 13;
 
+  const skip = ['id', 'media', 'mediaFiles', 'rawDate', 'formData', 'formName', ...LONG_TEXT_KEYS];
+  const entries = Object.entries(report).filter(([k, v]) => !skip.includes(k) && v !== undefined && v !== null && v !== '');
+
   const details = [
-    ['Report ID',    report.id],
-    ['Date',         formatDate(report.rawDate)],
-    ['Region',       report.region],
-    ['Zone',         report.zone],
-    ['Campaign',     report.campaign],
-    ['Attendance',   report.attendance],
-    ['Submitted By', report.submittedBy],
-    ['Status',       report.status],
+    ['Report ID', report.id],
+    ['Date', formatDate(report.rawDate)],
   ];
+
+  entries.forEach(([k, v]) => {
+    const label = KEY_LABELS[k] || k.replace(/([A-Z])/g, ' $1').replace(/^./, s => s.toUpperCase());
+    details.push([label, v]);
+  });
 
   const colW = (pw - 28) / 2;
   details.forEach(([label, value], i) => {
@@ -101,27 +184,37 @@ export async function downloadReportPDF(report, formatDate) {
     doc.setFontSize(9);
     doc.setFont('helvetica', 'normal');
     doc.setTextColor(...DARK);
-    doc.text(String(value || '—'), x + 2, ry + 5);
+    let strVal = String(value || '—');
+    if (strVal.length > 50) strVal = strVal.substring(0, 47) + '...';
+    doc.text(strVal, x + 2, ry + 5);
   });
   y += Math.ceil(details.length / 2) * 10 + 6;
 
-  // ── Notes ────────────────────────────────────────────────────
-  if (report.notes) {
-    checkPage(20);
-    doc.setFillColor(...LIGHT);
-    doc.roundedRect(14, y, pw - 28, 8, 2, 2, 'F');
-    doc.setTextColor(...PURPLE);
-    doc.setFontSize(9);
-    doc.setFont('helvetica', 'bold');
-    doc.text('NOTES', 18, y + 5.5);
-    y += 12;
-    doc.setFontSize(9);
-    doc.setFont('helvetica', 'normal');
-    doc.setTextColor(...DARK);
-    const lines = doc.splitTextToSize(report.notes, pw - 32);
-    doc.text(lines, 16, y);
-    y += lines.length * 5 + 6;
-  }
+  // ── Long Text Sections ───────────────────────────────────────
+  LONG_TEXT_KEYS.forEach(k => {
+    if (report[k] && String(report[k]).trim() !== '') {
+      const label = KEY_LABELS[k] || k.replace(/([A-Z])/g, ' $1').replace(/^./, s => s.toUpperCase());
+      checkPage(20);
+      doc.setFillColor(...LIGHT);
+      doc.roundedRect(14, y, pw - 28, 8, 2, 2, 'F');
+      doc.setTextColor(...PURPLE);
+      doc.setFontSize(9);
+      doc.setFont('helvetica', 'bold');
+      doc.text(label.toUpperCase(), 18, y + 5.5);
+      y += 12;
+      doc.setFontSize(9);
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(...DARK);
+      const lines = doc.splitTextToSize(String(report[k]), pw - 32);
+      
+      for (let l = 0; l < lines.length; l++) {
+        if (y > ph - 20) { doc.addPage(); y = 20; }
+        doc.text(lines[l], 16, y);
+        y += 5;
+      }
+      y += 6;
+    }
+  });
 
   // ── Analytics summary ────────────────────────────────────────
   checkPage(55);
@@ -133,15 +226,33 @@ export async function downloadReportPDF(report, formatDate) {
   doc.text('ANALYTICS SUMMARY', 18, y + 5.5);
   y += 13;
 
-  const attendance = parseInt(String(report.attendance).replace(/,/g, '')) || 0;
-  const kpis = [
-    { label: 'Total Attendance', value: report.attendance,              color: PURPLE          },
+  let kpis = [
     { label: 'Media Files',      value: (report.media || []).length,    color: [2, 132, 199]   },
-    { label: 'Campaign',         value: report.campaign,                color: GREEN           },
     { label: 'Status',           value: report.status,                  color: statusColor     },
   ];
 
-  const kpiW = (pw - 28) / 4;
+  if (report.totalAttendance !== undefined || report.attendance !== undefined) {
+    kpis.unshift({ label: 'Total Attendance', value: report.totalAttendance || report.attendance || 0, color: PURPLE });
+  } else if (report.ordered !== undefined) {
+    kpis.unshift({ label: 'Total Ordered', value: report.ordered, color: PURPLE });
+    kpis.splice(1, 0, { label: 'Total Received', value: report.received, color: GREEN });
+  } else if (report.testimoniesCount !== undefined) {
+    kpis.unshift({ label: 'Testimonies', value: report.testimoniesCount, color: PURPLE });
+  } else if (report.totalRemittance !== undefined) {
+    kpis.unshift({ label: 'Remittance', value: report.totalRemittance, color: PURPLE });
+  } else if (report.totalRegistrationHslhs !== undefined) {
+    kpis.unshift({ label: 'HSLHS Reg', value: report.totalRegistrationHslhs, color: PURPLE });
+  }
+
+  if (report.soulsSaved !== undefined) {
+    kpis.splice(1, 0, { label: 'Souls Saved', value: report.soulsSaved, color: GREEN });
+  } else if (report.newPartnersRecruited !== undefined || report.newPartners !== undefined) {
+    kpis.splice(1, 0, { label: 'New Partners', value: report.newPartnersRecruited || report.newPartners || 0, color: GREEN });
+  }
+
+  kpis = kpis.slice(0, 4);
+
+  const kpiW = (pw - 28) / kpis.length;
   kpis.forEach((k, i) => {
     const x = 14 + i * kpiW;
     doc.setFillColor(...WHITE);
@@ -161,25 +272,28 @@ export async function downloadReportPDF(report, formatDate) {
   y += 24;
 
   // Attendance bar
-  checkPage(25);
-  doc.setFontSize(8);
-  doc.setFont('helvetica', 'bold');
-  doc.setTextColor(...DARK);
-  doc.text('Attendance Overview', 14, y);
-  y += 5;
+  const att = parseInt(String(report.totalAttendance || report.attendance).replace(/,/g, '')) || 0;
+  if (att > 0) {
+    checkPage(25);
+    doc.setFontSize(8);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(...DARK);
+    doc.text('Attendance Overview', 14, y);
+    y += 5;
 
-  const barMaxW = pw - 80;
-  const barH    = 8;
-  const barW    = Math.min((attendance / Math.max(attendance, 1)) * barMaxW, barMaxW);
-  doc.setFillColor(230, 228, 250);
-  doc.roundedRect(14, y, barMaxW, barH, 2, 2, 'F');
-  doc.setFillColor(...PURPLE);
-  doc.roundedRect(14, y, barW, barH, 2, 2, 'F');
-  doc.setFontSize(8);
-  doc.setFont('helvetica', 'bold');
-  doc.setTextColor(...DARK);
-  doc.text(`${report.attendance} attendees`, 14 + barMaxW + 4, y + 5.5);
-  y += 16;
+    const barMaxW = pw - 80;
+    const barH    = 8;
+    const barW    = Math.min((att / Math.max(att, 1)) * barMaxW, barMaxW);
+    doc.setFillColor(230, 228, 250);
+    doc.roundedRect(14, y, barMaxW, barH, 2, 2, 'F');
+    doc.setFillColor(...PURPLE);
+    doc.roundedRect(14, y, barW, barH, 2, 2, 'F');
+    doc.setFontSize(8);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(...DARK);
+    doc.text(`${att} attendees`, 14 + barMaxW + 4, y + 5.5);
+    y += 16;
+  }
 
   // ── Supporting images ────────────────────────────────────────
   const media = (report.media || []).filter(f => f.type?.startsWith('image'));
