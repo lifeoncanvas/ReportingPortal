@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Eye, Download, Search, Upload, X, Check, ChevronDown, Plus, FileText, Heart, BookOpen, Newspaper, Users, Trash2, MessageSquare } from 'lucide-react';
 import { useAuth } from '../../../auth/AuthContext';
 import { downloadReportPDF } from '../../../utils/generateReportPDF';
+import * as XLSX from 'xlsx';
 import './styles.css';
 
 // ── Icons ──────────────────────────────────────────────
@@ -1592,18 +1593,54 @@ export default function ReportingPortal() {
     setShowForm(false);
   };
 
-  const handleExport = () => {
-    const headers = tab.columns.map(c => c.label);
-    const rows = filtered.map(r => tab.columns.map(c => r[c.key] ?? ''));
-    const content = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
-    const userName = user?.name ? user.name.replace(/\s+/g, '_') : 'User';
-    const formName = activeTab;
-    const a = Object.assign(document.createElement('a'), {
-      href: URL.createObjectURL(new Blob([content], { type: 'text/csv' })),
-      download: `${userName}_${formName}.csv`,
+  const handleExportAll = () => {
+    setToast('Generating Excel file...');
+    const wb = XLSX.utils.book_new();
+    
+    TABS_CONFIG.forEach(t => {
+      const tabReports = reportsByTab[t.id] || [];
+      if (tabReports.length === 0) return;
+      
+      const skip = ['media', 'mediaFiles', 'formData'];
+      const allKeys = new Set();
+      tabReports.forEach(r => {
+        Object.keys(r).forEach(k => {
+          if (!skip.includes(k) && r[k] !== undefined && r[k] !== null && r[k] !== '') {
+            allKeys.add(k);
+          }
+        });
+      });
+      
+      const keysArray = Array.from(allKeys).sort((a, b) => {
+        const priority = ['id', 'rawDate', 'status'];
+        const aIdx = priority.indexOf(a);
+        const bIdx = priority.indexOf(b);
+        if (aIdx !== -1 && bIdx !== -1) return aIdx - bIdx;
+        if (aIdx !== -1) return -1;
+        if (bIdx !== -1) return 1;
+        return 0;
+      });
+      
+      const headers = keysArray.map(k => KEY_LABELS[k] || k.replace(/([A-Z])/g, ' $1').replace(/^./, s => s.toUpperCase()));
+      const data = [headers];
+      
+      tabReports.forEach(r => {
+        const row = keysArray.map(k => r[k] !== undefined ? String(r[k]) : '—');
+        data.push(row);
+      });
+      
+      const ws = XLSX.utils.aoa_to_sheet(data);
+      XLSX.utils.book_append_sheet(wb, ws, t.label.substring(0, 31));
     });
-    a.click();
-    setToast(`Exported ${filtered.length} ${tab.label} reports`);
+    
+    if (wb.SheetNames.length === 0) {
+      setToast('No reports to export');
+      return;
+    }
+    
+    const userName = user?.name ? user.name.replace(/\s+/g, '_') : 'User';
+    XLSX.writeFile(wb, `${userName}_All_Reports.xlsx`);
+    setToast('Exported all reports successfully');
   };
 
   return (
@@ -1655,7 +1692,7 @@ export default function ReportingPortal() {
           <h2>Reporting Portal {user?.role === 'admin' ? '— Admin View' : ''}</h2>
           <p>{user?.role === 'admin' ? 'Review, approve, and manage all submitted reports' : 'Submit, manage, and track weekly activity reports'}</p>
         </div>
-        <button className="rp-export-btn excel" onClick={handleExport}><ExportIcon /> Export CSV</button>
+        <button className="rp-export-btn excel" onClick={handleExportAll}><ExportIcon /> Download All (Excel)</button>
       </div>
 
       {/* ── Tabs ── */}
