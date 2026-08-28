@@ -1553,6 +1553,9 @@ export default function ReportingPortal() {
       if (res.ok) {
         setToast('Report deleted 🗑️');
         fetchAllReports();
+      } else {
+        const errText = await res.text();
+        setToast(`Delete failed: ${res.status} ${errText}`.substring(0, 100));
       }
     } catch (e) {
       console.error(e);
