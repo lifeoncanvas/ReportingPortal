@@ -7,9 +7,9 @@ import './styles.css';
 // ── Icons ──────────────────────────────────────────────
 const ExportIcon = () => (
   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-    <polyline points="7 10 12 15 17 10"/>
-    <line x1="12" y1="15" x2="12" y2="3"/>
+    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+    <polyline points="7 10 12 15 17 10" />
+    <line x1="12" y1="15" x2="12" y2="3" />
   </svg>
 );
 
@@ -63,7 +63,7 @@ function MediaUploader({ files, onAdd, onRemove, label = "Upload Images / Files"
             <div className="rp-media-thumb" key={i}>
               {f.url && f.type?.startsWith('video') ? <video src={f.url} className="rp-media-img" muted />
                 : f.url ? <img src={f.url} alt={f.name} className="rp-media-img" />
-                : <div className="rp-media-img rp-media-pdf-thumb">{f.name?.endsWith('.pdf') ? 'PDF' : 'DOC'}</div>}
+                  : <div className="rp-media-img rp-media-pdf-thumb">{f.name?.endsWith('.pdf') ? 'PDF' : 'DOC'}</div>}
               <button className="rp-media-remove" onClick={() => onRemove(i)}>✕</button>
             </div>
           ))}
@@ -77,7 +77,7 @@ function MediaUploader({ files, onAdd, onRemove, label = "Upload Images / Files"
 function ClarificationModal({ report, endpoint, onClose, onDone }) {
   const [note, setNote] = useState('');
   const [loading, setLoading] = useState(false);
-  const baseUrl = window.ENV?.API_PATH || process.env.REACT_APP_API_URL ;
+  const baseUrl = window.ENV?.API_PATH || process.env.REACT_APP_API_URL;
 
   const send = async () => {
     if (!note.trim()) return;
@@ -101,10 +101,10 @@ function ClarificationModal({ report, endpoint, onClose, onDone }) {
       <div className="rp-modal" style={{ maxWidth: 480 }} onClick={e => e.stopPropagation()}>
         <div className="rp-modal-header">
           <h3>Ask for Clarification</h3>
-          <button className="rp-remove-btn" onClick={onClose}><X size={18}/></button>
+          <button className="rp-remove-btn" onClick={onClose}><X size={18} /></button>
         </div>
         <div className="rp-modal-body">
-          <p style={{ fontSize:13, color:'#6b7280', marginBottom:12 }}>
+          <p style={{ fontSize: 13, color: '#6b7280', marginBottom: 12 }}>
             Your note will be saved against this report and its status will be set to <strong>Needs Clarification</strong>.
           </p>
           <textarea
@@ -113,7 +113,7 @@ function ClarificationModal({ report, endpoint, onClose, onDone }) {
             onChange={e => setNote(e.target.value)}
             placeholder="Type your clarification request here..."
             className="kf-textarea"
-            style={{ width:'100%', fontSize:13 }}
+            style={{ width: '100%', fontSize: 13 }}
           />
         </div>
         <div className="rp-modal-footer">
@@ -149,14 +149,14 @@ function ReportTable({ reports, loading, columns, onView, onDownload, onApprove,
                 <td key={c.key}>
                   {c.key === 'status' ? <Badge status={row[c.key]} />
                     : c.key === 'id' ? <span className="rp-id">{row[c.key]}</span>
-                    : row[c.key] ?? '—'}
+                      : row[c.key] ?? '—'}
                 </td>
               ))}
               <td>
                 <div className="rp-actions">
                   <button className="rp-icon-btn view" title="View" onClick={() => onView(row)}><Eye size={14} /></button>
                   <button className="rp-icon-btn dl" title="Download" onClick={() => onDownload(row)}><Download size={14} /></button>
-                  
+
                   {userRole === 'admin' && (
                     <>
                       {row.status !== 'APPROVED' && row.status !== 'approved' && (
@@ -297,7 +297,7 @@ function ViewModal({ report, onClose }) {
                   <div className="rp-media-thumb" key={i}>
                     {f.url && f.type?.startsWith('video') ? <video src={f.url} className="rp-media-img" controls muted />
                       : f.url ? <img src={f.url} alt={f.name} className="rp-media-img" />
-                      : <div className="rp-media-img rp-media-pdf-thumb">PDF</div>}
+                        : <div className="rp-media-img rp-media-pdf-thumb">PDF</div>}
                   </div>
                 ))}
               </div>
@@ -338,7 +338,7 @@ function FormPopup({ title, eyebrow, icon, onClose, onSubmit, submitting, submit
             {submitting ? (
               <>
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" style={{ animation: 'spin 0.8s linear infinite' }}>
-                  <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
+                  <path d="M21 12a9 9 0 1 1-6.219-8.56" />
                 </svg>
                 Submitting…
               </>
@@ -409,25 +409,25 @@ function ZonalReportForm({ onClose, onSubmit: parentSubmit }) {
     const today = new Date().toISOString().split('T')[0];
     const payload = {
       // Fields matching CreateReportRequest / zone_weekly_reports table
-      submittedBy:                  form.zonalManager,
-      submitterEmail:               user?.email, 
-      submittedDate:                today,
-      submittedTime:                new Date().toTimeString().split(' ')[0],
-      weekStartDate:                today,
-      zoneName:                     form.zoneName,
-      zonalManager:                 form.zonalManager,
-      zonalPastorExecutiveMinistersMeeting:  form.pastoralAttendanceDirector,
+      submittedBy: form.zonalManager,
+      submitterEmail: user?.email,
+      submittedDate: today,
+      submittedTime: new Date().toTimeString().split(' ')[0],
+      weekStartDate: today,
+      zoneName: form.zoneName,
+      zonalManager: form.zonalManager,
+      zonalPastorExecutiveMinistersMeeting: form.pastoralAttendanceDirector,
       zonalManagerExecutiveMinistersMeeting: form.managerAttendanceDirector,
-      zonalManagerStrategyMeeting:  form.managerAttendanceStrategy,
+      zonalManagerStrategyMeeting: form.managerAttendanceStrategy,
       testimonyClarificationConcern: form.testimonyClarificationConcern,
-      popMediaUrl:                  null,
-      regionName:                   user?.region || 'Global',
-      participationPrayWithMe:      form.participationPrayWithMe,
-      totalRegistrationHslhs:       Number(form.totalRegistrationHslhs) || 0,
-      heraldConference:             form.heraldConference,
+      popMediaUrl: null,
+      regionName: user?.region || 'Global',
+      participationPrayWithMe: form.participationPrayWithMe,
+      totalRegistrationHslhs: Number(form.totalRegistrationHslhs) || 0,
+      heraldConference: form.heraldConference,
     };
     try {
-      await fetch(`${window.ENV?.API_PATH || process.env.REACT_APP_API_URL }/api/reports`, {
+      await fetch(`${window.ENV?.API_PATH || process.env.REACT_APP_API_URL}/api/reports`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
@@ -448,8 +448,8 @@ function ZonalReportForm({ onClose, onSubmit: parentSubmit }) {
   };
 
   return (
-    <FormPopup title="Zonal Weekly Report" eyebrow="KingsForms · Zonal Report" icon="🏛️"
-      onClose={onClose} onSubmit={handleSubmit} submitting={submitting} submitLabel="Submit Zonal Report">
+    <FormPopup title="Weekly Ministry Report" eyebrow="KingsForms · Weekly Ministry Report" icon="🏛️"
+      onClose={onClose} onSubmit={handleSubmit} submitting={submitting} submitLabel="Submit Weekly Ministry Report">
 
       {/* Zone Info */}
       <div className="popup-section-head">🏛️ Zone Information</div>
@@ -465,7 +465,7 @@ function ZonalReportForm({ onClose, onSubmit: parentSubmit }) {
       </div>
 
       {/* Attendance & Sponsorship */}
-      <div className="popup-section-head">📅 Meetings & Sponsorship</div>
+      <div className="popup-section-head">📅 Attendance and Meetings</div>
       <div className="popup-fields">
         <Field label="Zonal Pastor's attendance in the Executive Minister's weekly meeting?" required error={errors.pastoralAttendanceDirector}>
           <div className="kf-select-wrap">
@@ -525,7 +525,7 @@ function ZonalReportForm({ onClose, onSubmit: parentSubmit }) {
             const prev = files.map(f => ({ name: f.name, type: f.type, url: (f.type.startsWith('image') || f.type.startsWith('video')) ? URL.createObjectURL(f) : null, size: f.size }));
             set('media', [...form.media, ...prev]); set('mediaFiles', [...form.mediaFiles, ...files]);
           }}
-          onRemove={i => { set('media', form.media.filter((_,j)=>j!==i)); set('mediaFiles', form.mediaFiles.filter((_,j)=>j!==i)); }}
+          onRemove={i => { set('media', form.media.filter((_, j) => j !== i)); set('mediaFiles', form.mediaFiles.filter((_, j) => j !== i)); }}
         />
       </div>
     </FormPopup>
@@ -539,14 +539,14 @@ function ZonalReportForm({ onClose, onSubmit: parentSubmit }) {
 
 
 const BLAAAST_CATEGORIES = [
-  { key: 'joyfulSound',      label: 'Make a Joyful Sound',        amount: '30 Espees' },
-  { key: 'raiseBanner',      label: 'Raise a Banner',             amount: '300 Espees' },
-  { key: 'takeShield',       label: 'Take Up the Shield',         amount: '1,000 Espees' },
-  { key: 'greatShout',       label: 'Make a Great Shout',         amount: '2,500 Espees' },
-  { key: 'advanceTroop',     label: 'Advance Against a Troop',    amount: '5,000 Espees' },
-  { key: 'blowTrumpet',      label: 'Blow A Trumpet',             amount: '10,000 Espees' },
-  { key: 'liftHorn',         label: 'Lift the Horn',              amount: '100,000 Espees' },
-  { key: 'blastVictory',     label: 'Blast of Victory (Gold Sponsorship)', amount: '250,000 Espees' },
+  { key: 'joyfulSound', label: 'Make a Joyful Sound', amount: '30 Espees' },
+  { key: 'raiseBanner', label: 'Raise a Banner', amount: '300 Espees' },
+  { key: 'takeShield', label: 'Take Up the Shield', amount: '1,000 Espees' },
+  { key: 'greatShout', label: 'Make a Great Shout', amount: '2,500 Espees' },
+  { key: 'advanceTroop', label: 'Advance Against a Troop', amount: '5,000 Espees' },
+  { key: 'blowTrumpet', label: 'Blow A Trumpet', amount: '10,000 Espees' },
+  { key: 'liftHorn', label: 'Lift the Horn', amount: '100,000 Espees' },
+  { key: 'blastVictory', label: 'Blast of Victory (Gold Sponsorship)', amount: '250,000 Espees' },
 ];
 
 function PartnershipForm({ onClose, onSubmit: parentSubmit }) {
@@ -578,7 +578,7 @@ function PartnershipForm({ onClose, onSubmit: parentSubmit }) {
   const handleSubmit = async () => {
     setSubmitting(true);
     await new Promise(r => setTimeout(r, 500));
-    
+
     const finalNotes = form.others || '';
 
     parentSubmit({
@@ -615,7 +615,7 @@ function PartnershipForm({ onClose, onSubmit: parentSubmit }) {
           <input className="kf-input" type="number" min="0" placeholder="0"
             value={form.totalRemittance} onChange={e => setForm(p => ({ ...p, totalRemittance: e.target.value }))} />
         </Field>
-        
+
         <Field label="State purpose for each remittance (e.g. HSLHS, Healing, DOME, etc.)">
           <textarea className="kf-textarea" rows={2} placeholder="Provide details..."
             value={form.remittancePurpose} onChange={e => setForm(p => ({ ...p, remittancePurpose: e.target.value }))} />
@@ -627,19 +627,9 @@ function PartnershipForm({ onClose, onSubmit: parentSubmit }) {
               const prev = files.map(f => ({ name: f.name, type: f.type, url: (f.type.startsWith('image') || f.type.startsWith('video')) ? URL.createObjectURL(f) : null, size: f.size }));
               setForm(p => ({ ...p, popMedia: [...p.popMedia, ...prev], popMediaFiles: [...p.popMediaFiles, ...files] }));
             }}
-            onRemove={i => { setForm(p => ({ ...p, popMedia: p.popMedia.filter((_,j)=>j!==i), popMediaFiles: p.popMediaFiles.filter((_,j)=>j!==i) })); }}
+            onRemove={i => { setForm(p => ({ ...p, popMedia: p.popMedia.filter((_, j) => j !== i), popMediaFiles: p.popMediaFiles.filter((_, j) => j !== i) })); }}
             label="Upload POP"
           />
-        </Field>
-
-        <Field label="How many Trumpets were blown this week?" hint="Each Zone has a target of 1000 trumpets">
-          <input className="kf-input" type="number" min="0" placeholder="0"
-            value={form.trumpetsBlown} onChange={e => setForm(p => ({ ...p, trumpetsBlown: e.target.value }))} />
-        </Field>
-
-        <Field label="How many great shouts were made this week?">
-          <input className="kf-input" type="number" min="0" placeholder="0"
-            value={form.greatShouts} onChange={e => setForm(p => ({ ...p, greatShouts: e.target.value }))} />
         </Field>
 
         <Field label="How many Testimonies were submitted to the Department?">
@@ -662,17 +652,17 @@ function PartnershipForm({ onClose, onSubmit: parentSubmit }) {
               value={form.zonalPartnershipDetails} onChange={e => setForm(p => ({ ...p, zonalPartnershipDetails: e.target.value }))} />
           </Field>
         </div>
-        
+
         <Field label="Group Partnership (state how much was remitted by each group)">
           <input className="kf-input" type="text" placeholder="Enter group partnership..."
             value={form.groupsPartnership} onChange={e => setForm(p => ({ ...p, groupsPartnership: e.target.value }))} />
         </Field>
-        
+
         <Field label="Church Partnership (State how much was remitted by each Church)">
           <input className="kf-input" type="text" placeholder="Enter church partnership..."
             value={form.churchesPartnership} onChange={e => setForm(p => ({ ...p, churchesPartnership: e.target.value }))} />
         </Field>
-        
+
         <Field label="Cell Partnership (State how much was remitted by each Cell)">
           <input className="kf-input" type="text" placeholder="Enter cell partnership..."
             value={form.cellPartnership} onChange={e => setForm(p => ({ ...p, cellPartnership: e.target.value }))} />
@@ -703,10 +693,10 @@ function PartnershipForm({ onClose, onSubmit: parentSubmit }) {
         </div>
       </div>
 
-      <div className="popup-section-head">🏆 Milestones & Campaigns</div>
+      <div className="popup-section-head">🏆 Group milestones</div>
       <div className="popup-fields">
-        <Field label="Names of group Pastors that have advanced in the BLAAAST Milestones (please state name and new milestones)">
-          <textarea className="kf-textarea" rows={2} placeholder="Enter names..."
+        <Field label="Names of group Pastors that have advanced in the BLAAAST Milestones (please state name and Group milsteone)">
+          <textarea className="kf-textarea" rows={2} placeholder="enter the names and amount"
             value={form.groupPastorsMilestones} onChange={e => setForm(p => ({ ...p, groupPastorsMilestones: e.target.value }))} />
         </Field>
         <Field label="Pastors and members that have sponsored Teenspiration (300 espees) this week">
@@ -791,11 +781,11 @@ function TestimonialsForm({ onClose, onSubmit: parentSubmit }) {
     if (afterImages.length > 0) {
       filesList.push(`After Images (${afterImages.length}): ${afterImages.map(f => f.name).join(', ')}`);
     }
-    
+
     if (filesList.length > 0) {
       parts.push(`Attachments:\n- ` + filesList.join('\n- '));
     }
-    
+
     return parts.join('\n\n');
   };
 
@@ -947,7 +937,7 @@ function MagazineForm({ onClose, onSubmit: parentSubmit }) {
   const validate = () => {
     const e = {};
     const totalOrdered = (Number(form.adultCopies) || 0) + (Number(form.teensCopies) || 0) + (Number(form.kidsCopies) || 0);
-    
+
     if (totalOrdered <= 0) {
       e.adultCopies = 'At least one magazine type must have copies ordered';
     }
@@ -960,7 +950,7 @@ function MagazineForm({ onClose, onSubmit: parentSubmit }) {
     if (Number(form.kidsCopies) > 0 && !form.kidsLanguages.trim()) {
       e.kidsLanguages = 'Required when copies are specified';
     }
-    
+
     if (!String(form.receivedCopies).trim()) e.receivedCopies = 'Required';
     if (Number(form.receivedCopies) < totalOrdered && !form.notReceivedReason.trim()) {
       e.notReceivedReason = 'Please provide a reason';
@@ -973,7 +963,7 @@ function MagazineForm({ onClose, onSubmit: parentSubmit }) {
     if (Object.keys(e).length) return;
     setSubmitting(true);
     await new Promise(r => setTimeout(r, 500));
-    
+
     const totalOrdered = (Number(form.adultCopies) || 0) + (Number(form.teensCopies) || 0) + (Number(form.kidsCopies) || 0);
     const getLang = (lang, other) => lang === 'Other' ? (other || 'Other') : lang;
     const combinedLanguages = [
@@ -983,30 +973,30 @@ function MagazineForm({ onClose, onSubmit: parentSubmit }) {
     ].filter(Boolean).join('; ');
 
     parentSubmit({
-      adultCopies:          Number(form.adultCopies) || 0,
-      adultLanguages:       form.adultLanguages,
-      teensCopies:          Number(form.teensCopies) || 0,
-      teensLanguages:       form.teensLanguages,
-      kidsCopies:           Number(form.kidsCopies) || 0,
-      kidsLanguages:        form.kidsLanguages,
-      ordered:              totalOrdered,
-      language:             combinedLanguages,
-      received:             Number(form.receivedCopies) || 0,
-      receiptStatus:        Number(form.receivedCopies) === 0 ? 'No' : (Number(form.receivedCopies) < totalOrdered ? 'Partial' : 'Yes'),
-      reason:               form.notReceivedReason,
-      challengesFaced:      form.challengesFaced,
-      isAdult:              (Number(form.adultCopies) || 0) > 0,
-      isTeevolution:        (Number(form.teensCopies) || 0) > 0,
-      isKidsMagazine:       (Number(form.kidsCopies) || 0) > 0,
-      status:               'PENDING',
-      rawDate:              new Date().toISOString().split('T')[0],
-      monthlyMinimumOrder:  Number(form.monthlyMinimumOrder) || 0,
+      adultCopies: Number(form.adultCopies) || 0,
+      adultLanguages: form.adultLanguages,
+      teensCopies: Number(form.teensCopies) || 0,
+      teensLanguages: form.teensLanguages,
+      kidsCopies: Number(form.kidsCopies) || 0,
+      kidsLanguages: form.kidsLanguages,
+      ordered: totalOrdered,
+      language: combinedLanguages,
+      received: Number(form.receivedCopies) || 0,
+      receiptStatus: Number(form.receivedCopies) === 0 ? 'No' : (Number(form.receivedCopies) < totalOrdered ? 'Partial' : 'Yes'),
+      reason: form.notReceivedReason,
+      challengesFaced: form.challengesFaced,
+      isAdult: (Number(form.adultCopies) || 0) > 0,
+      isTeevolution: (Number(form.teensCopies) || 0) > 0,
+      isKidsMagazine: (Number(form.kidsCopies) || 0) > 0,
+      status: 'PENDING',
+      rawDate: new Date().toISOString().split('T')[0],
+      monthlyMinimumOrder: Number(form.monthlyMinimumOrder) || 0,
       monthlyMinimumOrderAmountPaid: Number(form.monthlyMinimumOrderAmountPaid) || 0,
       monthlyCopiesOrdered: Number(form.monthlyCopiesOrdered) || 0,
       cumulativeSponsoredAmountPaid: Number(form.cumulativeSponsoredAmountPaid) || 0,
-      proofOfPayment:       form.proofOfPaymentFiles.length,
-      praiseReports:        form.praiseReports,
-      datesReceived:        form.datesReceived,
+      proofOfPayment: form.proofOfPaymentFiles.length,
+      praiseReports: form.praiseReports,
+      datesReceived: form.datesReceived,
     });
     setSubmitting(false);
   };
@@ -1155,7 +1145,7 @@ function MagazineForm({ onClose, onSubmit: parentSubmit }) {
             const prev = files.map(f => ({ name: f.name, type: f.type, url: (f.type.startsWith('image') || f.type.startsWith('video')) ? URL.createObjectURL(f) : null, size: f.size }));
             setForm(p => ({ ...p, proofOfPaymentFiles: [...p.proofOfPaymentFiles, ...prev] }));
           }}
-          onRemove={i => setForm(p => ({ ...p, proofOfPaymentFiles: p.proofOfPaymentFiles.filter((_,j) => j !== i) }))}
+          onRemove={i => setForm(p => ({ ...p, proofOfPaymentFiles: p.proofOfPaymentFiles.filter((_, j) => j !== i) }))}
           label="Upload Proof of Payment (POP)"
           accept="image/*,.pdf,.doc,.docx"
         />
@@ -1215,17 +1205,17 @@ function OutreachForm({ onClose, onSubmit: parentSubmit }) {
     // Payload matches outreach_reports table columns
     parentSubmit({
       submittedDate: form.date,
-      category:      form.category === 'Other' ? form.customCategory || 'Other' : form.category,
-      locations:     form.locations,
-      story:         form.story,
-      mediaCount:    form.images.length,
-      status:        'PENDING',
-      rawDate:       form.date,
+      category: form.category === 'Other' ? form.customCategory || 'Other' : form.category,
+      locations: form.locations,
+      story: form.story,
+      mediaCount: form.images.length,
+      status: 'PENDING',
+      rawDate: form.date,
       httnMagazineTestimoniesOutreaches: '',
-      magazinesUsed:   parseInt(form.magazinesUsed) || 0,
-      peopleInvolved:  parseInt(form.peopleInvolved) || 0,
+      magazinesUsed: parseInt(form.magazinesUsed) || 0,
+      peopleInvolved: parseInt(form.peopleInvolved) || 0,
       totalAttendance: parseInt(form.totalAttendance) || 0,
-      soulsSaved:      parseInt(form.soulsSaved) || 0,
+      soulsSaved: parseInt(form.soulsSaved) || 0,
       outreachTestimonies: (() => {
         let finalTestimonies = form.outreachTestimonies;
         if (form.testimonyFiles && form.testimonyFiles.length > 0) {
@@ -1237,8 +1227,8 @@ function OutreachForm({ onClose, onSubmit: parentSubmit }) {
         }
         return finalTestimonies;
       })(),
-      followUpPlan:    form.followUpPlan,
-      healingTranslationsAchieved:  Number(form.healingTranslationsAchieved) || 0,
+      followUpPlan: form.followUpPlan,
+      healingTranslationsAchieved: Number(form.healingTranslationsAchieved) || 0,
       healingOutreachesHeld: Number(form.healingOutreachesHeld) || 0,
       healingOutreachLocations: form.healingOutreachLocations,
       healingMediaSubmitted: Number(form.healingMediaSubmitted) || 0,
@@ -1357,7 +1347,7 @@ function OutreachForm({ onClose, onSubmit: parentSubmit }) {
             const prev = files.map(f => ({ name: f.name, type: f.type, url: (f.type.startsWith('image') || f.type.startsWith('video')) ? URL.createObjectURL(f) : null, size: f.size }));
             setForm(p => ({ ...p, images: [...p.images, ...prev] }));
           }}
-          onRemove={i => setForm(p => ({ ...p, images: p.images.filter((_,j) => j !== i) }))}
+          onRemove={i => setForm(p => ({ ...p, images: p.images.filter((_, j) => j !== i) }))}
           label="Upload Photos & Videos (includes Healing outreaches)"
           accept="image/*,video/*"
         />
@@ -1372,15 +1362,15 @@ function OutreachForm({ onClose, onSubmit: parentSubmit }) {
 // ══════════════════════════════════════════════════════
 const TABS_CONFIG = [
   {
-    id: 'zonal', label: 'Zonal Report', icon: <Users size={14} />, emoji: '🏛️', color: '#4f46e5',
+    id: 'zonal', label: 'Weekly Ministry Report', icon: <Users size={14} />, emoji: '🏛️', color: '#4f46e5',
     columns: [
       { key: 'id', label: 'Report ID' }, { key: 'rawDate', label: 'Date' },
       { key: 'zone', label: 'Zone' }, { key: 'submittedBy', label: 'Submitted By' },
-      { key: 'partners', label: 'New Partners' }, 
+      { key: 'partners', label: 'New Partners' },
       { key: 'totalRegistrationHslhs', label: 'HSLHS Reg' },
       { key: 'status', label: 'Status' },
     ],
-    FormComponent: ZonalReportForm, btnLabel: 'Upload a New Zonal Report',
+    FormComponent: ZonalReportForm, btnLabel: 'Upload a New Weekly Ministry Report',
   },
   {
     id: 'partnership', label: 'Partnership Report', icon: <Heart size={14} />, emoji: '🤝', color: '#16a34a',
@@ -1451,13 +1441,13 @@ const TABS_CONFIG = [
 // ══════════════════════════════════════════════════════
 export default function ReportingPortal() {
   const { user } = useAuth();
-  const [activeTab, setActiveTab]       = useState('zonal');
-  const [search, setSearch]             = useState('');
+  const [activeTab, setActiveTab] = useState('zonal');
+  const [search, setSearch] = useState('');
   const [reportsByTab, setReportsByTab] = useState({ zonal: [], partnership: [], testimonials: [], magazine: [], outreach: [] });
-  const [showForm, setShowForm]         = useState(false);
-  const [viewReport, setViewReport]     = useState(null);
+  const [showForm, setShowForm] = useState(false);
+  const [viewReport, setViewReport] = useState(null);
   const [clarifyReport, setClarifyReport] = useState(null);
-  const [toast, setToast]               = useState('');
+  const [toast, setToast] = useState('');
 
 
   useEffect(() => {
@@ -1466,14 +1456,14 @@ export default function ReportingPortal() {
   }, [user]);
 
   const fetchAllReports = async () => {
-    const baseUrl = window.ENV?.API_PATH || process.env.REACT_APP_API_URL ;
+    const baseUrl = window.ENV?.API_PATH || process.env.REACT_APP_API_URL;
     const emailParam = (user?.role === 'admin' || user?.role === 'global') ? '' : `?email=${user?.email}`;
-    
+
     try {
       const zRes = await fetch(`${baseUrl}/api/reports${emailParam}`);
       if (!zRes.ok) throw new Error(`ZR Fetch Error: ${zRes.status}`);
       const zData = await zRes.json();
-      
+
       // Fetch others
       const tabs = ['partnership', 'testimonials', 'magazine', 'outreach'];
       const otherData = {};
@@ -1513,10 +1503,10 @@ export default function ReportingPortal() {
   };
 
   const handleApprove = async (report) => {
-    const baseUrl = window.ENV?.API_PATH || process.env.REACT_APP_API_URL ;
+    const baseUrl = window.ENV?.API_PATH || process.env.REACT_APP_API_URL;
     const endpoint = activeTab === 'zonal' ? '/api/reports' : `/api/portal-reports/${activeTab}`;
     const id = report.id.replace(/^[A-Z]+-/, '');
-    
+
     try {
       const res = await fetch(`${baseUrl}${endpoint}/${id}/approve`, { method: 'POST' });
       if (res.ok) {
@@ -1531,7 +1521,7 @@ export default function ReportingPortal() {
 
   const handleDelete = async (report) => {
     if (!window.confirm('Delete this report? This cannot be undone.')) return;
-    const baseUrl = window.ENV?.API_PATH || process.env.REACT_APP_API_URL ;
+    const baseUrl = window.ENV?.API_PATH || process.env.REACT_APP_API_URL;
     const endpoint = activeTab === 'zonal' ? '/api/reports' : `/api/portal-reports/${activeTab}`;
     const id = report.id.replace(/^[A-Z]+-/, '');
 
@@ -1547,7 +1537,7 @@ export default function ReportingPortal() {
     }
   };
 
-  const tab     = TABS_CONFIG.find(t => t.id === activeTab);
+  const tab = TABS_CONFIG.find(t => t.id === activeTab);
   const reports = reportsByTab[activeTab] || [];
 
   const filtered = reports.filter(r =>
@@ -1557,13 +1547,13 @@ export default function ReportingPortal() {
   const handleSubmit = async (data) => {
     try {
       if (['partnership', 'testimonials', 'magazine', 'outreach'].includes(activeTab)) {
-        const res = await fetch(`${window.ENV?.API_PATH || process.env.REACT_APP_API_URL }/api/portal-reports/${activeTab}`, {
+        const res = await fetch(`${window.ENV?.API_PATH || process.env.REACT_APP_API_URL}/api/portal-reports/${activeTab}`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             ...data,
             submitterEmail: user?.email,
-            zoneName:       user?.zone || user?.region,
+            zoneName: user?.zone || user?.region,
           }),
         });
         if (!res.ok) {
@@ -1577,13 +1567,13 @@ export default function ReportingPortal() {
       console.error('Submission failed', e);
       alert(`Failed to save report: ${e.message}`);
     }
-    
+
     setShowForm(false);
   };
 
   const handleExport = () => {
     const headers = tab.columns.map(c => c.label);
-    const rows    = filtered.map(r => tab.columns.map(c => r[c.key] ?? ''));
+    const rows = filtered.map(r => tab.columns.map(c => r[c.key] ?? ''));
     const content = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
     const userName = user?.name ? user.name.replace(/\s+/g, '_') : 'User';
     const formName = activeTab;
@@ -1661,7 +1651,7 @@ export default function ReportingPortal() {
         <ReportTable
           reports={filtered.map(r => ({ ...r, rawDate: formatDate(r.rawDate) }))}
           loading={false}
-          columns={user?.role === 'admin' 
+          columns={user?.role === 'admin'
             ? (tab.columns.some(c => c.key === 'submittedBy') ? tab.columns : [{ key: 'submittedBy', label: 'Submitted By' }, ...tab.columns])
             : tab.columns
           }

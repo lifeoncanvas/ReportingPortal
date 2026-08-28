@@ -6,7 +6,7 @@ import '../../GlobalMgr/ReportingPortal/styles.css';
 const API = window.ENV?.API_PATH || process.env.REACT_APP_API_URL ;
 
 const TABS = [
-  { id: 'zonal',        label: '🏛️ Zonal Reports',       endpoint: '/api/reports' },
+  { id: 'zonal',        label: '🏛️ Weekly Ministry Reports',       endpoint: '/api/reports' },
   { id: 'partnership',  label: '🤝 Partnership',          endpoint: '/api/portal-reports/partnership' },
   { id: 'testimonials', label: '✍️ Testimonials',         endpoint: '/api/portal-reports/testimonials' },
   { id: 'magazine',     label: '📖 Magazine',             endpoint: '/api/portal-reports/magazine' },
