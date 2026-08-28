@@ -266,6 +266,7 @@ const KEY_LABELS = {
   soulsSaved: "Souls Saved",
   outreachTestimonies: "Testimonies from the outreach(es)",
   followUpPlan: "Further plans for soul retention",
+  adminNote: "Admin Clarification Note",
 };
 
 // ── View Modal ─────────────────────────────────────────
