@@ -1436,6 +1436,26 @@ const TABS_CONFIG = [
   },
 ];
 
+const downloadReportCSV = (report, formName) => {
+  const skip = ['id', 'media', 'mediaFiles', 'rawDate', 'formData'];
+  const entries = Object.entries(report).filter(([k, v]) => !skip.includes(k) && v !== undefined && v !== null && v !== '');
+  
+  const lines = [`"Report ID","${report.id}"`, `"Form","${formName}"`, ""];
+  entries.forEach(([k, v]) => {
+    const label = KEY_LABELS[k] || k.replace(/([A-Z])/g, ' $1').replace(/^./, s => s.toUpperCase());
+    const safeLabel = `"${String(label).replace(/"/g, '""')}"`;
+    const safeValue = `"${String(v).replace(/"/g, '""')}"`;
+    lines.push(`${safeLabel},${safeValue}`);
+  });
+
+  const content = lines.join('\n');
+  const a = Object.assign(document.createElement('a'), {
+    href: URL.createObjectURL(new Blob([content], { type: 'text/csv;charset=utf-8;' })),
+    download: `${report.id}_${formName.replace(/\s+/g, '_')}.csv`,
+  });
+  a.click();
+};
+
 // ══════════════════════════════════════════════════════
 // MAIN COMPONENT
 // ══════════════════════════════════════════════════════
@@ -1448,6 +1468,7 @@ export default function ReportingPortal() {
   const [viewReport, setViewReport] = useState(null);
   const [clarifyReport, setClarifyReport] = useState(null);
   const [toast, setToast] = useState('');
+  const [downloadOptionsReport, setDownloadOptionsReport] = useState(null);
 
 
   useEffect(() => {
@@ -1479,23 +1500,23 @@ export default function ReportingPortal() {
 
       setReportsByTab({
         zonal: zData.map(r => ({
+          ...r,
           id: `ZR-${String(r.id).padStart(3, '0')}`,
           rawDate: r.submittedAt,
           zone: r.zoneName,
           submittedBy: r.submittedBy,
           partners: r.newPartnersRecruited,
-          status: r.status,
-          ...r
+          status: r.status
         })),
-        partnership: otherData.partnership.map(r => ({ id: `PR-${String(r.id).padStart(3, '0')}`, rawDate: r.submittedDate, ...r })),
-        testimonials: otherData.testimonials.map(r => ({ id: `TS-${String(r.id).padStart(3, '0')}`, rawDate: r.submittedDate, ...r })),
+        partnership: otherData.partnership.map(r => ({ ...r, id: `PR-${String(r.id).padStart(3, '0')}`, rawDate: r.submittedDate })),
+        testimonials: otherData.testimonials.map(r => ({ ...r, id: `TS-${String(r.id).padStart(3, '0')}`, rawDate: r.submittedDate })),
         magazine: otherData.magazine.map(r => ({
+          ...r,
           id: `MG-${String(r.id).padStart(3, '0')}`,
           rawDate: r.submittedDate,
-          magazineType: [r.isAdult && 'Adult', r.isTeevolution && 'Teevolution', r.isKidsMagazine && 'Kids'].filter(Boolean).join(', ') || 'N/A',
-          ...r
+          magazineType: [r.isAdult && 'Adult', r.isTeevolution && 'Teevolution', r.isKidsMagazine && 'Kids'].filter(Boolean).join(', ') || 'N/A'
         })),
-        outreach: otherData.outreach.map(r => ({ id: `OR-${String(r.id).padStart(3, '0')}`, rawDate: r.submittedDate, ...r })),
+        outreach: otherData.outreach.map(r => ({ ...r, id: `OR-${String(r.id).padStart(3, '0')}`, rawDate: r.submittedDate })),
       });
     } catch (err) {
       console.error("Failed to fetch reports", err);
@@ -1505,7 +1526,7 @@ export default function ReportingPortal() {
   const handleApprove = async (report) => {
     const baseUrl = window.ENV?.API_PATH || process.env.REACT_APP_API_URL;
     const endpoint = activeTab === 'zonal' ? '/api/reports' : `/api/portal-reports/${activeTab}`;
-    const id = report.id.replace(/^[A-Z]+-/, '');
+    const id = parseInt(String(report.id).replace(/^[A-Z]+-/, ''), 10);
 
     try {
       const res = await fetch(`${baseUrl}${endpoint}/${id}/approve`, { method: 'POST' });
@@ -1523,7 +1544,7 @@ export default function ReportingPortal() {
     if (!window.confirm('Delete this report? This cannot be undone.')) return;
     const baseUrl = window.ENV?.API_PATH || process.env.REACT_APP_API_URL;
     const endpoint = activeTab === 'zonal' ? '/api/reports' : `/api/portal-reports/${activeTab}`;
-    const id = report.id.replace(/^[A-Z]+-/, '');
+    const id = parseInt(String(report.id).replace(/^[A-Z]+-/, ''), 10);
 
     try {
       const res = await fetch(`${baseUrl}${endpoint}/${id}`, { method: 'DELETE' });
@@ -1598,6 +1619,30 @@ export default function ReportingPortal() {
         />
       )}
 
+      {downloadOptionsReport && (
+        <div className="rp-modal-overlay" onClick={() => setDownloadOptionsReport(null)}>
+          <div className="rp-modal" style={{ maxWidth: 320 }} onClick={e => e.stopPropagation()}>
+            <div className="rp-modal-header">
+              <h3>Download Report</h3>
+              <button className="rp-remove-btn" onClick={() => setDownloadOptionsReport(null)}><X size={16} /></button>
+            </div>
+            <div className="rp-modal-body" style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              <button className="submit-report-btn" style={{ '--btn-color': '#e11d48', width: '100%', justifyContent: 'center' }} onClick={() => {
+                const fullReport = reports.find(x => x.id === downloadOptionsReport.id);
+                if (fullReport) downloadReportPDF({ ...fullReport, formName: tab.label }, formatDate);
+                setDownloadOptionsReport(null);
+              }}>Download as PDF</button>
+              
+              <button className="submit-report-btn" style={{ '--btn-color': '#16a34a', width: '100%', justifyContent: 'center' }} onClick={() => {
+                const fullReport = reports.find(x => x.id === downloadOptionsReport.id);
+                if (fullReport) downloadReportCSV(fullReport, tab.label);
+                setDownloadOptionsReport(null);
+              }}>Download as CSV / Excel</button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {showForm && (
         <tab.FormComponent
           onClose={() => setShowForm(false)}
@@ -1656,13 +1701,7 @@ export default function ReportingPortal() {
             : tab.columns
           }
           onView={r => setViewReport(r)}
-          onDownload={r => {
-            setToast(`Downloading ${r.id}…`);
-            const fullReport = reports.find(x => x.id === r.id);
-            if (fullReport) {
-              downloadReportPDF({ ...fullReport, formName: tab.label }, formatDate);
-            }
-          }}
+          onDownload={r => setDownloadOptionsReport(r)}
           onApprove={handleApprove}
           onClarify={r => setClarifyReport(r)}
           onDelete={handleDelete}
