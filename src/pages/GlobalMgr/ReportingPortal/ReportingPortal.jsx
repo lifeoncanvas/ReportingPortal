@@ -1364,7 +1364,7 @@ function OutreachForm({ onClose, onSubmit: parentSubmit }) {
 // ══════════════════════════════════════════════════════
 const TABS_CONFIG = [
   {
-    id: 'zonal', label: 'Weekly Ministry Report', icon: <Users size={14} />, emoji: '🏛️', color: '#4f46e5',
+    id: 'zonal', label: 'Weekly Overview', icon: <Users size={14} />, emoji: '🏛️', color: '#4f46e5',
     columns: [
       { key: 'id', label: 'Report ID' }, { key: 'rawDate', label: 'Date' },
       { key: 'zone', label: 'Zone' }, { key: 'submittedBy', label: 'Submitted By' },
@@ -1372,7 +1372,7 @@ const TABS_CONFIG = [
       { key: 'totalRegistrationHslhs', label: 'HSLHS Reg' },
       { key: 'status', label: 'Status' },
     ],
-    FormComponent: ZonalReportForm, btnLabel: 'Upload a New Weekly Ministry Report',
+    FormComponent: ZonalReportForm, btnLabel: 'Upload a New Weekly Overview',
   },
   {
     id: 'partnership', label: 'Partnership Report', icon: <Heart size={14} />, emoji: '🤝', color: '#16a34a',
