@@ -700,11 +700,11 @@ function PartnershipForm({ onClose, onSubmit: parentSubmit }) {
             value={form.groupPastorsMilestones} onChange={e => setForm(p => ({ ...p, groupPastorsMilestones: e.target.value }))} />
         </Field>
         <Field label="Pastors and members that have sponsored Teenspiration (300 espees) this week">
-          <textarea className="kf-textarea" rows={2} placeholder="Enter names..."
+          <textarea className="kf-textarea" rows={2} placeholder="enter names and amount"
             value={form.sponsoredTeenspiration} onChange={e => setForm(p => ({ ...p, sponsoredTeenspiration: e.target.value }))} />
         </Field>
         <Field label="Pastors and members that have sponsored Kidspiration (300 espees) this week">
-          <textarea className="kf-textarea" rows={2} placeholder="Enter names..."
+          <textarea className="kf-textarea" rows={2} placeholder="enter names and amount"
             value={form.sponsoredKidspiration} onChange={e => setForm(p => ({ ...p, sponsoredKidspiration: e.target.value }))} />
         </Field>
       </div>
