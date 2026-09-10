@@ -5,11 +5,11 @@ export const getApiUrl = () => {
     return envPath.trim();
   }
 
-  // 2. If running in browser on a remote server (not localhost), auto-target port 8081
+  // 2. If running in browser on a remote server (not localhost), auto-target the same origin
   if (typeof window !== 'undefined' && window.location?.hostname) {
     const { protocol, hostname } = window.location;
     if (hostname !== 'localhost' && hostname !== '127.0.0.1') {
-      return `${protocol}//${hostname}:8081`;
+      return `${protocol}//${hostname}`; // Do NOT add :8081, Nginx will proxy /api automatically
     }
   }
 
