@@ -101,8 +101,8 @@ export const TRANSLATIONS = {
     magazine: 'Magazine', notifications: 'Notifications', settings: 'Settings',
     // Welcome
     welcomeBack: 'Welcome back', today: 'Today',
-    weeklyReminderTitle: 'Weekly Report Reminder',
-    weeklyReminderDesc: "Don't forget to submit your weekly report by end of day Thursday.",
+    weeklyReminderTitle: 'Programs/Campaign Engagement Report Reminder',
+    weeklyReminderDesc: "Don't forget to submit your Programs/Campaign Engagement Report by end of day Thursday.",
     // KPI
     totalReports: 'Total Reports', totalFinance: 'Total Finance',
     totalAttendance: 'Total Attendance', completionRate: 'Completion Rate',

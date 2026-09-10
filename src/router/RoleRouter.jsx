@@ -6,6 +6,7 @@ import GlobalMgrLayout from '../pages/GlobalMgr/GlobalMgrLayout';
 import ZonalMgrLayout  from '../pages/ZonalMgr/ZonalMgrLayout';
 import AdminLayout     from '../pages/Admin/AdminLayout';
 import SubmitReport from '../pages/Report/SubmitReport';
+import ZonalInformationForm from '../pages/Report/ZonalInformationForm';
 
 import GlobalDashboard  from '../pages/GlobalMgr/Dashboard/Dashboard';
 import ReportingPortal  from '../pages/GlobalMgr/ReportingPortal/ReportingPortal';
@@ -42,6 +43,7 @@ export default function RoleRouter() {
           <Route path="notifications" element={<Notifications />} />
           <Route path="settings"      element={<Settings />} />
           <Route path="submit-report" element={<SubmitReport />} />
+          <Route path="zonal-info"    element={<ZonalInformationForm />} />
         </Route>
         <Route path="*" element={<Navigate to="/global/dashboard" replace />} />
       </Routes>
@@ -59,6 +61,7 @@ export default function RoleRouter() {
           <Route path="notifications" element={<Notifications />} />
           <Route path="settings"      element={<Settings />} />
           <Route path="submit-report" element={<SubmitReport />} />
+          <Route path="zonal-info"    element={<ZonalInformationForm />} />
         </Route>
         <Route path="*" element={<Navigate to="/zonal/dashboard" replace />} />
       </Routes>
@@ -78,6 +81,7 @@ export default function RoleRouter() {
           <Route path="notifications"  element={<Notifications />} />
           <Route path="settings"       element={<Settings />} />
           <Route path="submit-report" element={<SubmitReport />} />
+          <Route path="zonal-info"    element={<ZonalInformationForm />} />
         </Route>
         <Route path="*" element={<Navigate to="/admin/dashboard" replace />} />
       </Routes>
@@ -96,6 +100,7 @@ export default function RoleRouter() {
         <Route path="notifications" element={<Notifications />} />
         <Route path="settings"      element={<Settings />} />
         <Route path="submit-report" element={<SubmitReport />} />
+        <Route path="zonal-info"    element={<ZonalInformationForm />} />
       </Route>
       <Route path="*" element={<Navigate to="/zonal/dashboard" replace />} />
     </Routes>

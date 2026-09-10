@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Eye, Download, Search, Upload, X, Check, ChevronDown, Plus, FileText, Heart, BookOpen, Newspaper, Users, Trash2, MessageSquare } from 'lucide-react';
+import { Eye, Download, Search, Upload, X, Check, ChevronDown, Plus, FileText, Heart, BookOpen, Newspaper, Users, Trash2, MessageSquare, FolderOpen } from 'lucide-react';
 import { useAuth } from '../../../auth/AuthContext';
 import { downloadReportPDF } from '../../../utils/generateReportPDF';
 import * as XLSX from 'xlsx';
@@ -315,40 +315,37 @@ function ViewModal({ report, onClose }) {
 }
 
 // ══════════════════════════════════════════════════════
-// POPUP WRAPPER — used by all forms
+// FORM WRAPPER — used by all forms
 // ══════════════════════════════════════════════════════
-function FormPopup({ title, eyebrow, icon, onClose, onSubmit, submitting, submitLabel, children }) {
+function FormContainer({ title, eyebrow, icon, onSubmit, submitting, submitLabel, children }) {
   return (
-    <div className="popup-overlay" onClick={onClose}>
-      <div className="popup-modal" onClick={e => e.stopPropagation()}>
-        <div className="popup-header">
-          <div className="popup-title-wrap">
-            <span className="popup-eyebrow">{eyebrow}</span>
-            <div className="popup-title">
-              <span className="popup-title-icon">{icon}</span>
-              <span>{title}</span>
-            </div>
+    <div className="inline-form-container" style={{ backgroundColor: '#fff', borderRadius: '12px', border: '1px solid #e2e8f0', overflow: 'hidden' }}>
+      <div className="popup-header" style={{ borderBottom: '1px solid #f1f5f9' }}>
+        <div className="popup-title-wrap">
+          <span className="popup-eyebrow">{eyebrow}</span>
+          <div className="popup-title">
+            <span className="popup-title-icon">{icon}</span>
+            <span>{title}</span>
           </div>
-          <button className="popup-close-btn" onClick={onClose}><X size={16} /></button>
         </div>
-        <div className="popup-scroll">
-          {children}
-        </div>
-        <div className="popup-footer">
-          <button className="popup-cancel-btn" onClick={onClose} disabled={submitting}>Cancel</button>
-          <button className="popup-submit-btn" onClick={onSubmit} disabled={submitting}>
-            {submitting ? (
-              <>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" style={{ animation: 'spin 0.8s linear infinite' }}>
-                  <path d="M21 12a9 9 0 1 1-6.219-8.56" />
-                </svg>
-                Submitting…
-              </>
-            ) : (
-              <><Check size={15} /> {submitLabel}</>
-            )}
-          </button>
-        </div>
+      </div>
+      <div className="popup-scroll" style={{ maxHeight: 'none' }}>
+        {children}
+      </div>
+      <div className="popup-footer" style={{ borderTop: '1px solid #f1f5f9' }}>
+        <div style={{flex: 1}}></div>
+        <button className="popup-submit-btn" onClick={onSubmit} disabled={submitting}>
+          {submitting ? (
+            <>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" style={{ animation: 'spin 0.8s linear infinite' }}>
+                <path d="M21 12a9 9 0 1 1-6.219-8.56" />
+              </svg>
+              Submitting…
+            </>
+          ) : (
+            <><Check size={15} /> {submitLabel}</>
+          )}
+        </button>
       </div>
     </div>
   );
@@ -360,33 +357,17 @@ document.head.appendChild(spinStyle);
 
 
 // ══════════════════════════════════════════════════════
-// ZONAL REPORT FORM — matched to kingsforms.online fields
+// ZONAL INFORMATION FORM
 // ══════════════════════════════════════════════════════
-function ZonalReportForm({ onClose, onSubmit: parentSubmit }) {
+function ZonalInformationForm({ onClose, onSubmit: parentSubmit }) {
   const { user } = useAuth();
   const EMPTY = {
     zoneName: '',
     zonalManager: '',
-    partnershipRemittance: '',
-    popMedia: [],
-    popMediaFiles: [],
-    remittancePurpose: '',
-    trumpetsBlown: '',
-    greatShouts: '',
-    newPartners: '',
-    testimoniesSubmitted: '',
-    healingTranslations: '',
-    healingOutreaches: '',
-    healingPicturesVideos: '',
     pastoralAttendanceDirector: '',
     managerAttendanceDirector: '',
     managerAttendanceStrategy: '',
     testimonyClarificationConcern: '',
-    media: [],
-    mediaFiles: [],
-    participationPrayWithMe: '',
-    totalRegistrationHslhs: '',
-    heraldConference: '',
   };
   const [form, setForm] = useState(EMPTY);
   const [errors, setErrors] = useState({});
@@ -410,7 +391,6 @@ function ZonalReportForm({ onClose, onSubmit: parentSubmit }) {
     setSubmitting(true);
     const today = new Date().toISOString().split('T')[0];
     const payload = {
-      // Fields matching CreateReportRequest / zone_weekly_reports table
       submittedBy: form.zonalManager,
       submitterEmail: user?.email,
       submittedDate: today,
@@ -422,11 +402,7 @@ function ZonalReportForm({ onClose, onSubmit: parentSubmit }) {
       zonalManagerExecutiveMinistersMeeting: form.managerAttendanceDirector,
       zonalManagerStrategyMeeting: form.managerAttendanceStrategy,
       testimonyClarificationConcern: form.testimonyClarificationConcern,
-      popMediaUrl: null,
       regionName: user?.region || 'Global',
-      participationPrayWithMe: form.participationPrayWithMe,
-      totalRegistrationHslhs: Number(form.totalRegistrationHslhs) || 0,
-      heraldConference: form.heraldConference,
     };
     try {
       await fetch(`${window.ENV?.API_PATH || process.env.REACT_APP_API_URL}/api/reports`, {
@@ -435,23 +411,20 @@ function ZonalReportForm({ onClose, onSubmit: parentSubmit }) {
         body: JSON.stringify(payload),
       });
     } catch (err) {
-      console.error('Failed to save zonal report to DB', err);
+      console.error('Failed to save zonal information to DB', err);
     }
     parentSubmit({
-      zone: form.zoneName,
-      submittedBy: form.zonalManager,
-      partners: form.newPartners,
-      remittance: form.partnershipRemittance,
+      zoneName: form.zoneName,
+      zonalManager: form.zonalManager,
       status: 'submitted',
-      media: form.media,
       rawDate: today,
     });
     setSubmitting(false);
   };
 
   return (
-    <FormPopup title="Weekly Ministry Report" eyebrow="KingsForms · Weekly Ministry Report" icon="🏛️"
-      onClose={onClose} onSubmit={handleSubmit} submitting={submitting} submitLabel="Submit Weekly Ministry Report">
+    <FormContainer title="Zonal Information" eyebrow="KingsForms · Zonal Info" icon="🏛️"
+      onSubmit={handleSubmit} submitting={submitting} submitLabel="Submit Zonal Information">
 
       {/* Zone Info */}
       <div className="popup-section-head">🏛️ Zone Information</div>
@@ -501,21 +474,118 @@ function ZonalReportForm({ onClose, onSubmit: parentSubmit }) {
             value={form.testimonyClarificationConcern} onChange={e => set('testimonyClarificationConcern', e.target.value)} />
         </Field>
       </div>
+    </FormContainer>
+  );
+}
 
-      {/* Pray With Me & HSLHS & Herald Conference */}
+
+// ══════════════════════════════════════════════════════
+// ZONAL REPORT FORM — matched to kingsforms.online fields
+// ══════════════════════════════════════════════════════
+function ZonalReportForm({ onClose, onSubmit: parentSubmit }) {
+  const { user } = useAuth();
+  const EMPTY = {
+    zoneName: '',
+    zonalManager: '',
+    partnershipRemittance: '',
+    popMedia: [],
+    popMediaFiles: [],
+    remittancePurpose: '',
+    trumpetsBlown: '',
+    greatShouts: '',
+    newPartners: '',
+    testimoniesSubmitted: '',
+    healingTranslations: '',
+    healingOutreaches: '',
+    healingPicturesVideos: '',
+    pastoralAttendanceDirector: '',
+    managerAttendanceDirector: '',
+    managerAttendanceStrategy: '',
+    testimonyClarificationConcern: '',
+    media: [],
+    mediaFiles: [],
+    totalRegistrationHslhs: '',
+    activePrayerCloud: '',
+    totalHerald: '',
+    activatedHealingCentre: '',
+    ongoingProgramsReport: '',
+  };
+  const [form, setForm] = useState(EMPTY);
+  const [errors, setErrors] = useState({});
+  const [submitting, setSubmitting] = useState(false);
+  const set = (k, v) => setForm(p => ({ ...p, [k]: v }));
+  const ATTENDANCE_OPTIONS = ['', 'Yes', 'No', 'Officially Excused'];
+
+  const validate = () => {
+    const e = {};
+    return e;
+  };
+
+  const handleSubmit = async () => {
+    const e = validate(); setErrors(e);
+    if (Object.keys(e).length) return;
+    setSubmitting(true);
+    const today = new Date().toISOString().split('T')[0];
+    const payload = {
+      // Fields matching CreateReportRequest / zone_weekly_reports table
+      submittedBy: user?.displayName || user?.name || 'User',
+      submitterEmail: user?.email,
+      submittedDate: today,
+      submittedTime: new Date().toTimeString().split(' ')[0],
+      weekStartDate: today,
+      popMediaUrl: null,
+      regionName: user?.region || 'Global',
+      totalRegistrationHslhs: Number(form.totalRegistrationHslhs) || 0,
+      activePrayerCloud: Number(form.activePrayerCloud) || 0,
+      totalHerald: Number(form.totalHerald) || 0,
+      activatedHealingCentre: Number(form.activatedHealingCentre) || 0,
+      ongoingProgramsReport: form.ongoingProgramsReport,
+    };
+    try {
+      await fetch(`${window.ENV?.API_PATH || process.env.REACT_APP_API_URL}/api/reports`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+    } catch (err) {
+      console.error('Failed to save zonal report to DB', err);
+    }
+    parentSubmit({
+      submittedBy: user?.displayName || user?.name || 'User',
+      partners: form.newPartners,
+      remittance: form.partnershipRemittance,
+      status: 'submitted',
+      media: form.media,
+      rawDate: today,
+    });
+    setSubmitting(false);
+  };
+
+  return (
+    <FormContainer title="Programs/Campaign Engagement Report" eyebrow="KingsForms · Programs/Campaign Engagement Report" icon="🏛️"
+      onSubmit={handleSubmit} submitting={submitting} submitLabel="Submit Programs/Campaign Engagement Report">
+
       <div className="popup-section-head">📣 Programs & Campaigns</div>
       <div className="popup-fields">
-        <Field label="Total number of participation pray with me">
-          <textarea className="kf-textarea" rows={2} placeholder="Enter details..."
-            value={form.participationPrayWithMe} onChange={e => set('participationPrayWithMe', e.target.value)} />
-        </Field>
         <Field label="Total Registration for HSLHS">
           <input className="kf-input" type="number" min="0" placeholder="0"
             value={form.totalRegistrationHslhs} onChange={e => set('totalRegistrationHslhs', e.target.value)} />
         </Field>
-        <Field label="Brief report for Herald Conference">
-          <input className="kf-input" placeholder="Enter status/details..."
-            value={form.heraldConference} onChange={e => set('heraldConference', e.target.value)} />
+        <Field label="Total no active prayer cloud">
+          <input className="kf-input" type="number" min="0" placeholder="0"
+            value={form.activePrayerCloud} onChange={e => set('activePrayerCloud', e.target.value)} />
+        </Field>
+        <Field label="Total no of herald">
+          <input className="kf-input" type="number" min="0" placeholder="0"
+            value={form.totalHerald} onChange={e => set('totalHerald', e.target.value)} />
+        </Field>
+        <Field label="Total no of activated healing centre">
+          <input className="kf-input" type="number" min="0" placeholder="0"
+            value={form.activatedHealingCentre} onChange={e => set('activatedHealingCentre', e.target.value)} />
+        </Field>
+        <Field label="Brief report for ongoing programs (eg.herald conference etc )">
+          <textarea className="kf-textarea" rows={3} placeholder="Enter details..."
+            value={form.ongoingProgramsReport} onChange={e => set('ongoingProgramsReport', e.target.value)} />
         </Field>
       </div>
 
@@ -530,7 +600,7 @@ function ZonalReportForm({ onClose, onSubmit: parentSubmit }) {
           onRemove={i => { set('media', form.media.filter((_, j) => j !== i)); set('mediaFiles', form.mediaFiles.filter((_, j) => j !== i)); }}
         />
       </div>
-    </FormPopup>
+    </FormContainer>
   );
 }
 
@@ -561,7 +631,9 @@ function PartnershipForm({ onClose, onSubmit: parentSubmit }) {
     blaaast: {},
     notes: '',
     others: '',
-    groupPastorsMilestones: '',
+    groupPastorsName: '',
+    groupName: '',
+    groupMilestoneName: '',
     sponsoredTeenspiration: '',
     sponsoredKidspiration: '',
     popMedia: [],
@@ -599,7 +671,7 @@ function PartnershipForm({ onClose, onSubmit: parentSubmit }) {
       notes: finalNotes,
       status: 'submitted',
       rawDate: new Date().toISOString().split('T')[0],
-      groupPastorsMilestones: form.groupPastorsMilestones,
+      groupPastorsMilestones: `Pastor: ${form.groupPastorsName}\nGroup: ${form.groupName}\nMilestone: ${form.groupMilestoneName}`,
       sponsoredTeenspiration: form.sponsoredTeenspiration,
       sponsoredKidspiration: form.sponsoredKidspiration,
       popMedia: form.popMedia
@@ -608,20 +680,21 @@ function PartnershipForm({ onClose, onSubmit: parentSubmit }) {
   };
 
   return (
-    <FormPopup title="Partnership Remittance Report" eyebrow="KingsForms · Partnership" icon="🤝"
-      onClose={onClose} onSubmit={handleSubmit} submitting={submitting} submitLabel="Submit Partnership Report">
+    <FormContainer title="Partnership Report" eyebrow="KingsForms · Partnership" icon="🤝"
+      onSubmit={handleSubmit} submitting={submitting} submitLabel="Submit Partnership Report">
 
       <div className="popup-section-head">💼 Partnership Breakdown (Espees)</div>
       <div className="popup-fields">
-        <Field label="Total Partnership Remittance for this week">
-          <input className="kf-input" type="number" min="0" placeholder="0"
-            value={form.totalRemittance} onChange={e => setForm(p => ({ ...p, totalRemittance: e.target.value }))} />
-        </Field>
-
-        <Field label="State purpose for each remittance (e.g. HSLHS, Healing, DOME, etc.)">
-          <textarea className="kf-textarea" rows={2} placeholder="Provide details..."
-            value={form.remittancePurpose} onChange={e => setForm(p => ({ ...p, remittancePurpose: e.target.value }))} />
-        </Field>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '1rem', alignItems: 'start' }}>
+          <Field label="Zonal Partnership for this week">
+            <input className="kf-input" type="text" placeholder="Enter zonal partnership (e.g. 5000 espees)..."
+              value={form.zonalPartnership} onChange={e => setForm(p => ({ ...p, zonalPartnership: e.target.value }))} />
+          </Field>
+          <Field label="Zonal Partnership Details (kindly state how much was given for each arm eg hslhs,httnm,crusade etc )">
+            <textarea className="kf-textarea" rows={1} placeholder="Enter details..."
+              value={form.zonalPartnershipDetails} onChange={e => setForm(p => ({ ...p, zonalPartnershipDetails: e.target.value }))} />
+          </Field>
+        </div>
 
         <Field label="Proof of Payment (POP)" hint="Upload POP for the transactions">
           <MediaUploader files={form.popMedia}
@@ -644,16 +717,7 @@ function PartnershipForm({ onClose, onSubmit: parentSubmit }) {
             value={form.newPartnersRecruited} onChange={e => setForm(p => ({ ...p, newPartnersRecruited: e.target.value }))} />
         </Field>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '1rem', alignItems: 'start' }}>
-          <Field label="Zonal Partnership for this week">
-            <input className="kf-input" type="text" placeholder="Enter zonal partnership (e.g. 5000 espees)..."
-              value={form.zonalPartnership} onChange={e => setForm(p => ({ ...p, zonalPartnership: e.target.value }))} />
-          </Field>
-          <Field label="Zonal Partnership Details (kindly state how much was given for each arm eg hslhs,httnm,crusade etc )">
-            <textarea className="kf-textarea" rows={1} placeholder="Enter details..."
-              value={form.zonalPartnershipDetails} onChange={e => setForm(p => ({ ...p, zonalPartnershipDetails: e.target.value }))} />
-          </Field>
-        </div>
+
 
         <Field label="Group Partnership (state how much was remitted by each group)">
           <input className="kf-input" type="text" placeholder="Enter group partnership..."
@@ -697,10 +761,20 @@ function PartnershipForm({ onClose, onSubmit: parentSubmit }) {
 
       <div className="popup-section-head">🏆 Group milestones</div>
       <div className="popup-fields">
-        <Field label="Names of group Pastors that have advanced in the BLAAAST Milestones (please state name and Group milsteone)">
-          <textarea className="kf-textarea" rows={2} placeholder="enter the names and amount"
-            value={form.groupPastorsMilestones} onChange={e => setForm(p => ({ ...p, groupPastorsMilestones: e.target.value }))} />
-        </Field>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '1rem', alignItems: 'end' }}>
+          <Field label="State the name of the group Pastors">
+            <input className="kf-input" type="text" placeholder="Pastor name"
+              value={form.groupPastorsName} onChange={e => setForm(p => ({ ...p, groupPastorsName: e.target.value }))} />
+          </Field>
+          <Field label="State the name of group">
+            <input className="kf-input" type="text" placeholder="Group name"
+              value={form.groupName} onChange={e => setForm(p => ({ ...p, groupName: e.target.value }))} />
+          </Field>
+          <Field label="State the name of group milestone">
+            <input className="kf-input" type="text" placeholder="Milestone name"
+              value={form.groupMilestoneName} onChange={e => setForm(p => ({ ...p, groupMilestoneName: e.target.value }))} />
+          </Field>
+        </div>
         <Field label="Pastors and members that have sponsored Teenspiration (300 espees) this week">
           <textarea className="kf-textarea" rows={2} placeholder="enter names and amount"
             value={form.sponsoredTeenspiration} onChange={e => setForm(p => ({ ...p, sponsoredTeenspiration: e.target.value }))} />
@@ -717,7 +791,7 @@ function PartnershipForm({ onClose, onSubmit: parentSubmit }) {
             value={form.others} onChange={e => setForm(p => ({ ...p, others: e.target.value }))} />
         </Field>
       </div>
-    </FormPopup>
+    </FormContainer>
   );
 }
 
@@ -824,8 +898,8 @@ function TestimonialsForm({ onClose, onSubmit: parentSubmit }) {
   };
 
   return (
-    <FormPopup title="Submit a Testimony" eyebrow="KingsForms · Testimonials" icon="✍️"
-      onClose={onClose} onSubmit={handleSubmit} submitting={submitting} submitLabel="Submit Testimony">
+    <FormContainer title="Testimonials" eyebrow="KingsForms · Testimonies" icon="✍️"
+      onSubmit={handleSubmit} submitting={submitting} submitLabel="Submit Testimony">
 
       {/* Category Dropdown */}
       <div className="popup-section-head">🏷️ Category</div>
@@ -901,7 +975,7 @@ function TestimonialsForm({ onClose, onSubmit: parentSubmit }) {
           </div>
         </div>
       )}
-    </FormPopup>
+    </FormContainer>
   );
 }
 
@@ -1006,11 +1080,11 @@ function MagazineForm({ onClose, onSubmit: parentSubmit }) {
   const totalOrdered = (Number(form.adultCopies) || 0) + (Number(form.teensCopies) || 0) + (Number(form.kidsCopies) || 0);
 
   return (
-    <FormPopup title="Magazine Order Report" eyebrow="KingsForms · Magazine" icon="📚"
-      onClose={onClose} onSubmit={handleSubmit} submitting={submitting} submitLabel="Submit Magazine Report">
+    <FormContainer title="Magazine Order Report" eyebrow="KingsForms · Magazine" icon="📚"
+      onSubmit={handleSubmit} submitting={submitting} submitLabel="Submit Magazine Report">
 
       {/* Magazine Types */}
-      <div className="popup-section-head">📚 Please state number of magazines ordered for each type (adult, teens, kids)</div>
+      <div className="popup-section-head">📚 Monthly Minimum Magazine Order Please state number of magazines ordered for each categories(adult, teens, kids)</div>
       <div className="popup-fields">
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
           <Field label="Adult Copies" error={errors.adultCopies}>
@@ -1113,25 +1187,14 @@ function MagazineForm({ onClose, onSubmit: parentSubmit }) {
       </div>
 
       {/* Monthly Ordering */}
-      <div className="popup-section-head">📦 Monthly ordered (local distributions)</div>
+      <div className="popup-section-head">📦 Monthly Sponsorship</div>
       <div className="popup-fields">
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-          <Field label="Monthly Minimum Magazine Order">
-            <input className="kf-input" type="number" min="0" placeholder="0"
-              value={form.monthlyMinimumOrder} onChange={e => setForm(p => ({ ...p, monthlyMinimumOrder: e.target.value }))} />
-          </Field>
-          <Field label="Amount Paid (Minimum Order)">
-            <input className="kf-input" type="number" min="0" placeholder="0.00" step="0.01"
-              value={form.monthlyMinimumOrderAmountPaid} onChange={e => setForm(p => ({ ...p, monthlyMinimumOrderAmountPaid: e.target.value }))} />
-          </Field>
-        </div>
-
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginTop: '1rem' }}>
           <Field label="Cumulative number of copies sponsored for the month (please update the total number of copies the zone has sponsored for the month)">
             <input className="kf-input" type="number" min="0" placeholder="0"
               value={form.monthlyCopiesOrdered} onChange={e => setForm(p => ({ ...p, monthlyCopiesOrdered: e.target.value }))} />
           </Field>
-          <Field label="Amount Paid (Cumulative)">
+          <Field label="How much was given to the sponsorship towards magazine ?">
             <input className="kf-input" type="number" min="0" placeholder="0.00" step="0.01"
               value={form.cumulativeSponsoredAmountPaid} onChange={e => setForm(p => ({ ...p, cumulativeSponsoredAmountPaid: e.target.value }))} />
           </Field>
@@ -1161,7 +1224,7 @@ function MagazineForm({ onClose, onSubmit: parentSubmit }) {
             value={form.praiseReports} onChange={e => setForm(p => ({ ...p, praiseReports: e.target.value }))} />
         </Field>
       </div>
-    </FormPopup>
+    </FormContainer>
   );
 }
 
@@ -1172,6 +1235,7 @@ function MagazineForm({ onClose, onSubmit: parentSubmit }) {
 const OUTREACH_CATEGORIES = ['Healing', 'Soul-winning', 'Prison Outreach', 'School Outreach', 'Market Outreach', 'Hospital Outreach', 'Other'];
 
 function OutreachForm({ onClose, onSubmit: parentSubmit }) {
+  const { user } = useAuth();
   const [form, setForm] = useState({
     date: '',
     category: '',
@@ -1199,13 +1263,13 @@ function OutreachForm({ onClose, onSubmit: parentSubmit }) {
     if (!form.date) e.date = 'Required';
     if (!form.category) e.category = 'Please select a category';
     if (!form.locations.trim()) e.locations = 'Required';
-    if (!form.story.trim()) e.story = 'Required';
     setErrors(e);
     if (Object.keys(e).length) return;
     setSubmitting(true);
     await new Promise(r => setTimeout(r, 500));
     // Payload matches outreach_reports table columns
     parentSubmit({
+      submittedBy: user?.displayName || user?.name || 'User',
       submittedDate: form.date,
       category: form.category === 'Other' ? form.customCategory || 'Other' : form.category,
       locations: form.locations,
@@ -1239,8 +1303,8 @@ function OutreachForm({ onClose, onSubmit: parentSubmit }) {
   };
 
   return (
-    <FormPopup title="Outreach / Crusade Activity Report" eyebrow="KingsForms · Outreach" icon="📍"
-      onClose={onClose} onSubmit={handleSubmit} submitting={submitting} submitLabel="Submit Outreach / Crusade Report">
+    <FormContainer title="Outreach / Crusade Activity Report" eyebrow="KingsForms · Outreach" icon="📍"
+      onSubmit={handleSubmit} submitting={submitting} submitLabel="Submit Outreach / Crusade Report">
 
       {/* Category */}
       <div className="popup-section-head">🏷️ Outreach / Crusade Category</div>
@@ -1271,79 +1335,32 @@ function OutreachForm({ onClose, onSubmit: parentSubmit }) {
           <input className={`kf-input${errors.date ? ' kf-input-err' : ''}`} type="date"
             value={form.date} onChange={e => setForm(p => ({ ...p, date: e.target.value }))} />
         </Field>
-        <Field label="Location(s)" required hint="Separate multiple locations with commas" error={errors.locations}>
+        <Field label="State the location of healing outreaches (e.g. market, hospitals, school, etc.)" required hint="Separate multiple locations with commas" error={errors.locations}>
           <input className={`kf-input${errors.locations ? ' kf-input-err' : ''}`}
             placeholder="e.g. Lagos Island, Surulere Market"
             value={form.locations} onChange={e => setForm(p => ({ ...p, locations: e.target.value }))} />
         </Field>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginTop: '1rem' }}>
-          <Field label="How many copies of magazine were used?">
-            <input className="kf-input" type="number" min="0" placeholder="0"
-              value={form.magazinesUsed} onChange={e => setForm(p => ({ ...p, magazinesUsed: e.target.value }))} />
-          </Field>
-          <Field label="How many people are involved?">
-            <input className="kf-input" type="number" min="0" placeholder="0"
-              value={form.peopleInvolved} onChange={e => setForm(p => ({ ...p, peopleInvolved: e.target.value }))} />
-          </Field>
-        </div>
+        <Field label="How many copies of magazine were distributed ?">
+          <input className="kf-input" type="number" min="0" placeholder="0"
+            value={form.magazinesUsed} onChange={e => setForm(p => ({ ...p, magazinesUsed: e.target.value }))} />
+        </Field>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginTop: '1rem' }}>
-          <Field label="What was the total attendance?">
-            <input className="kf-input" type="number" min="0" placeholder="0"
-              value={form.totalAttendance} onChange={e => setForm(p => ({ ...p, totalAttendance: e.target.value }))} />
-          </Field>
-          <Field label="How many souls were saved?">
-            <input className="kf-input" type="number" min="0" placeholder="0"
-              value={form.soulsSaved} onChange={e => setForm(p => ({ ...p, soulsSaved: e.target.value }))} />
-          </Field>
-        </div>
+        <Field label="how many healing outreach(es) were carried out ?">
+          <input className="kf-input" type="number" min="0" placeholder="0"
+            value={form.healingOutreachesHeld} onChange={e => setForm(p => ({ ...p, healingOutreachesHeld: e.target.value }))} />
+        </Field>
+
+        <Field label="How many souls were saved?">
+          <input className="kf-input" type="number" min="0" placeholder="0"
+            value={form.soulsSaved} onChange={e => setForm(p => ({ ...p, soulsSaved: e.target.value }))} />
+        </Field>
 
         <Field label="Kindly submit testimonies from the outreach(es) / crusade(s)">
           <textarea className="kf-textarea" rows={3} placeholder="Give testimonies..."
             value={form.outreachTestimonies} onChange={e => setForm(p => ({ ...p, outreachTestimonies: e.target.value }))} />
         </Field>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginTop: '1rem' }}>
-          <Field label="Total number of Healing translations achieved?">
-            <input className="kf-input" type="number" min="0" placeholder="0"
-              value={form.healingTranslationsAchieved} onChange={e => setForm(p => ({ ...p, healingTranslationsAchieved: e.target.value }))} />
-          </Field>
-          <Field label="How many Healing Outreaches / Crusades were carried out this week with the healing to nations magazine?">
-            <input className="kf-input" type="number" min="0" placeholder="0"
-              value={form.healingOutreachesHeld} onChange={e => setForm(p => ({ ...p, healingOutreachesHeld: e.target.value }))} />
-          </Field>
-        </div>
-
-        <Field label="State the location of healing outreaches (e.g. market, hospitals, school, etc.)">
-          <input className="kf-input" placeholder="e.g. local market, community school..."
-            value={form.healingOutreachLocations} onChange={e => setForm(p => ({ ...p, healingOutreachLocations: e.target.value }))} />
-        </Field>
-
-        <Field label="How many pictures and videos from the Healing outreaches / crusades were submitted?">
-          <input className="kf-input" type="number" min="0" placeholder="0"
-            value={form.healingMediaSubmitted} onChange={e => setForm(p => ({ ...p, healingMediaSubmitted: e.target.value }))} />
-        </Field>
-
-        <Field label="Kindly state further plans for soul retention">
-          <textarea className="kf-textarea" rows={3} placeholder="State follow-up plan..."
-            value={form.followUpPlan} onChange={e => setForm(p => ({ ...p, followUpPlan: e.target.value }))} />
-        </Field>
-      </div>
-
-      {/* Story */}
-      <div className="popup-section-head">📝 Outreach / Crusade Story</div>
-      <div className="popup-fields">
-        <Field label="Tell the story" required error={errors.story}>
-          <textarea className={`kf-textarea${errors.story ? ' kf-input-err' : ''}`} rows={7}
-            placeholder="Describe what happened — souls reached, testimonies heard, challenges, highlights…"
-            value={form.story} onChange={e => setForm(p => ({ ...p, story: e.target.value }))} />
-        </Field>
-      </div>
-
-      {/* Images & Videos */}
-      <div className="popup-section-head">📸 Outreach / Crusade Images & Videos</div>
-      <div className="popup-fields">
         <MediaUploader files={form.images}
           onAdd={files => {
             const prev = files.map(f => ({ name: f.name, type: f.type, url: (f.type.startsWith('image') || f.type.startsWith('video')) ? URL.createObjectURL(f) : null, size: f.size }));
@@ -1353,8 +1370,13 @@ function OutreachForm({ onClose, onSubmit: parentSubmit }) {
           label="Upload Photos & Videos (includes Healing outreaches)"
           accept="image/*,video/*"
         />
+
+        <Field label="Kindly state further plans for soul retention">
+          <textarea className="kf-textarea" rows={3} placeholder="State follow-up plan..."
+            value={form.followUpPlan} onChange={e => setForm(p => ({ ...p, followUpPlan: e.target.value }))} />
+        </Field>
       </div>
-    </FormPopup>
+    </FormContainer>
   );
 }
 
@@ -1364,15 +1386,24 @@ function OutreachForm({ onClose, onSubmit: parentSubmit }) {
 // ══════════════════════════════════════════════════════
 const TABS_CONFIG = [
   {
-    id: 'zonal', label: 'Weekly Overview', icon: <Users size={14} />, emoji: '🏛️', color: '#4f46e5',
+    id: 'zonal-info', label: 'Zonal Information', icon: <Users size={14} />, emoji: '🏛️', color: '#8b5cf6',
     columns: [
       { key: 'id', label: 'Report ID' }, { key: 'rawDate', label: 'Date' },
-      { key: 'zone', label: 'Zone' }, { key: 'submittedBy', label: 'Submitted By' },
+      { key: 'zoneName', label: 'Zone' }, { key: 'zonalManager', label: 'Zonal Manager' },
+      { key: 'status', label: 'Status' },
+    ],
+    FormComponent: ZonalInformationForm, btnLabel: 'Upload New Zonal Information',
+  },
+  {
+    id: 'zonal', label: 'Programs/Campaign Engagement Report', icon: <Users size={14} />, emoji: '📊', color: '#4f46e5',
+    columns: [
+      { key: 'id', label: 'Report ID' }, { key: 'rawDate', label: 'Date' },
+      { key: 'submittedBy', label: 'Submitted By' },
       { key: 'partners', label: 'New Partners' },
       { key: 'totalRegistrationHslhs', label: 'HSLHS Reg' },
       { key: 'status', label: 'Status' },
     ],
-    FormComponent: ZonalReportForm, btnLabel: 'Upload a New Weekly Overview',
+    FormComponent: ZonalReportForm, btnLabel: 'Upload a New Programs/Campaign Engagement Report',
   },
   {
     id: 'partnership', label: 'Partnership Report', icon: <Heart size={14} />, emoji: '🤝', color: '#16a34a',
@@ -1425,6 +1456,7 @@ const TABS_CONFIG = [
   {
     id: 'outreach', label: 'Outreach Report', icon: <FileText size={14} />, emoji: '📍', color: '#0891b2',
     columns: [
+      { key: 'submittedBy', label: 'Submitted By' },
       { key: 'id', label: 'Report ID' }, { key: 'rawDate', label: 'Date' },
       { key: 'category', label: 'Category' },
       { key: 'locations', label: 'Location(s)' },
@@ -1434,8 +1466,11 @@ const TABS_CONFIG = [
       { key: 'soulsSaved', label: 'Saved' },
       { key: 'status', label: 'Status' },
     ],
-    FormComponent: OutreachForm, btnLabel: 'Upload a New Outreach Report',
+    FormComponent: OutreachForm,
   },
+  {
+    id: 'submitted-forms', label: 'Submitted Forms', icon: <FolderOpen size={14} />, emoji: '📁', color: '#64748b'
+  }
 ];
 
 const downloadReportCSV = (report, formName) => {
@@ -1463,10 +1498,10 @@ const downloadReportCSV = (report, formName) => {
 // ══════════════════════════════════════════════════════
 export default function ReportingPortal() {
   const { user } = useAuth();
-  const [activeTab, setActiveTab] = useState('zonal');
+  const [activeTab, setActiveTab] = useState('zonal-info');
+  const [subTab, setSubTab] = useState('zonal-info');
   const [search, setSearch] = useState('');
-  const [reportsByTab, setReportsByTab] = useState({ zonal: [], partnership: [], testimonials: [], magazine: [], outreach: [] });
-  const [showForm, setShowForm] = useState(false);
+  const [reportsByTab, setReportsByTab] = useState({ 'zonal-info': [], zonal: [], partnership: [], testimonials: [], magazine: [], outreach: [] });
   const [viewReport, setViewReport] = useState(null);
   const [clarifyReport, setClarifyReport] = useState(null);
   const [toast, setToast] = useState('');
@@ -1501,6 +1536,14 @@ export default function ReportingPortal() {
       }
 
       setReportsByTab({
+        'zonal-info': zData.map(r => ({
+          ...r,
+          id: `ZI-${String(r.id).padStart(3, '0')}`,
+          rawDate: r.submittedAt,
+          zoneName: r.zoneName,
+          zonalManager: r.zonalManager,
+          status: r.status
+        })),
         zonal: zData.map(r => ({
           ...r,
           id: `ZR-${String(r.id).padStart(3, '0')}`,
@@ -1589,12 +1632,13 @@ export default function ReportingPortal() {
       }
       setToast(`${tab.label} submitted successfully`);
       await fetchAllReports(); // Wait for DB sync
+      
+      setSubTab(activeTab);
+      setActiveTab('submitted-forms');
     } catch (e) {
       console.error('Submission failed', e);
       alert(`Failed to save report: ${e.message}`);
     }
-
-    setShowForm(false);
   };
 
   const handleExportAll = () => {
@@ -1684,13 +1728,6 @@ export default function ReportingPortal() {
         </div>
       )}
 
-      {showForm && (
-        <tab.FormComponent
-          onClose={() => setShowForm(false)}
-          onSubmit={handleSubmit}
-        />
-      )}
-
       <div className="rp-page-header">
         <div>
           <h2>Reporting Portal {user?.role === 'admin' ? '— Admin View' : ''}</h2>
@@ -1703,12 +1740,12 @@ export default function ReportingPortal() {
       <div className="rp-tabs">
         {TABS_CONFIG.map(t => (
           <button key={t.id}
-            onClick={() => { setActiveTab(t.id); setSearch(''); setShowForm(false); }}
+            onClick={() => { setActiveTab(t.id); setSearch(''); }}
             className={`rp-tab ${activeTab === t.id ? 'active' : ''}`}
             style={activeTab === t.id ? { '--tab-color': t.color } : {}}>
             {t.icon} {t.label}
-            {reportsByTab[t.id].length > 0 && (
-              <span className="tab-count" style={{ background: t.color }}>{reportsByTab[t.id].length}</span>
+            {(reportsByTab[t.id] || []).length > 0 && t.id !== 'submitted-forms' && (
+              <span className="tab-count" style={{ background: t.color }}>{(reportsByTab[t.id] || []).length}</span>
             )}
           </button>
         ))}
@@ -1716,39 +1753,67 @@ export default function ReportingPortal() {
       <div className="rp-tab-divider" />
 
       {/* ── Panel ── */}
-      <div className="rp-panel">
-        <div className="rp-toolbar">
-          <div className="rp-search">
-            <Search size={14} color="#9ca3af" />
-            <input type="text" placeholder={`Search ${tab.label.toLowerCase()}…`}
-              value={search} onChange={e => setSearch(e.target.value)} />
+      {activeTab === 'submitted-forms' ? (
+        <div className="rp-panel">
+          <div className="rp-toolbar">
+            <div className="rp-search">
+              <Search size={14} color="#9ca3af" />
+              <input type="text" placeholder="Search submitted forms..."
+                value={search} onChange={e => setSearch(e.target.value)} />
+            </div>
           </div>
-          <div className="rp-toolbar-right">
-            <button className="submit-report-btn" style={{ '--btn-color': tab.color }} onClick={() => setShowForm(true)}>
-              <Plus size={14} /> {tab.btnLabel}
-            </button>
+
+          <div className="rp-sub-tabs" style={{ display: 'flex', gap: '8px', marginBottom: '16px', flexWrap: 'wrap' }}>
+            {TABS_CONFIG.filter(t => t.id !== 'submitted-forms').map(t => (
+              <button key={t.id}
+                onClick={() => setSubTab(t.id)}
+                style={{
+                  padding: '6px 12px', borderRadius: '20px', border: '1px solid #e2e8f0',
+                  background: subTab === t.id ? t.color : '#f8fafc',
+                  color: subTab === t.id ? '#fff' : '#475569',
+                  fontSize: '13px', cursor: 'pointer', fontWeight: 500,
+                  transition: 'all 0.2s'
+                }}>
+                {t.label}
+              </button>
+            ))}
           </div>
+
+          <p className="rp-count">
+             Showing {
+               (reportsByTab[subTab] || []).filter(r => Object.values(r).some(v => String(v).toLowerCase().includes(search.toLowerCase()))).length
+             } reports
+          </p>
+
+          <ReportTable
+            reports={(reportsByTab[subTab] || [])
+              .filter(r => Object.values(r).some(v => String(v).toLowerCase().includes(search.toLowerCase())))
+              .map(r => ({ ...r, rawDate: formatDate(r.rawDate) }))}
+            loading={false}
+            columns={(() => {
+               const st = TABS_CONFIG.find(t => t.id === subTab);
+               if (!st) return [];
+               return user?.role === 'admin'
+                ? (st.columns.some(c => c.key === 'submittedBy') ? st.columns : [{ key: 'submittedBy', label: 'Submitted By' }, ...st.columns])
+                : st.columns;
+            })()}
+            onView={r => setViewReport(r)}
+            onDownload={r => setDownloadOptionsReport(r)}
+            onApprove={handleApprove}
+            onClarify={r => setClarifyReport(r)}
+            onDelete={handleDelete}
+            userRole={user?.role}
+          />
         </div>
-
-        <p className="rp-count">
-          Showing {filtered.length} {tab.label.toLowerCase()} report{filtered.length !== 1 ? 's' : ''}
-        </p>
-
-        <ReportTable
-          reports={filtered.map(r => ({ ...r, rawDate: formatDate(r.rawDate) }))}
-          loading={false}
-          columns={user?.role === 'admin'
-            ? (tab.columns.some(c => c.key === 'submittedBy') ? tab.columns : [{ key: 'submittedBy', label: 'Submitted By' }, ...tab.columns])
-            : tab.columns
-          }
-          onView={r => setViewReport(r)}
-          onDownload={r => setDownloadOptionsReport(r)}
-          onApprove={handleApprove}
-          onClarify={r => setClarifyReport(r)}
-          onDelete={handleDelete}
-          userRole={user?.role}
-        />
-      </div>
+      ) : (
+        <div className="rp-panel" style={{ padding: '0', background: 'transparent', boxShadow: 'none' }}>
+           {tab && tab.FormComponent && (
+             <tab.FormComponent
+               onSubmit={handleSubmit}
+             />
+           )}
+        </div>
+      )}
     </div>
   );
 }
