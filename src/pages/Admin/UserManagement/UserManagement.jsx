@@ -14,6 +14,7 @@ const ROLE_COLORS = {
   user:    { bg: '#f3f4f6', color: '#4b5563' },
   zonal:   { bg: '#dbeafe', color: '#1d4ed8' },
   admin:   { bg: '#fef9c3', color: '#a16207' },
+  global:  { bg: '#e0e7ff', color: '#4f46e5' },
 };
 
 const EMPTY_FORM = {
@@ -78,6 +79,26 @@ export default function UserManagement() {
     fetchUsers();
   };
 
+  const inlineChangeRole = async (id, newRole) => {
+    const user = users.find(u => u.id === id);
+    if (!user || user.role === newRole) return;
+    
+    // Optimistic UI update
+    setUsers(prev => prev.map(u => u.id === id ? { ...u, role: newRole } : u));
+    
+    try {
+      await fetch(`${process.env.REACT_APP_API_URL}/api/users/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...user, role: newRole })
+      });
+      fetchUsers();
+    } catch (err) {
+      console.error(err);
+      fetchUsers(); // Revert on failure
+    }
+  };
+
   const toggleStatus = async (id) => {
     const user = users.find(u => u.id === id);
     if (!user) return;
@@ -86,12 +107,21 @@ export default function UserManagement() {
     if (user.role !== 'admin') {
       newRole = newStatus === 'active' ? 'zonal' : 'user';
     }
-    await fetch(`${process.env.REACT_APP_API_URL}/api/users/${id}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ...user, status: newStatus, role: newRole })
-    });
-    fetchUsers();
+    
+    // Optimistic UI update
+    setUsers(prev => prev.map(u => u.id === id ? { ...u, status: newStatus, role: newRole } : u));
+
+    try {
+      await fetch(`${process.env.REACT_APP_API_URL}/api/users/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...user, status: newStatus, role: newRole })
+      });
+      fetchUsers();
+    } catch (err) {
+      console.error(err);
+      fetchUsers(); // Revert on failure
+    }
   };
 
   const handleApprove = async (id) => {
@@ -196,9 +226,29 @@ export default function UserManagement() {
                     <td>{u.email}</td>
                     <td>{u.phone || '—'}</td>
                     <td>
-                      <span className="um-role-badge" style={{ background: rc.bg, color: rc.color }}>
-                        {u.role}
-                      </span>
+                      <select 
+                        value={u.role.toLowerCase()} 
+                        onChange={(e) => inlineChangeRole(u.id, e.target.value)}
+                        className="um-role-select"
+                        style={{ 
+                          background: rc.bg, 
+                          color: rc.color, 
+                          border: 'none', 
+                          borderRadius: '12px', 
+                          padding: '4px 8px', 
+                          fontSize: '12px', 
+                          fontWeight: '600', 
+                          cursor: 'pointer', 
+                          outline: 'none',
+                          WebkitAppearance: 'none',
+                          textTransform: 'capitalize'
+                        }}
+                      >
+                        <option value="user">User</option>
+                        <option value="zonal">Zonal</option>
+                        <option value="global">Global</option>
+                        <option value="admin">Admin</option>
+                      </select>
                     </td>
                     <td>{u.region}</td>
                     <td>
