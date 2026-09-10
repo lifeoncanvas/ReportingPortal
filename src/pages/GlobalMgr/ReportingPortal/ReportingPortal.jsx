@@ -576,7 +576,7 @@ function ZonalReportForm({ onClose, onSubmit: parentSubmit }) {
           <input className="kf-input" type="number" min="0" placeholder="0"
             value={form.totalRegistrationHslhs} onChange={e => set('totalRegistrationHslhs', e.target.value)} />
         </Field>
-        <Field label="Total Number Active Prayer Clouds">
+        <Field label="Total Number of Active Prayer Clouds">
           <input className="kf-input" type="number" min="0" placeholder="0"
             value={form.activePrayerCloud} onChange={e => set('activePrayerCloud', e.target.value)} />
         </Field>
