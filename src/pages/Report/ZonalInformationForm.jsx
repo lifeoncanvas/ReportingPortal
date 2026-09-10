@@ -16,7 +16,7 @@ const initialForm = {
 
 const FIELDS = [
   {
-    section: "Zone Information",
+    section: "Weekly Zonal Information",
     icon: "🏛️",
     fields: [
       { key: "zoneName", label: "Name of Zone", type: "text", required: true },
@@ -28,16 +28,16 @@ const FIELDS = [
     section: "Attendance & Meetings",
     icon: "📅",
     fields: [
-      { key: "zonalPastorExecutiveMinistersMeeting", label: "ZONAL PASTOR'S ATTENDANCE IN THE EXECUTIVE MINISTER'S WEEKLY MEETING?", type: "select", required: true },
-      { key: "zonalManagerExecutiveMinistersMeeting", label: "ZONAL MANAGER'S ATTENDANCE IN THE EXECUTIVE MINISTER'S WEEKLY MEETING?", type: "select", required: true },
-      { key: "zonalManagerStrategyMeeting", label: "ZONAL MANAGER'S ATTENDANCE IN THE WEEKLY MANAGERS STRATEGY MEETING?", type: "select", required: true }
+      { key: "zonalPastorExecutiveMinistersMeeting", label: "Zonal Pastor's attendance in the Executive Minister's weekly meeting?", type: "select", required: true },
+      { key: "zonalManagerExecutiveMinistersMeeting", label: "Zonal Manager's attendance in the Executive Minister's weekly meeting?", type: "select", required: true },
+      { key: "zonalManagerStrategyMeeting", label: "Zonal Manager's attendance in the weekly Managers strategy meeting?", type: "select", required: true }
     ]
   },
   {
     section: "Comments & Feedback",
     icon: "📝",
     fields: [
-      { key: "notes", label: "ANY TESTIMONY, CLARIFICATION OR CONCERN?", type: "textarea", required: false }
+      { key: "notes", label: "Any Testimony, Clarification or Concern?", type: "textarea", required: false }
     ]
   }
 ];
