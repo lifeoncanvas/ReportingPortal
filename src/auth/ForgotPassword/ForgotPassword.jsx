@@ -339,6 +339,14 @@ export default function ForgotPassword({ onBack }) {
                             onChange={(e) => setNewPassword(e.target.value)}
                             required
                         />
+                        <input
+                            type="password"
+                            placeholder="Confirm New Password"
+                            style={styles.input}
+                            value={confirmPassword}
+                            onChange={(e) => setConfirmPassword(e.target.value)}
+                            required
+                        />
                         <button type="submit" disabled={loading} style={styles.button}>
                             {loading ? "Updating..." : "Change Password"}
                         </button>
