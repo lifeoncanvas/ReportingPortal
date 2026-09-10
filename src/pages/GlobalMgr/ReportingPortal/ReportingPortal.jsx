@@ -430,11 +430,11 @@ function ZonalInformationForm({ onClose, onSubmit: parentSubmit }) {
       <div className="popup-section-head">🏛️ Zone Information</div>
       <div className="popup-fields">
         <Field label="Name of Zone" required error={errors.zoneName}>
-          <input className={`kf-input${errors.zoneName ? ' kf-input-err' : ''}`} placeholder="e.g. Zone A"
+          <input className={`kf-input${errors.zoneName ? ' kf-input-err' : ''}`} placeholder="E.g. Zone A"
             value={form.zoneName} onChange={e => set('zoneName', e.target.value)} />
         </Field>
         <Field label="Zonal Manager" required error={errors.zonalManager}>
-          <input className={`kf-input${errors.zonalManager ? ' kf-input-err' : ''}`} placeholder="Full name"
+          <input className={`kf-input${errors.zonalManager ? ' kf-input-err' : ''}`} placeholder="Full Name"
             value={form.zonalManager} onChange={e => set('zonalManager', e.target.value)} />
         </Field>
       </div>
@@ -442,35 +442,35 @@ function ZonalInformationForm({ onClose, onSubmit: parentSubmit }) {
       {/* Attendance & Sponsorship */}
       <div className="popup-section-head">📅 Attendance and Meetings</div>
       <div className="popup-fields">
-        <Field label="Zonal Pastor's attendance in the Executive Minister's weekly meeting?" required error={errors.pastoralAttendanceDirector}>
+        <Field label="Zonal Pastor's Attendance in the Executive Minister's Weekly Meeting?" required error={errors.pastoralAttendanceDirector}>
           <div className="kf-select-wrap">
             <select className={`kf-select${errors.pastoralAttendanceDirector ? ' kf-input-err' : ''}`} value={form.pastoralAttendanceDirector} onChange={e => set('pastoralAttendanceDirector', e.target.value)}>
-              <option value="">Please select</option>
+              <option value="">Please Select</option>
               {ATTENDANCE_OPTIONS.filter(o => o).map(opt => <option key={opt} value={opt}>{opt}</option>)}
             </select>
             <ChevronDown size={13} className="kf-select-chevron" />
           </div>
         </Field>
-        <Field label="Zonal Manager's attendance in the Executive Minister's weekly meeting?" required error={errors.managerAttendanceDirector}>
+        <Field label="Zonal Manager's Attendance in the Executive Minister's Weekly Meeting?" required error={errors.managerAttendanceDirector}>
           <div className="kf-select-wrap">
             <select className={`kf-select${errors.managerAttendanceDirector ? ' kf-input-err' : ''}`} value={form.managerAttendanceDirector} onChange={e => set('managerAttendanceDirector', e.target.value)}>
-              <option value="">Please select</option>
+              <option value="">Please Select</option>
               {ATTENDANCE_OPTIONS.filter(o => o).map(opt => <option key={opt} value={opt}>{opt}</option>)}
             </select>
             <ChevronDown size={13} className="kf-select-chevron" />
           </div>
         </Field>
-        <Field label="Zonal Manager's attendance in the weekly Managers strategy meeting?" required error={errors.managerAttendanceStrategy}>
+        <Field label="Zonal Manager's Attendance in the Weekly Managers Strategy Meeting?" required error={errors.managerAttendanceStrategy}>
           <div className="kf-select-wrap">
             <select className={`kf-select${errors.managerAttendanceStrategy ? ' kf-input-err' : ''}`} value={form.managerAttendanceStrategy} onChange={e => set('managerAttendanceStrategy', e.target.value)}>
-              <option value="">Please select</option>
+              <option value="">Please Select</option>
               {ATTENDANCE_OPTIONS.filter(o => o).map(opt => <option key={opt} value={opt}>{opt}</option>)}
             </select>
             <ChevronDown size={13} className="kf-select-chevron" />
           </div>
         </Field>
         <Field label="Any Testimony, Clarification or Concern?">
-          <textarea className="kf-textarea" rows={3} placeholder="Provide details..."
+          <textarea className="kf-textarea" rows={3} placeholder="Provide Details..."
             value={form.testimonyClarificationConcern} onChange={e => set('testimonyClarificationConcern', e.target.value)} />
         </Field>
       </div>
@@ -509,6 +509,7 @@ function ZonalReportForm({ onClose, onSubmit: parentSubmit }) {
     totalHerald: '',
     activatedHealingCentre: '',
     ongoingProgramsReport: '',
+    reportDate: '',
   };
   const [form, setForm] = useState(EMPTY);
   const [errors, setErrors] = useState({});
@@ -532,7 +533,7 @@ function ZonalReportForm({ onClose, onSubmit: parentSubmit }) {
       submitterEmail: user?.email,
       submittedDate: today,
       submittedTime: new Date().toTimeString().split(' ')[0],
-      weekStartDate: today,
+      weekStartDate: form.reportDate || today,
       popMediaUrl: null,
       regionName: user?.region || 'Global',
       totalRegistrationHslhs: Number(form.totalRegistrationHslhs) || 0,
@@ -562,28 +563,32 @@ function ZonalReportForm({ onClose, onSubmit: parentSubmit }) {
   };
 
   return (
-    <FormContainer title="Programs/Campaign Engagement Report" eyebrow="KingsForms · Programs/Campaign Engagement Report" icon="🏛️"
+    <FormContainer title="Weekly Programs/Campaign Engagement Report" eyebrow="KingsForms · Programs/Campaign Engagement Report" icon="🏛️"
       onSubmit={handleSubmit} submitting={submitting} submitLabel="Submit Programs/Campaign Engagement Report">
 
       <div className="popup-section-head">📣 Programs & Campaigns</div>
       <div className="popup-fields">
+        <Field label="Date" required error={errors.reportDate}>
+          <input className={`kf-input${errors.reportDate ? ' kf-input-err' : ''}`} type="date"
+            value={form.reportDate} onChange={e => set('reportDate', e.target.value)} />
+        </Field>
         <Field label="Total Registration for HSLHS">
           <input className="kf-input" type="number" min="0" placeholder="0"
             value={form.totalRegistrationHslhs} onChange={e => set('totalRegistrationHslhs', e.target.value)} />
         </Field>
-        <Field label="Total no active prayer cloud">
+        <Field label="Total Number Active Prayer Clouds">
           <input className="kf-input" type="number" min="0" placeholder="0"
             value={form.activePrayerCloud} onChange={e => set('activePrayerCloud', e.target.value)} />
         </Field>
-        <Field label="Total no of herald">
+        <Field label="Total Number of Herald">
           <input className="kf-input" type="number" min="0" placeholder="0"
             value={form.totalHerald} onChange={e => set('totalHerald', e.target.value)} />
         </Field>
-        <Field label="Total no of activated healing centre">
+        <Field label="Total Number of Activated Healing Centres">
           <input className="kf-input" type="number" min="0" placeholder="0"
             value={form.activatedHealingCentre} onChange={e => set('activatedHealingCentre', e.target.value)} />
         </Field>
-        <Field label="Brief report for ongoing programs (eg.herald conference etc )">
+        <Field label="Brief Report for Ongoing Programs (Eg, Herald Conference etc)">
           <textarea className="kf-textarea" rows={3} placeholder="Enter details..."
             value={form.ongoingProgramsReport} onChange={e => set('ongoingProgramsReport', e.target.value)} />
         </Field>
@@ -623,6 +628,7 @@ const BLAAAST_CATEGORIES = [
 
 function PartnershipForm({ onClose, onSubmit: parentSubmit }) {
   const [form, setForm] = useState({
+    reportDate: '',
     zonalPartnership: '',
     zonalPartnershipDetails: '',
     groupsPartnership: '',
@@ -631,9 +637,7 @@ function PartnershipForm({ onClose, onSubmit: parentSubmit }) {
     blaaast: {},
     notes: '',
     others: '',
-    groupPastorsName: '',
-    groupName: '',
-    groupMilestoneName: '',
+    milestones: [{ pastorName: '', groupName: '', milestoneName: '' }],
     sponsoredTeenspiration: '',
     sponsoredKidspiration: '',
     popMedia: [],
@@ -670,8 +674,11 @@ function PartnershipForm({ onClose, onSubmit: parentSubmit }) {
       testimoniesSubmitted: Number(form.testimoniesSubmitted) || 0,
       notes: finalNotes,
       status: 'submitted',
-      rawDate: new Date().toISOString().split('T')[0],
-      groupPastorsMilestones: `Pastor: ${form.groupPastorsName}\nGroup: ${form.groupName}\nMilestone: ${form.groupMilestoneName}`,
+      rawDate: form.reportDate || new Date().toISOString().split('T')[0],
+      groupPastorsMilestones: form.milestones
+        .filter(m => m.pastorName || m.groupName || m.milestoneName)
+        .map((m, i) => `Entry ${i + 1} — Pastor: ${m.pastorName}, Group: ${m.groupName}, Milestone: ${m.milestoneName}`)
+        .join('\n'),
       sponsoredTeenspiration: form.sponsoredTeenspiration,
       sponsoredKidspiration: form.sponsoredKidspiration,
       popMedia: form.popMedia
@@ -680,23 +687,27 @@ function PartnershipForm({ onClose, onSubmit: parentSubmit }) {
   };
 
   return (
-    <FormContainer title="Partnership Report" eyebrow="KingsForms · Partnership" icon="🤝"
+    <FormContainer title="Weekly Partnership Report" eyebrow="KingsForms · Partnership" icon="🤝"
       onSubmit={handleSubmit} submitting={submitting} submitLabel="Submit Partnership Report">
 
       <div className="popup-section-head">💼 Partnership Breakdown (Espees)</div>
       <div className="popup-fields">
+        <Field label="Date" required>
+          <input className="kf-input" type="date"
+            value={form.reportDate} onChange={e => setForm(p => ({ ...p, reportDate: e.target.value }))} />
+        </Field>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '1rem', alignItems: 'start' }}>
-          <Field label="Zonal Partnership for this week">
-            <input className="kf-input" type="text" placeholder="Enter zonal partnership (e.g. 5000 espees)..."
+          <Field label="Zonal Partnership for this Week">
+            <input className="kf-input" type="text" placeholder="Enter Zonal Partnership (Eg, 5000 Espees)..."
               value={form.zonalPartnership} onChange={e => setForm(p => ({ ...p, zonalPartnership: e.target.value }))} />
           </Field>
-          <Field label="Zonal Partnership Details (kindly state how much was given for each arm eg hslhs,httnm,crusade etc )">
-            <textarea className="kf-textarea" rows={1} placeholder="Enter details..."
+          <Field label="Zonal Partnership Details (Kindly State How Much Was Given for Each Arm Eg HSLHS, HTTNM, Crusade etc)">
+            <textarea className="kf-textarea" rows={1} placeholder="Enter Details..."
               value={form.zonalPartnershipDetails} onChange={e => setForm(p => ({ ...p, zonalPartnershipDetails: e.target.value }))} />
           </Field>
         </div>
 
-        <Field label="Proof of Payment (POP)" hint="Upload POP for the transactions">
+        <Field label="Proof of Payment (POP)" hint="Upload POP for the Transactions">
           <MediaUploader files={form.popMedia}
             onAdd={files => {
               const prev = files.map(f => ({ name: f.name, type: f.type, url: (f.type.startsWith('image') || f.type.startsWith('video')) ? URL.createObjectURL(f) : null, size: f.size }));
@@ -707,37 +718,35 @@ function PartnershipForm({ onClose, onSubmit: parentSubmit }) {
           />
         </Field>
 
-        <Field label="How many Testimonies were submitted to the Department?">
+        <Field label="How Many Testimonies Were Submitted to the Department?">
           <input className="kf-input" type="number" min="0" placeholder="0"
             value={form.testimoniesSubmitted} onChange={e => setForm(p => ({ ...p, testimoniesSubmitted: e.target.value }))} />
         </Field>
 
-        <Field label="How many new partners were recruited?">
+        <Field label="How Many New Partners Were Recruited?">
           <input className="kf-input" type="number" min="0" placeholder="0"
             value={form.newPartnersRecruited} onChange={e => setForm(p => ({ ...p, newPartnersRecruited: e.target.value }))} />
         </Field>
 
-
-
-        <Field label="Group Partnership (state how much was remitted by each group)">
-          <input className="kf-input" type="text" placeholder="Enter group partnership..."
+        <Field label="Group Partnership (State How Much Was Remitted by Each Group)">
+          <input className="kf-input" type="text" placeholder="Enter Group Partnership..."
             value={form.groupsPartnership} onChange={e => setForm(p => ({ ...p, groupsPartnership: e.target.value }))} />
         </Field>
 
-        <Field label="Church Partnership (State how much was remitted by each Church)">
-          <input className="kf-input" type="text" placeholder="Enter church partnership..."
+        <Field label="Church Partnership (State How Much Was Remitted by Each Church)">
+          <input className="kf-input" type="text" placeholder="Enter Church Partnership..."
             value={form.churchesPartnership} onChange={e => setForm(p => ({ ...p, churchesPartnership: e.target.value }))} />
         </Field>
 
-        <Field label="Cell Partnership (State how much was remitted by each Cell)">
-          <input className="kf-input" type="text" placeholder="Enter cell partnership..."
+        <Field label="Cell Partnership (State How Much Was Remitted by Each Cell)">
+          <input className="kf-input" type="text" placeholder="Enter Cell Partnership..."
             value={form.cellPartnership} onChange={e => setForm(p => ({ ...p, cellPartnership: e.target.value }))} />
         </Field>
       </div>
 
       <div className="popup-section-head">🎺 BLAAAST Partnership Categories</div>
       <div className="popup-fields">
-        <p className="kf-section-note">How many partners gave in each of these BLAAAST categories this week?</p>
+        <p className="kf-section-note">How Many Partners Gave in Each of These BLAAAST Categories This Week?</p>
         <div className="blaaast-grid">
           {BLAAAST_CATEGORIES.map(cat => (
             <div key={cat.key} className="blaaast-row">
@@ -759,35 +768,63 @@ function PartnershipForm({ onClose, onSubmit: parentSubmit }) {
         </div>
       </div>
 
-      <div className="popup-section-head">🏆 Group milestones</div>
+      <div className="popup-section-head">🏆 Group Milestones</div>
       <div className="popup-fields">
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '1rem', alignItems: 'end' }}>
-          <Field label="State the name of the group Pastors">
-            <input className="kf-input" type="text" placeholder="Pastor name"
-              value={form.groupPastorsName} onChange={e => setForm(p => ({ ...p, groupPastorsName: e.target.value }))} />
-          </Field>
-          <Field label="State the name of group">
-            <input className="kf-input" type="text" placeholder="Group name"
-              value={form.groupName} onChange={e => setForm(p => ({ ...p, groupName: e.target.value }))} />
-          </Field>
-          <Field label="State the name of group milestone">
-            <input className="kf-input" type="text" placeholder="Milestone name"
-              value={form.groupMilestoneName} onChange={e => setForm(p => ({ ...p, groupMilestoneName: e.target.value }))} />
-          </Field>
-        </div>
-        <Field label="Pastors and members that have sponsored Teenspiration (300 espees) this week">
-          <textarea className="kf-textarea" rows={2} placeholder="enter names and amount"
+        {form.milestones.map((entry, idx) => (
+          <div key={idx} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr auto', gap: '1rem', alignItems: 'end', marginBottom: idx < form.milestones.length - 1 ? 8 : 0 }}>
+            <Field label={idx === 0 ? 'State the Name of the Group Pastors' : ''}>
+              <input className="kf-input" type="text" placeholder="Pastor Name"
+                value={entry.pastorName} onChange={e => {
+                  const updated = [...form.milestones];
+                  updated[idx] = { ...updated[idx], pastorName: e.target.value };
+                  setForm(p => ({ ...p, milestones: updated }));
+                }} />
+            </Field>
+            <Field label={idx === 0 ? 'State the Name of Group' : ''}>
+              <input className="kf-input" type="text" placeholder="Group Name"
+                value={entry.groupName} onChange={e => {
+                  const updated = [...form.milestones];
+                  updated[idx] = { ...updated[idx], groupName: e.target.value };
+                  setForm(p => ({ ...p, milestones: updated }));
+                }} />
+            </Field>
+            <Field label={idx === 0 ? 'State the Name of Group Milestone' : ''}>
+              <input className="kf-input" type="text" placeholder="Milestone Name"
+                value={entry.milestoneName} onChange={e => {
+                  const updated = [...form.milestones];
+                  updated[idx] = { ...updated[idx], milestoneName: e.target.value };
+                  setForm(p => ({ ...p, milestones: updated }));
+                }} />
+            </Field>
+            <div style={{ paddingBottom: 4 }}>
+              {form.milestones.length > 1 && (
+                <button type="button" onClick={() => setForm(p => ({ ...p, milestones: p.milestones.filter((_, i) => i !== idx) }))}
+                  style={{ background: 'none', border: '1px solid #fecaca', borderRadius: 6, color: '#dc2626', cursor: 'pointer', padding: '6px 8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                  title="Remove Entry">
+                  <X size={14} />
+                </button>
+              )}
+            </div>
+          </div>
+        ))}
+        <button type="button"
+          onClick={() => setForm(p => ({ ...p, milestones: [...p.milestones, { pastorName: '', groupName: '', milestoneName: '' }] }))}
+          style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'none', border: '1px dashed #c9a84c', borderRadius: 6, color: '#c9a84c', cursor: 'pointer', padding: '8px 16px', fontSize: 13, fontWeight: 600, marginTop: 4 }}>
+          <Plus size={14} /> Add Another Entry
+        </button>
+        <Field label="Pastors and Members That Have Sponsored Teenspiration (300 Espees) This Week">
+          <textarea className="kf-textarea" rows={2} placeholder="Enter Names and Amount"
             value={form.sponsoredTeenspiration} onChange={e => setForm(p => ({ ...p, sponsoredTeenspiration: e.target.value }))} />
         </Field>
-        <Field label="Pastors and members that have sponsored Kidspiration (300 espees) this week">
-          <textarea className="kf-textarea" rows={2} placeholder="enter names and amount"
+        <Field label="Pastors and Members That Have Sponsored Kidspiration (300 Espees) This Week">
+          <textarea className="kf-textarea" rows={2} placeholder="Enter Names and Amount"
             value={form.sponsoredKidspiration} onChange={e => setForm(p => ({ ...p, sponsoredKidspiration: e.target.value }))} />
         </Field>
       </div>
 
       <div className="popup-fields">
-        <Field label="Additional notes">
-          <textarea className="kf-textarea" rows={2} placeholder="Enter other remarks or comments..."
+        <Field label="Additional Notes">
+          <textarea className="kf-textarea" rows={2} placeholder="Enter Other Remarks or Comments..."
             value={form.others} onChange={e => setForm(p => ({ ...p, others: e.target.value }))} />
         </Field>
       </div>
@@ -802,16 +839,17 @@ function PartnershipForm({ onClose, onSubmit: parentSubmit }) {
 const TESTIMONY_CATEGORIES = [
   { key: 'Healing Streams', label: 'Healing Streams' },
   { key: 'Partnership', label: 'Partnership' },
-  { key: 'Healing to the nations Magazines', label: 'Healing to the nations Magazines' },
+  { key: 'Healing to the Nations Magazines', label: 'Healing to the Nations Magazines' },
   { key: 'Prayer Clouds', label: 'Prayer Clouds' },
   { key: 'Crusades', label: 'Crusades' },
-  { key: 'Pray with me', label: 'Pray with me' },
+  { key: 'Pray With Me', label: 'Pray With Me' },
   { key: 'Heralds', label: 'Heralds' },
   { key: 'Others', label: 'Others' }
 ];
 
 function TestimonialsForm({ onClose, onSubmit: parentSubmit }) {
   const [category, setCategory] = useState('');
+  const [othersDetails, setOthersDetails] = useState('');
   const [documents, setDocuments] = useState([]);
   const [videos, setVideos] = useState([]);
   const [beforeImages, setBeforeImages] = useState([]);
@@ -887,50 +925,59 @@ function TestimonialsForm({ onClose, onSubmit: parentSubmit }) {
       // We send it under the "othersTestimonies" field since it's dynamic now, or we can map it based on category. 
       // The backend saves these as text fields. We'll map it safely to "othersTestimonies" or just let the backend handle it.
       // Wait, let's just map it to the closest match or others.
-      prayWithMeTestimonies: category === 'Pray with me' ? formatTestimonyContent() : '',
+      prayWithMeTestimonies: category === 'Pray With Me' ? formatTestimonyContent() : '',
       translationTestimonies: category === 'Heralds' ? formatTestimonyContent() : '',
       partnershipTestimonies: category === 'Partnership' ? formatTestimonyContent() : '',
       salvationTestimonies: category === 'Crusades' ? formatTestimonyContent() : '',
-      healingTestimonies: (category === 'Healing Streams' || category === 'Healing to the nations Magazines') ? formatTestimonyContent() : '',
+      healingTestimonies: (category === 'Healing Streams' || category === 'Healing to the Nations Magazines') ? formatTestimonyContent() : '',
       othersTestimonies: (category === 'Others' || category === 'Prayer Clouds') ? formatTestimonyContent() : '',
+      othersDetails: category === 'Others' ? othersDetails : '',
     });
     setSubmitting(false);
   };
 
   return (
-    <FormContainer title="Testimonials" eyebrow="KingsForms · Testimonies" icon="✍️"
+    <FormContainer title="Weekly Testimonials" eyebrow="KingsForms · Testimonies" icon="✍️"
       onSubmit={handleSubmit} submitting={submitting} submitLabel="Submit Testimony">
 
       {/* Category Dropdown */}
       <div className="popup-section-head">🏷️ Category</div>
       <div className="popup-fields">
-        <Field label="Select a category" error={error}>
-          <select className="kf-input" value={category} onChange={e => setCategory(e.target.value)}>
-            <option value="">Select a category</option>
+        <Field label="Select a Category" error={error}>
+          <select className="kf-input" value={category} onChange={e => { setCategory(e.target.value); if (e.target.value !== 'Others') setOthersDetails(''); }}>
+            <option value="">Select a Category</option>
             {TESTIMONY_CATEGORIES.map(cat => (
               <option key={cat.key} value={cat.key}>{cat.label}</option>
             ))}
           </select>
         </Field>
+        {category === 'Others' && (
+          <Field label="Others Details (Please Write the Entire Testimony Here)">
+            <textarea className="kf-textarea" rows={6} placeholder="Write Others Testimony Here..."
+              value={othersDetails} onChange={e => setOthersDetails(e.target.value)} />
+          </Field>
+        )}
       </div>
 
       {category && (
         <div style={{ padding: '20px 32px' }}>
           <div className="popup-fields" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
 
-            <Field label="Member Name" hint="Who does this testimony belong to?">
-              <input className="kf-input" type="text" placeholder="e.g. Sister Anne"
+            <Field label="Member Name" hint="Who Does This Testimony Belong To?">
+              <input className="kf-input" type="text" placeholder="E.g. Sister Anne"
                 value={memberName} onChange={e => setMemberName(e.target.value)} />
             </Field>
 
-            <Field label={`${category} Details (please write the entire testimony here)`}>
-              <textarea className="kf-textarea" rows={6} placeholder={`Write ${category} testimony here...`}
-                value={categoryDetails} onChange={e => setCategoryDetails(e.target.value)} />
-            </Field>
+            {category !== 'Others' && (
+              <Field label={`${category} Details (Please Write the Entire Testimony Here)`}>
+                <textarea className="kf-textarea" rows={6} placeholder={`Write ${category} Testimony Here...`}
+                  value={categoryDetails} onChange={e => setCategoryDetails(e.target.value)} />
+              </Field>
+            )}
 
             {/* Uploads */}
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-              <Field label="Upload PDF or Word files">
+              <Field label="Upload PDF or Word Files">
                 <MediaUploader
                   files={documents}
                   onAdd={handleAddFiles(setDocuments)}
@@ -940,7 +987,7 @@ function TestimonialsForm({ onClose, onSubmit: parentSubmit }) {
                 />
               </Field>
 
-              <Field label="Upload Video testimony">
+              <Field label="Upload Video Testimony">
                 <MediaUploader
                   files={videos}
                   onAdd={handleAddFiles(setVideos)}
@@ -1004,6 +1051,8 @@ function MagazineForm({ onClose, onSubmit: parentSubmit }) {
     monthlyMinimumOrderAmountPaid: '',
     monthlyCopiesOrdered: '',
     cumulativeSponsoredAmountPaid: '',
+    sponsorshipDate: '',
+    amountPaidThisWeek: '',
     proofOfPaymentFiles: [],
     datesReceived: '',
   });
@@ -1080,11 +1129,22 @@ function MagazineForm({ onClose, onSubmit: parentSubmit }) {
   const totalOrdered = (Number(form.adultCopies) || 0) + (Number(form.teensCopies) || 0) + (Number(form.kidsCopies) || 0);
 
   return (
-    <FormContainer title="Magazine Order Report" eyebrow="KingsForms · Magazine" icon="📚"
+    <FormContainer title="Weekly Magazine Order Report" eyebrow="KingsForms · Magazine" icon="📚"
       onSubmit={handleSubmit} submitting={submitting} submitLabel="Submit Magazine Report">
 
+      <div className="popup-fields">
+        <Field label="Date">
+          <input className="kf-input" type="date"
+            value={form.sponsorshipDate} onChange={e => setForm(p => ({ ...p, sponsorshipDate: e.target.value }))} />
+        </Field>
+        <Field label="State the Amount Paid This Week">
+          <input className="kf-input" type="number" min="0" placeholder="0.00" step="0.01"
+            value={form.amountPaidThisWeek} onChange={e => setForm(p => ({ ...p, amountPaidThisWeek: e.target.value }))} />
+        </Field>
+      </div>
+
       {/* Magazine Types */}
-      <div className="popup-section-head">📚 Monthly Minimum Magazine Order Please state number of magazines ordered for each categories(adult, teens, kids)</div>
+      <div className="popup-section-head">📚 Monthly Minimum Magazine Order (Please State Number of Magazines Ordered for Each Category - Adult, Teens, Kids)</div>
       <div className="popup-fields">
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
           <Field label="Adult Copies" error={errors.adultCopies}>
@@ -1105,7 +1165,7 @@ function MagazineForm({ onClose, onSubmit: parentSubmit }) {
               <ChevronDown className="kf-select-chevron" size={16} />
             </div>
             {form.adultLanguages === 'Other' && (
-              <input className="kf-input" style={{ marginTop: '0.5rem' }} placeholder="Specify language..."
+              <input className="kf-input" style={{ marginTop: '0.5rem' }} placeholder="Specify Language..."
                 value={form.adultLanguagesOther} onChange={e => setForm(p => ({ ...p, adultLanguagesOther: e.target.value }))} />
             )}
           </Field>
@@ -1130,7 +1190,7 @@ function MagazineForm({ onClose, onSubmit: parentSubmit }) {
               <ChevronDown className="kf-select-chevron" size={16} />
             </div>
             {form.teensLanguages === 'Other' && (
-              <input className="kf-input" style={{ marginTop: '0.5rem' }} placeholder="Specify language..."
+              <input className="kf-input" style={{ marginTop: '0.5rem' }} placeholder="Specify Language..."
                 value={form.teensLanguagesOther} onChange={e => setForm(p => ({ ...p, teensLanguagesOther: e.target.value }))} />
             )}
           </Field>
@@ -1155,7 +1215,7 @@ function MagazineForm({ onClose, onSubmit: parentSubmit }) {
               <ChevronDown className="kf-select-chevron" size={16} />
             </div>
             {form.kidsLanguages === 'Other' && (
-              <input className="kf-input" style={{ marginTop: '0.5rem' }} placeholder="Specify language..."
+              <input className="kf-input" style={{ marginTop: '0.5rem' }} placeholder="Specify Language..."
                 value={form.kidsLanguagesOther} onChange={e => setForm(p => ({ ...p, kidsLanguagesOther: e.target.value }))} />
             )}
           </Field>
@@ -1165,23 +1225,20 @@ function MagazineForm({ onClose, onSubmit: parentSubmit }) {
       {/* Receipt Status */}
       <div className="popup-section-head">📬 Receipt Status</div>
       <div className="popup-fields">
-        <Field label="Number of copies received" required error={errors.receivedCopies}>
+        <Field label="Number of Copies Received" required error={errors.receivedCopies}>
           <input className={`kf-input${errors.receivedCopies ? ' kf-input-err' : ''}`} type="number" min="0" placeholder="0"
             value={form.receivedCopies} onChange={e => setForm(p => ({ ...p, receivedCopies: e.target.value }))} />
         </Field>
-        <Field label="Date(s) received">
-          <input className="kf-input" type="date"
-            value={form.datesReceived} onChange={e => setForm(p => ({ ...p, datesReceived: e.target.value }))} />
-        </Field>
+
         {Number(form.receivedCopies) < totalOrdered && (
-          <Field label="If not received — provide reason" required error={errors.notReceivedReason}>
+          <Field label="If Not Received — Provide Reason" required error={errors.notReceivedReason}>
             <textarea className={`kf-textarea${errors.notReceivedReason ? ' kf-input-err' : ''}`} rows={3}
-              placeholder="Explain why copies were not received…"
+              placeholder="Explain Why Copies Were Not Received…"
               value={form.notReceivedReason} onChange={e => setForm(p => ({ ...p, notReceivedReason: e.target.value }))} />
           </Field>
         )}
-        <Field label="State challenges faced or complains">
-          <textarea className="kf-textarea" rows={3} placeholder="Describe any challenges faced..."
+        <Field label="State Challenges Faced or Complaints">
+          <textarea className="kf-textarea" rows={3} placeholder="Describe Any Challenges Faced..."
             value={form.challengesFaced} onChange={e => setForm(p => ({ ...p, challengesFaced: e.target.value }))} />
         </Field>
       </div>
@@ -1189,16 +1246,10 @@ function MagazineForm({ onClose, onSubmit: parentSubmit }) {
       {/* Monthly Ordering */}
       <div className="popup-section-head">📦 Monthly Sponsorship</div>
       <div className="popup-fields">
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-          <Field label="Cumulative number of copies sponsored for the month (please update the total number of copies the zone has sponsored for the month)">
-            <input className="kf-input" type="number" min="0" placeholder="0"
-              value={form.monthlyCopiesOrdered} onChange={e => setForm(p => ({ ...p, monthlyCopiesOrdered: e.target.value }))} />
-          </Field>
-          <Field label="How much was given to the sponsorship towards magazine ?">
+          <Field label="How Much Was Given Towards Magazine Sponsorship?">
             <input className="kf-input" type="number" min="0" placeholder="0.00" step="0.01"
               value={form.cumulativeSponsoredAmountPaid} onChange={e => setForm(p => ({ ...p, cumulativeSponsoredAmountPaid: e.target.value }))} />
           </Field>
-        </div>
       </div>
 
       {/* POP */}
@@ -1219,8 +1270,8 @@ function MagazineForm({ onClose, onSubmit: parentSubmit }) {
       {/* Praise Reports */}
       <div className="popup-section-head">📝 Praise Reports</div>
       <div className="popup-fields">
-        <Field label="Praise reports from outreaches this week">
-          <textarea className="kf-textarea" rows={2} placeholder="Share praise reports from the magazine distribution…"
+        <Field label="Praise Reports from Outreaches This Week">
+          <textarea className="kf-textarea" rows={2} placeholder="Share Praise Reports from the Magazine Distribution…"
             value={form.praiseReports} onChange={e => setForm(p => ({ ...p, praiseReports: e.target.value }))} />
         </Field>
       </div>
@@ -1303,13 +1354,21 @@ function OutreachForm({ onClose, onSubmit: parentSubmit }) {
   };
 
   return (
-    <FormContainer title="Outreach / Crusade Activity Report" eyebrow="KingsForms · Outreach" icon="📍"
-      onSubmit={handleSubmit} submitting={submitting} submitLabel="Submit Outreach / Crusade Report">
+    <FormContainer title="Weekly Outreach/Crusade Activity Report" eyebrow="KingsForms · Outreach" icon="📍"
+      onSubmit={handleSubmit} submitting={submitting} submitLabel="Submit Outreach/Crusade Report">
+
+      {/* Date */}
+      <div className="popup-fields" style={{ marginBottom: '16px' }}>
+        <Field label="Date of Outreach/Crusade" required error={errors.date}>
+          <input className={`kf-input${errors.date ? ' kf-input-err' : ''}`} type="date"
+            value={form.date} onChange={e => setForm(p => ({ ...p, date: e.target.value }))} />
+        </Field>
+      </div>
 
       {/* Category */}
-      <div className="popup-section-head">🏷️ Outreach / Crusade Category</div>
+      <div className="popup-section-head">🏷️ Outreach/Crusade Category</div>
       <div className="popup-fields">
-        <Field label="What type of outreach / crusade was this?" required hint="(healing, soul-winning, etc.)" error={errors.category}>
+        <Field label="What Type of Outreach/Crusade Was This?" required hint="(Healing, Soul-winning, Etc.)" error={errors.category}>
           <div className="outreach-cat-grid">
             {OUTREACH_CATEGORIES.map(cat => (
               <button key={cat} type="button"
@@ -1321,43 +1380,39 @@ function OutreachForm({ onClose, onSubmit: parentSubmit }) {
           </div>
         </Field>
         {form.category === 'Other' && (
-          <Field label="Please specify type">
-            <input className="kf-input" placeholder="Enter category…"
+          <Field label="Please Specify Type">
+            <input className="kf-input" placeholder="Enter Category…"
               value={form.customCategory} onChange={e => setForm(p => ({ ...p, customCategory: e.target.value }))} />
           </Field>
         )}
       </div>
 
       {/* Outreach Details */}
-      <div className="popup-section-head">📍 Outreach / Crusade Details</div>
+      <div className="popup-section-head">📍 Outreach/Crusade Details</div>
       <div className="popup-fields">
-        <Field label="Date of Outreach / Crusade" required error={errors.date}>
-          <input className={`kf-input${errors.date ? ' kf-input-err' : ''}`} type="date"
-            value={form.date} onChange={e => setForm(p => ({ ...p, date: e.target.value }))} />
-        </Field>
-        <Field label="State the location of healing outreaches (e.g. market, hospitals, school, etc.)" required hint="Separate multiple locations with commas" error={errors.locations}>
+        <Field label="State the Location of Healing Outreaches (E.g. Market, Hospitals, School, Etc.)" required hint="Separate Multiple Locations With Commas" error={errors.locations}>
           <input className={`kf-input${errors.locations ? ' kf-input-err' : ''}`}
-            placeholder="e.g. Lagos Island, Surulere Market"
+            placeholder="E.g. Lagos Island, Surulere Market"
             value={form.locations} onChange={e => setForm(p => ({ ...p, locations: e.target.value }))} />
         </Field>
 
-        <Field label="How many copies of magazine were distributed ?">
+        <Field label="How Many Copies of Magazine Were Distributed?">
           <input className="kf-input" type="number" min="0" placeholder="0"
             value={form.magazinesUsed} onChange={e => setForm(p => ({ ...p, magazinesUsed: e.target.value }))} />
         </Field>
 
-        <Field label="how many healing outreach(es) were carried out ?">
+        <Field label="How Many Healing Outreach(es) Were Carried Out?">
           <input className="kf-input" type="number" min="0" placeholder="0"
             value={form.healingOutreachesHeld} onChange={e => setForm(p => ({ ...p, healingOutreachesHeld: e.target.value }))} />
         </Field>
 
-        <Field label="How many souls were saved?">
+        <Field label="How Many Souls Were Saved?">
           <input className="kf-input" type="number" min="0" placeholder="0"
             value={form.soulsSaved} onChange={e => setForm(p => ({ ...p, soulsSaved: e.target.value }))} />
         </Field>
 
-        <Field label="Kindly submit testimonies from the outreach(es) / crusade(s)">
-          <textarea className="kf-textarea" rows={3} placeholder="Give testimonies..."
+        <Field label="Kindly Submit Testimonies From the Outreach(es)/Crusade(s)">
+          <textarea className="kf-textarea" rows={3} placeholder="Give Testimonies..."
             value={form.outreachTestimonies} onChange={e => setForm(p => ({ ...p, outreachTestimonies: e.target.value }))} />
         </Field>
 
@@ -1367,12 +1422,12 @@ function OutreachForm({ onClose, onSubmit: parentSubmit }) {
             setForm(p => ({ ...p, images: [...p.images, ...prev] }));
           }}
           onRemove={i => setForm(p => ({ ...p, images: p.images.filter((_, j) => j !== i) }))}
-          label="Upload Photos & Videos (includes Healing outreaches)"
+          label="Upload Photos & Videos (Includes Healing Outreaches)"
           accept="image/*,video/*"
         />
 
-        <Field label="Kindly state further plans for soul retention">
-          <textarea className="kf-textarea" rows={3} placeholder="State follow-up plan..."
+        <Field label="Kindly State Further Plans for Soul Retention">
+          <textarea className="kf-textarea" rows={3} placeholder="State Follow-up Plan..."
             value={form.followUpPlan} onChange={e => setForm(p => ({ ...p, followUpPlan: e.target.value }))} />
         </Field>
       </div>
@@ -1570,7 +1625,7 @@ export default function ReportingPortal() {
 
   const handleApprove = async (report) => {
     const baseUrl = window.ENV?.API_PATH || process.env.REACT_APP_API_URL;
-    const endpoint = activeTab === 'zonal' ? '/api/reports' : `/api/portal-reports/${activeTab}`;
+    const endpoint = (subTab === 'zonal' || subTab === 'zonal-info') ? '/api/reports' : `/api/portal-reports/${subTab}`;
     const id = parseInt(String(report.id).replace(/^[A-Z]+-/, ''), 10);
 
     try {
@@ -1588,7 +1643,7 @@ export default function ReportingPortal() {
   const handleDelete = async (report) => {
     if (!window.confirm('Delete this report? This cannot be undone.')) return;
     const baseUrl = window.ENV?.API_PATH || process.env.REACT_APP_API_URL;
-    const endpoint = activeTab === 'zonal' ? '/api/reports' : `/api/portal-reports/${activeTab}`;
+    const endpoint = (subTab === 'zonal' || subTab === 'zonal-info') ? '/api/reports' : `/api/portal-reports/${subTab}`;
     const id = parseInt(String(report.id).replace(/^[A-Z]+-/, ''), 10);
 
     try {
@@ -1630,11 +1685,20 @@ export default function ReportingPortal() {
           throw new Error(`Submit failed (${res.status}): ${txt}`);
         }
       }
+      // Optimistically update UI so it shows instantly
+      setReportsByTab(prev => ({
+        ...prev,
+        [activeTab]: [{ ...data, id: data.id || `NEW-${Math.floor(Math.random() * 1000)}`, rawDate: data.rawDate || new Date().toISOString().split('T')[0] }, ...(prev[activeTab] || [])]
+      }));
+
       setToast(`${tab.label} submitted successfully`);
-      await fetchAllReports(); // Wait for DB sync
       
+      // Switch tabs instantly
       setSubTab(activeTab);
       setActiveTab('submitted-forms');
+
+      // Fetch fresh data in background
+      fetchAllReports();
     } catch (e) {
       console.error('Submission failed', e);
       alert(`Failed to save report: ${e.message}`);
@@ -1744,9 +1808,6 @@ export default function ReportingPortal() {
             className={`rp-tab ${activeTab === t.id ? 'active' : ''}`}
             style={activeTab === t.id ? { '--tab-color': t.color } : {}}>
             {t.icon} {t.label}
-            {(reportsByTab[t.id] || []).length > 0 && t.id !== 'submitted-forms' && (
-              <span className="tab-count" style={{ background: t.color }}>{(reportsByTab[t.id] || []).length}</span>
-            )}
           </button>
         ))}
       </div>
