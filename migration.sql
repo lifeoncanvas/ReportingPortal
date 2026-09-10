@@ -80,5 +80,12 @@ ADD COLUMN souls_saved INT DEFAULT 0,
 ADD COLUMN outreach_testimonies TEXT DEFAULT NULL,
 ADD COLUMN follow_up_plan TEXT DEFAULT NULL;
 
+-- Added for new fields in Reporting Portal
+ALTER TABLE loveworld_reports.partnership_reports 
+ADD COLUMN zonal_partnership_details TEXT DEFAULT NULL;
 
+ALTER TABLE loveworld_reports.outreach_reports 
+ADD COLUMN submitted_by VARCHAR(255) DEFAULT NULL;
 
+-- Added for admin notification
+ALTER TABLE loveworld_reports.users ADD COLUMN admin_approval_notification_sent BOOLEAN DEFAULT FALSE;
