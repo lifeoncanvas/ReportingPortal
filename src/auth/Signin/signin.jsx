@@ -57,7 +57,7 @@ export default function Signin({ onSwitch, onForgotPassword }) {
   const handleKingChatLogin = () => {
     const loginOptions = {
       scopes: ["authenticate", "profile"],
-      clientId: (window.ENV?.KINGSCHAT_CLIENT_ID || process.env.REACT_APP_KINGSCHAT_CLIENT_ID || '8ae69d5f-d25d-4c05-9914-ab947ffa5b77').trim(), 
+      clientId: (window.ENV?.KINGSCHAT_CLIENT_ID || process.env.REACT_APP_KINGSCHAT_CLIENT_ID || '5510380c-caac-4baa-ad0c-288dcdffaf1f').trim(), 
     };
     
     setLoading(true);
