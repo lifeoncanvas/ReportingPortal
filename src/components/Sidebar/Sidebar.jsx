@@ -1,8 +1,8 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 import {
-  LayoutDashboard, FileText, DollarSign,
-  BarChart2, ClipboardList, Users, BookOpen,
+  LayoutDashboard, FileText,
+  BarChart2, ClipboardList, Users,
 } from 'lucide-react';
 import { useAuth } from '../../auth/AuthContext';
 import { useSettings } from '../../context/SettingsContext';

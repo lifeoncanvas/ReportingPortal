@@ -1,9 +1,7 @@
 import React, { useState } from 'react';
-import { useAuth } from '../AuthContext';
 import '../Signup/styles.css';
 
 export default function InviteSignup({ token }) {
-  const { login } = useAuth();
   const [name, setName] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');

@@ -1,5 +1,5 @@
 import jsPDF from 'jspdf';
-import autoTable from 'jspdf-autotable';
+import 'jspdf-autotable';
 
 const PURPLE = [79, 70, 229];
 const LIGHT  = [245, 243, 255];
@@ -10,6 +10,7 @@ const WHITE  = [255, 255, 255];
 
 const KEY_LABELS = {
   zoneName: "Name of Zone",
+  zonalPastor: "Zonal Pastor's Name",
   zonalManager: "Zonal Manager",
   partnershipRemittance: "Total Partnership Remittance",
   remittancePurpose: "Purpose for each remittance",
@@ -27,6 +28,11 @@ const KEY_LABELS = {
   submittedByEmail: "Submitted By Email",
   participationPrayWithMe: "Total number of participation pray with me",
   totalRegistrationHslhs: "Total Registration for HSLHS",
+  activePrayerCloud: "Total Number of Active Prayer Clouds",
+  totalHerald: "Total Number of Heralds",
+  totalHeralds: "Total Number of Heralds",
+  activatedHealingCentre: "Total Number of Activate Healing Centres",
+  ongoingProgramsReport: "Brief Report for Ongoing Programs",
   heraldConference: "Brief report for Herald Conference",
   totalPartnershipRemittance: "Total Partnership Remittance",
   newPartnersRecruited: "New Partners Recruited",

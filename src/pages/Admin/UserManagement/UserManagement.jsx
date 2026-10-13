@@ -2,14 +2,6 @@ import React, { useState } from 'react';
 import { Search, Filter, Plus, Edit2, Trash2, X, Check, Shield } from 'lucide-react';
 import './styles.css';
 
-const INITIAL_USERS = [
-  { id: 1, firstName: 'Global',  lastName: 'Partnership Manager', email: 'global@loveworld.com',  role: 'zonal',   region: 'Global',        status: 'active',   joined: '1/10/2024' },
-  { id: 2, firstName: 'Zonal',   lastName: 'Partnership Manager', email: 'zonal@loveworld.com',   role: 'zonal',   region: 'North America', status: 'active',   joined: '2/15/2024' },
-  { id: 3, firstName: 'System',  lastName: 'Administrator',       email: 'admin@loveworld.com',   role: 'admin',   region: 'Global',        status: 'active',   joined: '1/1/2024'  },
-  { id: 5, firstName: 'John',    lastName: 'Smith',               email: 'john@loveworld.com',    role: 'zonal',   region: 'Africa',        status: 'active',   joined: '4/5/2024'  },
-  { id: 6, firstName: 'Sarah',   lastName: 'Johnson',             email: 'sarah@loveworld.com',   role: 'zonal',   region: 'Asia Pacific',  status: 'active',   joined: '4/12/2024' },
-];
-
 const ROLE_COLORS = {
   user:    { bg: '#f3f4f6', color: '#4b5563' },
   zonal:   { bg: '#dbeafe', color: '#1d4ed8' },

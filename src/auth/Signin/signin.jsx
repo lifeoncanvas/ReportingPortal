@@ -3,7 +3,7 @@ import { useAuth } from '../AuthContext';
 import { useToast } from '../../context/ToastContext';
 import { useNavigate } from 'react-router-dom';
 import kingsChatWebSdk from 'kingschat-web-sdk';
-import { MessageCircle, Mail, Phone, ChevronDown, ChevronRight, Lock, ArrowRight } from 'lucide-react';
+import { Mail, Phone, Lock } from 'lucide-react';
 import 'kingschat-web-sdk/dist/stylesheets/style.min.css';
 import '../Signup/styles.css'; // Use shared styles
 

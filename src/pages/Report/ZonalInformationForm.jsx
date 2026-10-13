@@ -6,6 +6,7 @@ const ATTENDANCE_OPTIONS = ["Yes", "No", "Officially Excused"];
 
 const initialForm = {
   zoneName: "",
+  zonalPastor: "",
   zonalManager: "",
   datesReceived: "",
   zonalPastorExecutiveMinistersMeeting: "",
@@ -20,6 +21,7 @@ const FIELDS = [
     icon: "🏛️",
     fields: [
       { key: "zoneName", label: "Name of Zone", type: "text", required: true },
+      { key: "zonalPastor", label: "Zonal Pastor's Name", type: "text", required: true },
       { key: "zonalManager", label: "Zonal Manager", type: "text", required: true },
       { key: "datesReceived", label: "Date(s) received", type: "date", required: true }
     ]

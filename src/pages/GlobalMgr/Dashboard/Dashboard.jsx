@@ -4,12 +4,10 @@ import { useSettings } from '../../../context/SettingsContext';
 import { useAuth } from '../../../auth/AuthContext';
 import { useNotifications } from '../../../context/NotificationContext';
 import {
-  LineChart, Line, BarChart, Bar, PieChart, Pie, Cell,
+  LineChart, Line, BarChart, Bar,
   XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
 } from 'recharts';
 import './styles.css';
-
-const REGION_COLORS = ['#4f46e5', '#818cf8', '#a5b4fc', '#c7d2fe'];
 
 const monthlyData = [
   { month: 'Jan', reports: 40, finance: 24 },
@@ -20,15 +18,8 @@ const monthlyData = [
   { month: 'Jun', reports: 75, finance: 60 },
 ];
 
-const regionData = [
-  { name: 'Africa',   value: 40 },
-  { name: 'Europe',   value: 25 },
-  { name: 'Americas', value: 20 },
-  { name: 'Asia',     value: 15 },
-];
-
 export default function Dashboard() {
-  const { t, formatDate, currSymbol } = useSettings();
+  const { t, currSymbol } = useSettings();
   const { user } = useAuth();
   const { notifications } = useNotifications();
   const magazineNotifs = notifications.filter(n => n.icon === 'magazine').slice(0, 5);

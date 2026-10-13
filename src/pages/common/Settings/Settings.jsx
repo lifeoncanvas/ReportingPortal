@@ -205,12 +205,6 @@ export default function Settings() {
         }
     };
 
-    const handle2FAToggle = () => {
-        const next = !settings.security.twoFactor;
-        updateSection('security', { twoFactor: next });
-        showToast(next ? (t?.enabled || 'Enabled') : (t?.disabled || 'Disabled'));
-    };
-
     // Preferences
     const [prefDraft, setPrefDraft] = useState({ ...settings.preferences });
     useEffect(() => { setPrefDraft({ ...settings.preferences }); }, [settings.preferences]);

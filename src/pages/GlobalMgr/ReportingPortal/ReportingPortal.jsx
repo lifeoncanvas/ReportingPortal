@@ -186,6 +186,7 @@ function ReportTable({ reports, loading, columns, onView, onDownload, onApprove,
 const KEY_LABELS = {
   // Zonal Report / Zone Info
   zoneName: "Name of Zone",
+  zonalPastor: "Zonal Pastor's Name",
   zonalManager: "Zonal Manager",
   partnershipRemittance: "Total Partnership Remittance",
   remittancePurpose: "Purpose for each remittance",
@@ -203,6 +204,11 @@ const KEY_LABELS = {
   submittedByEmail: "Submitted By Email",
   participationPrayWithMe: "Total number of participation pray with me",
   totalRegistrationHslhs: "Total Registration for HSLHS",
+  activePrayerCloud: "Total Number of Active Prayer Clouds",
+  totalHerald: "Total Number of Heralds",
+  totalHeralds: "Total Number of Heralds",
+  activatedHealingCentre: "Total Number of Activate Healing Centres",
+  ongoingProgramsReport: "Brief Report for Ongoing Programs",
   heraldConference: "Brief report for Herald Conference",
   totalPartnershipRemittance: "Total Partnership Remittance",
   newPartnersRecruited: "New Partners Recruited",
@@ -363,6 +369,7 @@ function ZonalInformationForm({ onClose, onSubmit: parentSubmit }) {
   const { user } = useAuth();
   const EMPTY = {
     zoneName: '',
+    zonalPastor: '',
     zonalManager: '',
     pastoralAttendanceDirector: '',
     managerAttendanceDirector: '',
@@ -378,6 +385,7 @@ function ZonalInformationForm({ onClose, onSubmit: parentSubmit }) {
   const validate = () => {
     const e = {};
     if (!form.zoneName.trim()) e.zoneName = 'Required';
+    if (!form.zonalPastor.trim()) e.zonalPastor = 'Required';
     if (!form.zonalManager.trim()) e.zonalManager = 'Required';
     if (!form.pastoralAttendanceDirector) e.pastoralAttendanceDirector = 'Required';
     if (!form.managerAttendanceDirector) e.managerAttendanceDirector = 'Required';
@@ -397,6 +405,7 @@ function ZonalInformationForm({ onClose, onSubmit: parentSubmit }) {
       submittedTime: new Date().toTimeString().split(' ')[0],
       weekStartDate: today,
       zoneName: form.zoneName,
+      zonalPastor: form.zonalPastor,
       zonalManager: form.zonalManager,
       zonalPastorExecutiveMinistersMeeting: form.pastoralAttendanceDirector,
       zonalManagerExecutiveMinistersMeeting: form.managerAttendanceDirector,
@@ -415,6 +424,7 @@ function ZonalInformationForm({ onClose, onSubmit: parentSubmit }) {
     }
     parentSubmit({
       zoneName: form.zoneName,
+      zonalPastor: form.zonalPastor,
       zonalManager: form.zonalManager,
       status: 'submitted',
       rawDate: today,
@@ -432,6 +442,10 @@ function ZonalInformationForm({ onClose, onSubmit: parentSubmit }) {
         <Field label="Name of Zone" required error={errors.zoneName}>
           <input className={`kf-input${errors.zoneName ? ' kf-input-err' : ''}`} placeholder="E.g. Zone A"
             value={form.zoneName} onChange={e => set('zoneName', e.target.value)} />
+        </Field>
+        <Field label="Zonal Pastor's Name" required error={errors.zonalPastor}>
+          <input className={`kf-input${errors.zonalPastor ? ' kf-input-err' : ''}`} placeholder="Full Name"
+            value={form.zonalPastor} onChange={e => set('zonalPastor', e.target.value)} />
         </Field>
         <Field label="Zonal Manager" required error={errors.zonalManager}>
           <input className={`kf-input${errors.zonalManager ? ' kf-input-err' : ''}`} placeholder="Full Name"
@@ -515,7 +529,6 @@ function ZonalReportForm({ onClose, onSubmit: parentSubmit }) {
   const [errors, setErrors] = useState({});
   const [submitting, setSubmitting] = useState(false);
   const set = (k, v) => setForm(p => ({ ...p, [k]: v }));
-  const ATTENDANCE_OPTIONS = ['', 'Yes', 'No', 'Officially Excused'];
 
   const validate = () => {
     const e = {};
@@ -580,11 +593,11 @@ function ZonalReportForm({ onClose, onSubmit: parentSubmit }) {
           <input className="kf-input" type="number" min="0" placeholder="0"
             value={form.activePrayerCloud} onChange={e => set('activePrayerCloud', e.target.value)} />
         </Field>
-        <Field label="Total Number of Herald">
+        <Field label="Total Number of Heralds">
           <input className="kf-input" type="number" min="0" placeholder="0"
             value={form.totalHerald} onChange={e => set('totalHerald', e.target.value)} />
         </Field>
-        <Field label="Total Number of Activated Healing Centres">
+        <Field label="Total Number of Activate Healing Centres">
           <input className="kf-input" type="number" min="0" placeholder="0"
             value={form.activatedHealingCentre} onChange={e => set('activatedHealingCentre', e.target.value)} />
         </Field>
@@ -1444,7 +1457,7 @@ const TABS_CONFIG = [
     id: 'zonal-info', label: 'Zonal Information', icon: <Users size={14} />, emoji: '🏛️', color: '#8b5cf6',
     columns: [
       { key: 'id', label: 'Report ID' }, { key: 'rawDate', label: 'Date' },
-      { key: 'zoneName', label: 'Zone' }, { key: 'zonalManager', label: 'Zonal Manager' },
+      { key: 'zoneName', label: 'Zone' }, { key: 'zonalPastor', label: "Zonal Pastor's Name" }, { key: 'zonalManager', label: 'Zonal Manager' },
       { key: 'status', label: 'Status' },
     ],
     FormComponent: ZonalInformationForm, btnLabel: 'Upload New Zonal Information',
@@ -1596,6 +1609,7 @@ export default function ReportingPortal() {
           id: `ZI-${String(r.id).padStart(3, '0')}`,
           rawDate: r.submittedAt,
           zoneName: r.zoneName,
+          zonalPastor: r.zonalPastor,
           zonalManager: r.zonalManager,
           status: r.status
         })),
@@ -1662,11 +1676,7 @@ export default function ReportingPortal() {
   };
 
   const tab = TABS_CONFIG.find(t => t.id === activeTab);
-  const reports = reportsByTab[activeTab] || [];
-
-  const filtered = reports.filter(r =>
-    Object.values(r).some(v => String(v).toLowerCase().includes(search.toLowerCase()))
-  );
+  const reports = reportsByTab[subTab] || reportsByTab[activeTab] || [];
 
   const handleSubmit = async (data) => {
     try {

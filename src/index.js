@@ -6,7 +6,7 @@ import { AuthProvider }     from './auth/AuthContext';
 import { SettingsProvider } from './context/SettingsContext';
 
 // Filter out ResizeObserver loop errors that are benign but pop up in dev mode
-const errorHandler = window.addEventListener('error', e => {
+window.addEventListener('error', e => {
     if (e.message === 'ResizeObserver loop completed with undelivered notifications.') {
         const overlay = document.querySelector('iframe');
         if (overlay) overlay.style.display = 'none';

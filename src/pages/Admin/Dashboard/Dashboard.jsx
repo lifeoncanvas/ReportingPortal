@@ -1,41 +1,11 @@
 import React from 'react';
 import { Users, FileText, Shield, Download } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { useNotifications } from '../../../context/NotificationContext';
 import { useAuth } from '../../../auth/AuthContext';
 import './styles.css';
 
-const KPI = [
-  { label: 'Total Users',   value: '248',    pct: '+5%',  iconBg: '#ede9fe', iconColor: '#5b21b6', icon: Users      },
-  { label: 'Total Reports', value: '1,284',  pct: '+12%', iconBg: '#dcfce7', iconColor: '#16a34a', icon: FileText   },
-  { label: 'Active Roles',  value: '3',      pct: '',     iconBg: '#fff7ed', iconColor: '#ea580c', icon: Shield     },
-];
-
-const LOGS = [
-  { dot: '#4f46e5', action: 'Created new user',       module: 'User Mgmt',  moduleBg: '#ede9fe', moduleColor: '#5b21b6', user: 'System Administrator', time: '3/10/2026 2:00 PM'  },
-  { dot: '#16a34a', action: 'Submitted weekly report', module: 'Reporting',  moduleBg: '#dcfce7', moduleColor: '#16a34a', user: 'John Smith',           time: '3/8/2026 4:00 PM'   },
-  { dot: '#0284c7', action: 'Downloaded report',       module: 'Analytics',  moduleBg: '#e0f2fe', moduleColor: '#0284c7', user: 'Zonal Manager',        time: '3/8/2026 8:50 PM'   },
-  { dot: '#a16207', action: 'Updated user role',       module: 'User Mgmt',  moduleBg: '#fef9c3', moduleColor: '#a16207', user: 'System Administrator', time: '3/7/2026 2:45 PM'   },
-  { dot: '#9d174d', action: 'Exported finance data',   module: 'Finance',    moduleBg: '#fce7f3', moduleColor: '#9d174d', user: 'System Administrator', time: '3/6/2026 8:15 PM'   },
-];
-
-const REGION_STATS = [
-  { label: 'North America', count: 412, pct: 80 },
-  { label: 'Africa',        count: 334, pct: 65 },
-  { label: 'Europe',        count: 268, pct: 52 },
-  { label: 'Asia Pacific',  count: 206, pct: 40 },
-  { label: 'South America', count: 164, pct: 32 },
-];
-
-const ROLE_DIST = [
-  { label: 'Zonal Managers',    count: 86,  pct: 85, color: '#1d4ed8' },
-  { label: 'Administrators',    count: 4,   pct: 15, color: '#a16207' },
-];
-
 export default function AdminDashboard() {
   const navigate = useNavigate();
-  const { notifications } = useNotifications();
-  const magazineNotifs = notifications.filter(n => n.icon === 'magazine').slice(0, 5);
   const { user } = useAuth();
   const [stats, setStats] = React.useState(null);
   const [users, setUsers] = React.useState([]);

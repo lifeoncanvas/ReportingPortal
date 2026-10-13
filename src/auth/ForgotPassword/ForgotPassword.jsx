@@ -20,7 +20,6 @@ export default function ForgotPassword({ onBack }) {
     const [error, setError] = useState("");
     const [message, setMessage] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
-    const [showSetupForm, setShowSetupForm] = useState(false);
 
     const handleRequestOtp = async (e) => {
         if (e) e.preventDefault();

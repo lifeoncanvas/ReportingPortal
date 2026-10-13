@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { MessageSquare, X, Send, User, Bot, Minimize2 } from 'lucide-react';
+import { MessageSquare, X, Send, Minimize2 } from 'lucide-react';
 import './styles.css';
 
 export default function SupportChatBot() {

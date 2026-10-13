@@ -5,23 +5,9 @@ import { useAuth } from '../../../auth/AuthContext';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import './styles.css';
 
-const campaignData = [
-  { name: 'Spring Outreach', Attendance: 1000 },
-  { name: 'Easter Campaign', Attendance: 350  },
-  { name: 'Healing Streams', Attendance: 750  },
-];
-
-const activity = [
-  { name: 'John Smith',       action: 'Submitted report for Zone A', date: '3/8/2026' },
-  { name: 'Sarah Johnson',    action: 'Submitted report for Zone B', date: '3/7/2026' },
-  { name: 'David Lee',        action: 'Submitted report for Zone C', date: '3/6/2026' },
-  { name: 'Mary Wilson',      action: 'Submitted report for Zone D', date: '3/5/2026' },
-  { name: 'Carlos Rodriguez', action: 'Submitted report for Zone E', date: '3/4/2026' },
-];
-
 export default function ZonalDashboard() {
   const navigate = useNavigate();
-  const { t, currSymbol } = useSettings();
+  const { t } = useSettings();
   const { user } = useAuth();
   const [stats, setStats] = React.useState(null);
 

@@ -4,7 +4,6 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../auth/AuthContext';
 import { useSettings } from '../../context/SettingsContext';
 import { useNotifications } from '../../context/NotificationContext';
-import logo from '../../HSLogo.png';
 
 import './styles.css';
 

@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../AuthContext';
-import { MessageCircle, Mail, Phone, ChevronDown, ChevronRight, User, Lock, ArrowRight } from 'lucide-react';
+import { Mail, Phone, User, Lock } from 'lucide-react';
 import kingsChatWebSdk from 'kingschat-web-sdk';
 import 'kingschat-web-sdk/dist/stylesheets/style.min.css';
 import './styles.css';
 
 export default function Signup({ onSwitch }) {
-  const { signup, loginWithKingChat } = useAuth();
+  const { loginWithKingChat } = useAuth();
   const navigate = useNavigate();
   const [activeSection, setActiveSection] = useState(null); // 'kingschat', 'email', 'phone'
   
@@ -63,10 +63,6 @@ export default function Signup({ onSwitch }) {
         console.error("KingsChat login error:", err);
         setError('KingsChat login was cancelled or failed.');
       });
-  };
-
-  const openKingsChatReg = () => {
-    window.open('https://kingschat.online/', '_blank');
   };
 
   const handleSubmit = async (e, type) => {
