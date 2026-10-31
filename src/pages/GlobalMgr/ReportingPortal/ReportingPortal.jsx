@@ -18,7 +18,9 @@ const ExportIcon = () => (
 // ── Helpers ────────────────────────────────────────────
 function formatDate(raw) {
   if (!raw) return '—';
-  const d = new Date(raw);
+  const isoStr = typeof raw === 'string' ? raw.trim().replace(' ', 'T') : raw;
+  const d = new Date(isoStr);
+  if (isNaN(d.getTime())) return String(raw);
   return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
 }
 
@@ -1610,9 +1612,9 @@ export default function ReportingPortal() {
           id: `ZI-${String(r.id).padStart(3, '0')}`,
           rawDate: r.createdAt || r.submittedAt || r.submittedDate,
           submittedBy: r.submittedBy || r.submittedByEmail || r.zonalManager || 'User',
-          zoneName: r.zoneName,
-          zonalPastor: r.zonalPastor,
-          zonalManager: r.zonalManager,
+          zoneName: r.zoneName || '—',
+          zonalPastor: r.zonalPastor || '—',
+          zonalManager: r.zonalManager || '—',
           status: r.status
         })),
         zonal: zData.map(r => ({
@@ -1620,7 +1622,7 @@ export default function ReportingPortal() {
           id: `ZR-${String(r.id).padStart(3, '0')}`,
           rawDate: r.createdAt || r.submittedAt || r.submittedDate,
           submittedBy: r.submittedBy || r.submittedByEmail || r.zonalManager || 'User',
-          zone: r.zoneName,
+          zone: r.zoneName || '—',
 
           partners: r.newPartnersRecruited,
           status: r.status
@@ -1815,27 +1817,30 @@ export default function ReportingPortal() {
 
       {/* ── Tabs ── */}
       <div className="rp-tabs">
-        {TABS_CONFIG.map(t => (
-          <button key={t.id}
-            onClick={() => { setActiveTab(t.id); setSearch(''); }}
-            className={`rp-tab ${activeTab === t.id ? 'active' : ''}`}
-            style={activeTab === t.id ? { '--tab-color': t.color } : {}}>
-            {t.icon} {t.label}
-            {t.id === 'submitted-forms' && (
+        {TABS_CONFIG.map(t => {
+          const count = t.id === 'submitted-forms'
+            ? Object.values(reportsByTab).reduce((sum, list) => sum + (Array.isArray(list) ? list.length : 0), 0)
+            : (reportsByTab[t.id] || []).length;
+          return (
+            <button key={t.id}
+              onClick={() => { setActiveTab(t.id); setSearch(''); }}
+              className={`rp-tab ${activeTab === t.id ? 'active' : ''}`}
+              style={activeTab === t.id ? { '--tab-color': t.color } : {}}>
+              {t.icon} {t.label}
               <span style={{
                 marginLeft: 8,
-                background: activeTab === t.id ? 'rgba(255,255,255,0.3)' : '#4f46e5',
+                background: activeTab === t.id ? 'rgba(255,255,255,0.3)' : (count > 0 ? '#4f46e5' : '#cbd5e1'),
                 color: '#fff',
                 padding: '2px 8px',
                 borderRadius: 12,
                 fontSize: 11,
                 fontWeight: 700
               }}>
-                {Object.values(reportsByTab).reduce((sum, list) => sum + (Array.isArray(list) ? list.length : 0), 0)}
+                {count}
               </span>
-            )}
-          </button>
-        ))}
+            </button>
+          );
+        })}
       </div>
       <div className="rp-tab-divider" />
 
