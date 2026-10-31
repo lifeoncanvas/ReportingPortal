@@ -2,21 +2,16 @@ import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext';
 
-import GlobalMgrLayout from '../pages/GlobalMgr/GlobalMgrLayout';
 import ZonalMgrLayout  from '../pages/ZonalMgr/ZonalMgrLayout';
 import AdminLayout     from '../pages/Admin/AdminLayout';
 import SubmitReport from '../pages/Report/SubmitReport';
 import ZonalInformationForm from '../pages/Report/ZonalInformationForm';
 
-import GlobalDashboard  from '../pages/GlobalMgr/Dashboard/Dashboard';
 import ReportingPortal  from '../pages/GlobalMgr/ReportingPortal/ReportingPortal';
-import Analytics        from '../pages/GlobalMgr/Analytics/Analytics';
-import GlobalAuditLogs  from '../pages/GlobalMgr/AuditLogs/AuditLogs';
 
 import ZonalDashboard      from '../pages/ZonalMgr/Dashboard/Dashboard';
 import ZonalReportingTabs  from '../pages/ZonalMgr/ReportingPortal/ZonalReportingTabs';
 import ZonalAnalytics      from '../pages/ZonalMgr/Analytics/Analytics';
-
 
 import AdminDashboard   from '../pages/Admin/Dashboard/Dashboard';
 import UserManagement   from '../pages/Admin/UserManagement/UserManagement';
@@ -31,44 +26,7 @@ export default function RoleRouter() {
 
   if (user === null) return <Navigate to="/login" replace />;
 
-  if (user?.role === 'global') {
-    return (
-      <Routes>
-        <Route path="/global" element={<GlobalMgrLayout />}>
-          <Route index element={<Navigate to="dashboard" replace />} />
-          <Route path="dashboard"     element={<GlobalDashboard />} />
-          <Route path="reporting"     element={<ReportingPortal />} />
-          <Route path="analytics"     element={<Analytics />} />
-          <Route path="audit"         element={<GlobalAuditLogs />} />
-          <Route path="notifications" element={<Notifications />} />
-          <Route path="settings"      element={<Settings />} />
-          <Route path="submit-report" element={<SubmitReport />} />
-          <Route path="zonal-info"    element={<ZonalInformationForm />} />
-        </Route>
-        <Route path="*" element={<Navigate to="/global/dashboard" replace />} />
-      </Routes>
-    );
-  }
-
-  if (user?.role === 'zonal') {
-    return (
-      <Routes>
-        <Route path="/zonal" element={<ZonalMgrLayout />}>
-          <Route index element={<Navigate to="dashboard" replace />} />
-          <Route path="dashboard"     element={<ZonalDashboard />} />
-          <Route path="reporting"     element={<ZonalReportingTabs />} />
-          <Route path="analytics"     element={<ZonalAnalytics />} />
-          <Route path="notifications" element={<Notifications />} />
-          <Route path="settings"      element={<Settings />} />
-          <Route path="submit-report" element={<SubmitReport />} />
-          <Route path="zonal-info"    element={<ZonalInformationForm />} />
-        </Route>
-        <Route path="*" element={<Navigate to="/zonal/dashboard" replace />} />
-      </Routes>
-    );
-  }
-
-  if (user?.role === 'admin') {
+  if (user?.role?.toLowerCase() === 'admin') {
     return (
       <Routes>
         <Route path="/admin" element={<AdminLayout />}>
@@ -80,16 +38,15 @@ export default function RoleRouter() {
           <Route path="audit"          element={<AdminAuditLogs />} />
           <Route path="notifications"  element={<Notifications />} />
           <Route path="settings"       element={<Settings />} />
-          <Route path="submit-report" element={<SubmitReport />} />
-          <Route path="zonal-info"    element={<ZonalInformationForm />} />
+          <Route path="submit-report"  element={<SubmitReport />} />
+          <Route path="zonal-info"     element={<ZonalInformationForm />} />
         </Route>
         <Route path="*" element={<Navigate to="/admin/dashboard" replace />} />
       </Routes>
     );
   }
 
-  // Default fallback for KingsChat users (who get 'user' or unassigned by default)
-  // Map them to the Zonal Manager Layout so they see the Zonal Portal automatically
+  // All other users (zonal managers)
   return (
     <Routes>
       <Route path="/zonal" element={<ZonalMgrLayout />}>

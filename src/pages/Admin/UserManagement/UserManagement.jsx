@@ -4,15 +4,13 @@ import { getApiUrl } from '../../../utils/apiConfig';
 import './styles.css';
 
 const ROLE_COLORS = {
-  user:    { bg: '#f3f4f6', color: '#4b5563' },
-  zonal:   { bg: '#dbeafe', color: '#1d4ed8' },
-  admin:   { bg: '#fef9c3', color: '#a16207' },
-  global:  { bg: '#e0e7ff', color: '#4f46e5' },
+  zonal:   { bg: '#ede9fe', color: '#5b21b6' },
+  admin:   { bg: '#fef3c7', color: '#d97706' },
 };
 
 const EMPTY_FORM = {
   firstName: '', lastName: '', email: '',
-  role: 'user', region: '', status: 'inactive',
+  role: 'zonal', region: 'Global', status: 'active',
 };
 
 export default function UserManagement() {
@@ -50,10 +48,7 @@ export default function UserManagement() {
   const handleSave = async () => {
     if (!form.email || !editUser) return;
 
-    let finalRole = form.role;
-    if (form.role !== 'admin') {
-      finalRole = form.status === 'active' ? 'zonal' : 'user';
-    }
+    const finalRole = form.role?.toLowerCase() === 'admin' ? 'admin' : 'zonal';
     const payload = { ...form, role: finalRole };
 
     await fetch(`${getApiUrl()}/api/users/${editUser.id}`, {
@@ -96,19 +91,16 @@ export default function UserManagement() {
     const user = users.find(u => u.id === id);
     if (!user) return;
     const newStatus = user.status === 'active' ? 'inactive' : 'active';
-    let newRole = user.role;
-    if (user.role !== 'admin') {
-      newRole = newStatus === 'active' ? 'zonal' : 'user';
-    }
+    const currentRole = user.role?.toLowerCase() === 'admin' ? 'admin' : 'zonal';
     
     // Optimistic UI update
-    setUsers(prev => prev.map(u => u.id === id ? { ...u, status: newStatus, role: newRole } : u));
+    setUsers(prev => prev.map(u => u.id === id ? { ...u, status: newStatus, role: currentRole } : u));
 
     try {
       await fetch(`${getApiUrl()}/api/users/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...user, status: newStatus, role: newRole })
+        body: JSON.stringify({ ...user, status: newStatus, role: currentRole })
       });
       fetchUsers();
     } catch (err) {
@@ -221,12 +213,12 @@ export default function UserManagement() {
                     <td>{u.phone || '—'}</td>
                     <td>
                       <select 
-                        value={u.role.toLowerCase()} 
+                        value={u.role?.toLowerCase() === 'admin' ? 'admin' : 'zonal'} 
                         onChange={(e) => inlineChangeRole(u.id, e.target.value)}
                         className="um-role-select"
                         style={{ 
-                          background: rc.bg, 
-                          color: rc.color, 
+                          background: u.role?.toLowerCase() === 'admin' ? '#fef3c7' : '#ede9fe', 
+                          color: u.role?.toLowerCase() === 'admin' ? '#d97706' : '#5b21b6', 
                           border: 'none', 
                           borderRadius: '12px', 
                           padding: '4px 8px', 
@@ -238,10 +230,8 @@ export default function UserManagement() {
                           textTransform: 'capitalize'
                         }}
                       >
-                        <option value="user">User</option>
-                        <option value="zonal">Zonal</option>
-                        <option value="global">Global</option>
                         <option value="admin">Admin</option>
+                        <option value="zonal">Zonal</option>
                       </select>
                     </td>
                     <td>{u.region}</td>
@@ -354,11 +344,10 @@ export default function UserManagement() {
                 </div>
                 <div className="um-field">
                   <label>Role</label>
-                  <select value={form.role || (form.status === 'active' ? 'zonal' : 'user')}
+                  <select value={form.role?.toLowerCase() === 'admin' ? 'admin' : 'zonal'}
                     onChange={e => setForm(p => ({ ...p, role: e.target.value }))}>
-                    {form.status !== 'active' && <option value="user">User (Inactive)</option>}
-                    <option value="zonal">Zonal Manager</option>
-                    <option value="admin">System Administrator</option>
+                    <option value="admin">Admin</option>
+                    <option value="zonal">Zonal</option>
                   </select>
                 </div>
                 <div className="um-field">
