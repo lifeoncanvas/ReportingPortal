@@ -2,6 +2,7 @@ import React from 'react';
 import { FileText, DollarSign, Users, TrendingUp, BookOpen } from 'lucide-react';
 import { useSettings } from '../../../context/SettingsContext';
 import { useAuth } from '../../../auth/AuthContext';
+import { getApiUrl } from '../../../utils/apiConfig';
 import { useNotifications } from '../../../context/NotificationContext';
 import {
   LineChart, Line, BarChart, Bar,
@@ -26,7 +27,7 @@ export default function Dashboard() {
   const [stats, setStats] = React.useState(null);
 
   React.useEffect(() => {
-    fetch(`${process.env.REACT_APP_API_URL}/api/dashboard/stats`)
+    fetch(`${getApiUrl()}/api/dashboard/stats`)
       .then(res => res.json())
       .then(data => setStats(data))
       .catch(err => console.error(err));

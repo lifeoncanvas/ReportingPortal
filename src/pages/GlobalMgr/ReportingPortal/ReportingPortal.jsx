@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Eye, Download, Search, Upload, X, Check, ChevronDown, Plus, FileText, Heart, BookOpen, Newspaper, Users, Trash2, MessageSquare, FolderOpen } from 'lucide-react';
 import { useAuth } from '../../../auth/AuthContext';
+import { getApiUrl } from '../../../utils/apiConfig';
 import { downloadReportPDF } from '../../../utils/generateReportPDF';
 import * as XLSX from 'xlsx';
 import './styles.css';
@@ -414,7 +415,7 @@ function ZonalInformationForm({ onClose, onSubmit: parentSubmit }) {
       regionName: user?.region || 'Global',
     };
     try {
-      await fetch(`${window.ENV?.API_PATH || process.env.REACT_APP_API_URL}/api/reports`, {
+      await fetch(`${getApiUrl()}/api/reports`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
@@ -556,7 +557,7 @@ function ZonalReportForm({ onClose, onSubmit: parentSubmit }) {
       ongoingProgramsReport: form.ongoingProgramsReport,
     };
     try {
-      await fetch(`${window.ENV?.API_PATH || process.env.REACT_APP_API_URL}/api/reports`, {
+      await fetch(`${getApiUrl()}/api/reports`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
@@ -1582,7 +1583,7 @@ export default function ReportingPortal() {
   }, [user]);
 
   const fetchAllReports = async () => {
-    const baseUrl = window.ENV?.API_PATH || process.env.REACT_APP_API_URL;
+    const baseUrl = getApiUrl();
     const emailParam = (user?.role === 'admin' || user?.role === 'global') ? '' : `?email=${user?.email}`;
 
     try {
@@ -1607,7 +1608,8 @@ export default function ReportingPortal() {
         'zonal-info': zData.map(r => ({
           ...r,
           id: `ZI-${String(r.id).padStart(3, '0')}`,
-          rawDate: r.submittedAt,
+          rawDate: r.createdAt || r.submittedAt || r.submittedDate,
+          submittedBy: r.submittedBy || r.submittedByEmail || r.zonalManager || 'User',
           zoneName: r.zoneName,
           zonalPastor: r.zonalPastor,
           zonalManager: r.zonalManager,
@@ -1616,9 +1618,10 @@ export default function ReportingPortal() {
         zonal: zData.map(r => ({
           ...r,
           id: `ZR-${String(r.id).padStart(3, '0')}`,
-          rawDate: r.submittedAt,
+          rawDate: r.createdAt || r.submittedAt || r.submittedDate,
+          submittedBy: r.submittedBy || r.submittedByEmail || r.zonalManager || 'User',
           zone: r.zoneName,
-          submittedBy: r.submittedBy,
+
           partners: r.newPartnersRecruited,
           status: r.status
         })),
@@ -1638,7 +1641,7 @@ export default function ReportingPortal() {
   };
 
   const handleApprove = async (report) => {
-    const baseUrl = window.ENV?.API_PATH || process.env.REACT_APP_API_URL;
+    const baseUrl = getApiUrl();
     const endpoint = (subTab === 'zonal' || subTab === 'zonal-info') ? '/api/reports' : `/api/portal-reports/${subTab}`;
     const id = parseInt(String(report.id).replace(/^[A-Z]+-/, ''), 10);
 
@@ -1656,7 +1659,7 @@ export default function ReportingPortal() {
 
   const handleDelete = async (report) => {
     if (!window.confirm('Delete this report? This cannot be undone.')) return;
-    const baseUrl = window.ENV?.API_PATH || process.env.REACT_APP_API_URL;
+    const baseUrl = getApiUrl();
     const endpoint = (subTab === 'zonal' || subTab === 'zonal-info') ? '/api/reports' : `/api/portal-reports/${subTab}`;
     const id = parseInt(String(report.id).replace(/^[A-Z]+-/, ''), 10);
 
@@ -1681,7 +1684,7 @@ export default function ReportingPortal() {
   const handleSubmit = async (data) => {
     try {
       if (['partnership', 'testimonials', 'magazine', 'outreach'].includes(activeTab)) {
-        const res = await fetch(`${window.ENV?.API_PATH || process.env.REACT_APP_API_URL}/api/portal-reports/${activeTab}`, {
+        const res = await fetch(`${getApiUrl()}/api/portal-reports/${activeTab}`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({

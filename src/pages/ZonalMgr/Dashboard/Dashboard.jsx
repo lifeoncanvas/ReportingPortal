@@ -2,6 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSettings } from '../../../context/SettingsContext';
 import { useAuth } from '../../../auth/AuthContext';
+import { getApiUrl } from '../../../utils/apiConfig';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import './styles.css';
 
@@ -13,7 +14,7 @@ export default function ZonalDashboard() {
 
   React.useEffect(() => {
     if (user?.email) {
-      fetch(`${process.env.REACT_APP_API_URL}/api/dashboard/stats?email=${user.email}`)
+      fetch(`${getApiUrl()}/api/dashboard/stats?email=${encodeURIComponent(user.email)}`)
         .then(res => {
           if (!res.ok) return res.text().then(text => { throw new Error(`HTTP ${res.status}: ${text}`) });
           return res.json();
