@@ -1821,6 +1821,19 @@ export default function ReportingPortal() {
             className={`rp-tab ${activeTab === t.id ? 'active' : ''}`}
             style={activeTab === t.id ? { '--tab-color': t.color } : {}}>
             {t.icon} {t.label}
+            {t.id === 'submitted-forms' && (
+              <span style={{
+                marginLeft: 8,
+                background: activeTab === t.id ? 'rgba(255,255,255,0.3)' : '#4f46e5',
+                color: '#fff',
+                padding: '2px 8px',
+                borderRadius: 12,
+                fontSize: 11,
+                fontWeight: 700
+              }}>
+                {Object.values(reportsByTab).reduce((sum, list) => sum + (Array.isArray(list) ? list.length : 0), 0)}
+              </span>
+            )}
           </button>
         ))}
       </div>
@@ -1848,7 +1861,18 @@ export default function ReportingPortal() {
                   fontSize: '13px', cursor: 'pointer', fontWeight: 500,
                   transition: 'all 0.2s'
                 }}>
-                {t.label} ({(reportsByTab[t.id] || []).length})
+                <span>{t.label}</span>
+                <span style={{
+                  marginLeft: 6,
+                  background: subTab === t.id ? 'rgba(255,255,255,0.3)' : (((reportsByTab[t.id] || []).length > 0) ? '#4f46e5' : '#cbd5e1'),
+                  color: '#fff',
+                  padding: '1px 7px',
+                  borderRadius: 10,
+                  fontSize: 11,
+                  fontWeight: 700
+                }}>
+                  {(reportsByTab[t.id] || []).length}
+                </span>
               </button>
             ))}
           </div>
