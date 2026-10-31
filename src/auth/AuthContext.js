@@ -47,7 +47,7 @@ export function AuthProvider({ children }) {
         signal: controller.signal,
         body: JSON.stringify({
           token: accessToken,
-          email: kcUser?.email || null,
+          email: (kcUser?.email && typeof kcUser.email === 'object') ? (kcUser.email.address || kcUser.email.email || null) : (kcUser?.email || null),
           firstName: (kcUser?.first_name || kcUser?.firstName || (kcUser?.name ? kcUser.name.split(' ')[0] : null)),
           lastName: (kcUser?.last_name || kcUser?.lastName || (kcUser?.name && kcUser.name.includes(' ') ? kcUser.name.split(' ').slice(1).join(' ') : null)),
           username: kcUser?.username || null,

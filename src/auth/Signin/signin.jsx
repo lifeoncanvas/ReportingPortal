@@ -75,7 +75,15 @@ export default function Signin({ onSwitch, onForgotPassword }) {
             });
             if (pRes.ok) {
               const pData = await pRes.json();
-              kcUser = pData.profile || pData.user || pData;
+              const rawProfile = pData.profile || pData.user || pData;
+              let profileEmail = null;
+              if (rawProfile?.email) {
+                profileEmail = typeof rawProfile.email === 'object' ? (rawProfile.email.address || rawProfile.email.email) : rawProfile.email;
+              }
+              kcUser = {
+                ...rawProfile,
+                email: profileEmail || rawProfile?.email
+              };
               console.log("Fetched KingsChat Profile on client:", kcUser);
             }
           } catch (e) {
