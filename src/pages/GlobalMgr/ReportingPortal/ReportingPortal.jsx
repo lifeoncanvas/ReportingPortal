@@ -402,37 +402,45 @@ function ZonalInformationForm({ onClose, onSubmit: parentSubmit }) {
     setSubmitting(true);
     const today = new Date().toISOString().split('T')[0];
     const payload = {
-      submittedBy: form.zonalManager,
-      submitterEmail: user?.email,
+      submittedBy: form.zonalManager || user?.name || user?.displayName || 'User',
+      submitterEmail: user?.email || 'admin@loveworld.com',
       submittedDate: today,
       submittedTime: new Date().toTimeString().split(' ')[0],
       weekStartDate: today,
-      zoneName: form.zoneName,
-      zonalPastor: form.zonalPastor,
-      zonalManager: form.zonalManager,
-      zonalPastorExecutiveMinistersMeeting: form.pastoralAttendanceDirector,
-      zonalManagerExecutiveMinistersMeeting: form.managerAttendanceDirector,
-      zonalManagerStrategyMeeting: form.managerAttendanceStrategy,
-      testimonyClarificationConcern: form.testimonyClarificationConcern,
+      zoneName: form.zoneName || 'Default Zone',
+      zonalPastor: form.zonalPastor || '—',
+      zonalManager: form.zonalManager || user?.name || 'User',
+      zonalPastorExecutiveMinistersMeeting: form.pastoralAttendanceDirector || 'No',
+      zonalManagerExecutiveMinistersMeeting: form.managerAttendanceDirector || 'No',
+      zonalManagerStrategyMeeting: form.managerAttendanceStrategy || 'No',
+      testimonyClarificationConcern: form.testimonyClarificationConcern || '',
       regionName: user?.region || 'Global',
     };
     try {
-      await fetch(`${getApiUrl()}/api/reports`, {
+      const res = await fetch(`${getApiUrl()}/api/reports`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
+      if (!res.ok) {
+        const txt = await res.text();
+        throw new Error(`Server returned ${res.status}: ${txt}`);
+      }
+      const saved = await res.json();
+      parentSubmit({
+        ...saved,
+        zoneName: form.zoneName,
+        zonalPastor: form.zonalPastor,
+        zonalManager: form.zonalManager,
+        status: 'PENDING',
+        rawDate: today,
+      });
     } catch (err) {
       console.error('Failed to save zonal information to DB', err);
+      alert(`Submission failed: ${err.message}`);
+    } finally {
+      setSubmitting(false);
     }
-    parentSubmit({
-      zoneName: form.zoneName,
-      zonalPastor: form.zonalPastor,
-      zonalManager: form.zonalManager,
-      status: 'submitted',
-      rawDate: today,
-    });
-    setSubmitting(false);
   };
 
   return (
@@ -546,36 +554,50 @@ function ZonalReportForm({ onClose, onSubmit: parentSubmit }) {
     const payload = {
       // Fields matching CreateReportRequest / zone_weekly_reports table
       submittedBy: user?.displayName || user?.name || 'User',
-      submitterEmail: user?.email,
+      submitterEmail: user?.email || 'admin@loveworld.com',
       submittedDate: today,
       submittedTime: new Date().toTimeString().split(' ')[0],
       weekStartDate: form.reportDate || today,
+      zoneName: user?.zone || user?.region || 'Default Zone',
+      zonalManager: user?.displayName || user?.name || 'Zonal Manager',
+      zonalPastor: '—',
+      zonalPastorExecutiveMinistersMeeting: 'No',
+      zonalManagerExecutiveMinistersMeeting: 'No',
+      zonalManagerStrategyMeeting: 'No',
       popMediaUrl: null,
       regionName: user?.region || 'Global',
       totalRegistrationHslhs: Number(form.totalRegistrationHslhs) || 0,
       activePrayerCloud: Number(form.activePrayerCloud) || 0,
       totalHerald: Number(form.totalHerald) || 0,
       activatedHealingCentre: Number(form.activatedHealingCentre) || 0,
-      ongoingProgramsReport: form.ongoingProgramsReport,
+      ongoingProgramsReport: form.ongoingProgramsReport || '',
     };
     try {
-      await fetch(`${getApiUrl()}/api/reports`, {
+      const res = await fetch(`${getApiUrl()}/api/reports`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
+      if (!res.ok) {
+        const txt = await res.text();
+        throw new Error(`Server returned ${res.status}: ${txt}`);
+      }
+      const saved = await res.json();
+      parentSubmit({
+        ...saved,
+        submittedBy: payload.submittedBy,
+        partners: form.newPartners,
+        remittance: form.partnershipRemittance,
+        status: 'PENDING',
+        media: form.media,
+        rawDate: today,
+      });
     } catch (err) {
       console.error('Failed to save zonal report to DB', err);
+      alert(`Submission failed: ${err.message}`);
+    } finally {
+      setSubmitting(false);
     }
-    parentSubmit({
-      submittedBy: user?.displayName || user?.name || 'User',
-      partners: form.newPartners,
-      remittance: form.partnershipRemittance,
-      status: 'submitted',
-      media: form.media,
-      rawDate: today,
-    });
-    setSubmitting(false);
   };
 
   return (
@@ -1686,34 +1708,32 @@ export default function ReportingPortal() {
   const handleSubmit = async (data) => {
     try {
       if (['partnership', 'testimonials', 'magazine', 'outreach'].includes(activeTab)) {
+        const payload = {
+          ...data,
+          submittedBy: data.submittedBy || user?.displayName || user?.name || 'User',
+          submitterEmail: user?.email || 'admin@loveworld.com',
+          zoneName: data.zoneName || user?.zone || user?.region || 'Default Zone',
+          status: 'PENDING',
+        };
         const res = await fetch(`${getApiUrl()}/api/portal-reports/${activeTab}`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            ...data,
-            submitterEmail: user?.email,
-            zoneName: user?.zone || user?.region,
-          }),
+          body: JSON.stringify(payload),
         });
         if (!res.ok) {
           const txt = await res.text();
           throw new Error(`Submit failed (${res.status}): ${txt}`);
         }
       }
-      // Optimistically update UI so it shows instantly
-      setReportsByTab(prev => ({
-        ...prev,
-        [activeTab]: [{ ...data, id: data.id || `NEW-${Math.floor(Math.random() * 1000)}`, rawDate: data.rawDate || new Date().toISOString().split('T')[0] }, ...(prev[activeTab] || [])]
-      }));
 
-      setToast(`${tab.label} submitted successfully`);
+      setToast(`${tab?.label || 'Report'} submitted successfully`);
       
-      // Switch tabs instantly
+      // Switch tabs instantly to submitted-forms
       setSubTab(activeTab);
       setActiveTab('submitted-forms');
 
       // Fetch fresh data in background
-      fetchAllReports();
+      await fetchAllReports();
     } catch (e) {
       console.error('Submission failed', e);
       alert(`Failed to save report: ${e.message}`);
@@ -1819,7 +1839,11 @@ export default function ReportingPortal() {
       <div className="rp-tabs">
         {TABS_CONFIG.map(t => {
           const count = t.id === 'submitted-forms'
-            ? Object.values(reportsByTab).reduce((sum, list) => sum + (Array.isArray(list) ? list.length : 0), 0)
+            ? ((reportsByTab['zonal-info'] || []).length
+              + (reportsByTab['partnership'] || []).length
+              + (reportsByTab['testimonials'] || []).length
+              + (reportsByTab['magazine'] || []).length
+              + (reportsByTab['outreach'] || []).length)
             : (reportsByTab[t.id] || []).length;
           return (
             <button key={t.id}

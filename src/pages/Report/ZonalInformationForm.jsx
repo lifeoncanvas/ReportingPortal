@@ -75,8 +75,8 @@ export default function ZonalInformationForm() {
     try {
       const payload = {
         ...form,
-        submittedBy: user?.displayName || 'User',
-        submitterEmail: user?.email || '',
+        submittedBy: form.zonalManager || user?.displayName || user?.name || 'User',
+        submitterEmail: user?.email || 'admin@loveworld.com',
         submittedDate: new Date().toISOString().split('T')[0],
         submittedTime: new Date().toISOString().split('T')[1].split('.')[0],
       };
