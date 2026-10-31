@@ -35,7 +35,7 @@ export function AuthProvider({ children }) {
 
   const loginWithKingChat = async (accessToken, onPendingToasts, kcUser) => {
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 15000); // 15s timeout
+    const timeoutId = setTimeout(() => controller.abort(), 60000); // 60s timeout
 
     try {
       const apiUrl = getApiUrl();
@@ -84,7 +84,7 @@ export function AuthProvider({ children }) {
       clearTimeout(timeoutId);
       console.error("KingsChat Auth failed:", err);
       if (err.name === 'AbortError') {
-        return 'Request timed out. The server is taking too long to respond.';
+        return 'Request timed out. The server is taking too long to respond. Please try again.';
       }
       return 'Connection error: Could not reach the authentication server.';
     }

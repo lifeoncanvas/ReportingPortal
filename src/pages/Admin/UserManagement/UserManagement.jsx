@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Search, Filter, Plus, Edit2, Trash2, X, Check, Shield } from 'lucide-react';
+import { getApiUrl } from '../../../utils/apiConfig';
 import './styles.css';
 
 const ROLE_COLORS = {
@@ -28,7 +29,7 @@ export default function UserManagement() {
 
   const fetchUsers = async () => {
     try {
-      const res = await fetch(`${process.env.REACT_APP_API_URL}/api/users`);
+      const res = await fetch(`${getApiUrl()}/api/users`);
       const data = await res.json();
       setUsers(data || []);
     } catch(err) { console.log("Failed to load users", err); }
@@ -55,7 +56,7 @@ export default function UserManagement() {
     }
     const payload = { ...form, role: finalRole };
 
-    await fetch(`${process.env.REACT_APP_API_URL}/api/users/${editUser.id}`, {
+    await fetch(`${getApiUrl()}/api/users/${editUser.id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
@@ -66,7 +67,7 @@ export default function UserManagement() {
   };
 
   const handleDelete = async (id) => {
-    await fetch(`${process.env.REACT_APP_API_URL}/api/users/${id}`, { method: 'DELETE' });
+    await fetch(`${getApiUrl()}/api/users/${id}`, { method: 'DELETE' });
     setDeleteId(null);
     fetchUsers();
   };
@@ -79,7 +80,7 @@ export default function UserManagement() {
     setUsers(prev => prev.map(u => u.id === id ? { ...u, role: newRole } : u));
     
     try {
-      await fetch(`${process.env.REACT_APP_API_URL}/api/users/${id}`, {
+      await fetch(`${getApiUrl()}/api/users/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ...user, role: newRole })
@@ -104,7 +105,7 @@ export default function UserManagement() {
     setUsers(prev => prev.map(u => u.id === id ? { ...u, status: newStatus, role: newRole } : u));
 
     try {
-      await fetch(`${process.env.REACT_APP_API_URL}/api/users/${id}`, {
+      await fetch(`${getApiUrl()}/api/users/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ...user, status: newStatus, role: newRole })
@@ -117,7 +118,7 @@ export default function UserManagement() {
   };
 
   const handleApprove = async (id) => {
-    const res = await fetch(`${process.env.REACT_APP_API_URL}/api/users/${id}/approve`, { method: 'POST' });
+    const res = await fetch(`${getApiUrl()}/api/users/${id}/approve`, { method: 'POST' });
     if (res.ok) {
       showToast('User approved successfully!');
       fetchUsers();
@@ -129,7 +130,7 @@ export default function UserManagement() {
 
   const handleMakeAdmin = async (u) => {
     if (!window.confirm(`Promote ${u.firstName} ${u.lastName || ''} to Admin? This will grant full system access.`)) return;
-    await fetch(`${process.env.REACT_APP_API_URL}/api/users/${u.id}`, {
+    await fetch(`${getApiUrl()}/api/users/${u.id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ ...u, role: 'admin', status: 'active' })
@@ -162,7 +163,7 @@ export default function UserManagement() {
           { label: 'Total Users',    value: users.length,                               bg: '#ede9fe', color: '#5b21b6' },
           { label: 'Active',         value: users.filter(u => u.status === 'active').length,   bg: '#dcfce7', color: '#16a34a' },
           { label: 'Inactive',       value: users.filter(u => u.status === 'inactive').length, bg: '#fee2e2', color: '#dc2626' },
-          { label: 'Roles',          value: 2,                                          bg: '#fff7ed', color: '#ea580c' },
+          { label: 'Total Reports',  value: users.reduce((acc, u) => acc + (u.reportCount || 0), 0), bg: '#e0f2fe', color: '#0369a1' },
         ].map(s => (
           <div className="um-stat-card" key={s.label}>
             <div className="um-stat-value" style={{ color: s.color }}>{s.value}</div>
@@ -197,6 +198,7 @@ export default function UserManagement() {
                 <th>Phone</th>
                 <th>Role</th>
                 <th>Region</th>
+                <th>Reports</th>
                 <th>Status</th>
                 <th>Joined</th>
                 <th>Actions</th>
@@ -243,6 +245,19 @@ export default function UserManagement() {
                       </select>
                     </td>
                     <td>{u.region}</td>
+                    <td>
+                      <span style={{
+                        background: '#e0f2fe',
+                        color: '#0369a1',
+                        padding: '4px 10px',
+                        borderRadius: '12px',
+                        fontSize: '12px',
+                        fontWeight: '700',
+                        display: 'inline-block'
+                      }}>
+                        {u.reportCount || 0}
+                      </span>
+                    </td>
                     <td>
                       <button
                         className={`um-status-badge ${u.status}`}

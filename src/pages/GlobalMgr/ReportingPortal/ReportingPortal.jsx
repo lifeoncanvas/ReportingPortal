@@ -1845,7 +1845,7 @@ export default function ReportingPortal() {
                   fontSize: '13px', cursor: 'pointer', fontWeight: 500,
                   transition: 'all 0.2s'
                 }}>
-                {t.label}
+                {t.label} ({(reportsByTab[t.id] || []).length})
               </button>
             ))}
           </div>

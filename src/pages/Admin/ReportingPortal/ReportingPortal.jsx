@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../../auth/AuthContext';
 import { Eye, Check, Trash2, MessageSquare, X, Download } from 'lucide-react';
+import { getApiUrl } from '../../../utils/apiConfig';
 import '../../GlobalMgr/ReportingPortal/styles.css';
 
-const API = window.ENV?.API_PATH || process.env.REACT_APP_API_URL ;
+const API = getApiUrl();
 
 const TABS = [
   { id: 'zonal',        label: '🏛️ Weekly Ministry Reports',       endpoint: '/api/reports' },
@@ -107,6 +108,26 @@ export default function AdminReportingPortal() {
   const [clarifyReport, setClarifyReport] = useState(null);
   const [search, setSearch] = useState('');
   const [toast, setToast] = useState('');
+  const [tabCounts, setTabCounts] = useState({});
+
+  const fetchAllCounts = async () => {
+    try {
+      const api = getApiUrl();
+      const counts = {};
+      await Promise.all(TABS.map(async (t) => {
+        try {
+          const res = await fetch(`${api}${t.endpoint}`);
+          const data = await res.json();
+          counts[t.id] = Array.isArray(data) ? data.length : 0;
+        } catch {
+          counts[t.id] = 0;
+        }
+      }));
+      setTabCounts(counts);
+    } catch (e) {
+      console.error("Failed fetching tab counts", e);
+    }
+  };
 
   const tab = TABS.find(t => t.id === activeTab);
 
@@ -126,20 +147,20 @@ export default function AdminReportingPortal() {
     setLoading(false);
   };
 
-  useEffect(() => { fetchReports(); }, [activeTab]);
+  useEffect(() => { fetchReports(); fetchAllCounts(); }, [activeTab]);
 
   const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(''), 3000); };
 
   const handleApprove = async (id) => {
     await fetch(`${API}${tab.endpoint}/${id}/approve`, { method: 'POST' });
-    showToast('Report approved ✅');
+    showToast('Report approved ✅'); fetchAllCounts();
     fetchReports();
   };
 
   const handleDelete = async (id) => {
     if (!window.confirm('Delete this report? This cannot be undone.')) return;
     await fetch(`${API}${tab.endpoint}/${id}`, { method: 'DELETE' });
-    showToast('Report deleted 🗑️');
+    showToast('Report deleted 🗑️'); fetchAllCounts();
     fetchReports();
   };
 
@@ -226,7 +247,7 @@ export default function AdminReportingPortal() {
       <div style={{ marginBottom:24, display:'flex', alignItems:'flex-start', justifyContent:'space-between', flexWrap:'wrap', gap:12 }}>
         <div>
           <h2 style={{ fontWeight:800, fontSize:22, margin:0 }}>Reporting Portal — Admin View</h2>
-          <p style={{ color:'#6b7280', fontSize:14, margin:'4px 0 0' }}>Review, approve, and manage all submitted reports</p>
+          <p style={{ color:'#6b7280', fontSize:14, margin:'4px 0 0' }}>Review, approve, and manage all submitted reports · <strong>Total Reports: {Object.values(tabCounts).reduce((a, b) => a + b, 0)}</strong></p>
         </div>
         <button
           onClick={handleExport}
@@ -244,7 +265,16 @@ export default function AdminReportingPortal() {
             padding:'8px 16px', borderRadius:20, border:'none', cursor:'pointer', fontSize:13, fontWeight:600,
             background: activeTab === t.id ? '#1e293b' : '#f1f5f9',
             color: activeTab === t.id ? '#fff' : '#374151',
-          }}>{t.label}</button>
+            display: 'inline-flex', alignItems: 'center', gap: 6,
+          }}>
+            <span>{t.label}</span>
+            <span style={{
+              background: activeTab === t.id ? 'rgba(255,255,255,0.25)' : '#e2e8f0',
+              padding: '2px 8px', borderRadius: 10, fontSize: 11, fontWeight: 700
+            }}>
+              {tabCounts[t.id] ?? 0}
+            </span>
+          </button>
         ))}
       </div>
 

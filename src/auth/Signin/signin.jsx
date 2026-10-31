@@ -66,7 +66,22 @@ export default function Signin({ onSwitch, onForgotPassword }) {
       kingsChatWebSdk.login(loginOptions)
       .then(async (tokenResponse) => {
         console.log("KingsChat SDK Login Success:", tokenResponse);
-        const { accessToken, user: kcUser } = tokenResponse;
+        const { accessToken } = tokenResponse;
+        let kcUser = tokenResponse.user || null;
+        if (!kcUser && accessToken) {
+          try {
+            const pRes = await fetch("https://connect.kingsch.at/api/profile", {
+              headers: { Authorization: `Bearer ${accessToken}` }
+            });
+            if (pRes.ok) {
+              const pData = await pRes.json();
+              kcUser = pData.profile || pData.user || pData;
+              console.log("Fetched KingsChat Profile on client:", kcUser);
+            }
+          } catch (e) {
+            console.warn("Client profile fetch error:", e);
+          }
+        }
         const err = await loginWithKingChat(accessToken, handleLoginResponse, kcUser);
         setLoading(false);
         

@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { useAuth } from "../../auth/AuthContext";
+import { getApiUrl } from "../../utils/apiConfig";
 
-const API = `${process.env.REACT_APP_API_URL}/api/reports`;
+const getApi = () => `${getApiUrl()}/api/reports`;
 const ATTENDANCE_OPTIONS = ["Yes", "No", "Officially Excused"];
 
 const initialForm = {
@@ -79,7 +80,7 @@ export default function ZonalInformationForm() {
         submittedDate: new Date().toISOString().split('T')[0],
         submittedTime: new Date().toISOString().split('T')[1].split('.')[0],
       };
-      const res = await fetch(API, {
+      const res = await fetch(getApi(), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload)

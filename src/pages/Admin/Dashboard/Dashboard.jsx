@@ -2,6 +2,7 @@ import React from 'react';
 import { Users, FileText, Shield, Download } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../auth/AuthContext';
+import { getApiUrl } from '../../../utils/apiConfig';
 import './styles.css';
 
 export default function AdminDashboard() {
@@ -11,7 +12,7 @@ export default function AdminDashboard() {
   const [users, setUsers] = React.useState([]);
 
   React.useEffect(() => {
-    fetch(`${process.env.REACT_APP_API_URL}/api/dashboard/stats`)
+    fetch(`${getApiUrl()}/api/dashboard/stats`)
       .then(res => {
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         return res.json();
@@ -19,7 +20,7 @@ export default function AdminDashboard() {
       .then(data => setStats(data))
       .catch(err => console.error("Stats API error:", err));
 
-    fetch(`${process.env.REACT_APP_API_URL}/api/users`)
+    fetch(`${getApiUrl()}/api/users`)
       .then(res => res.json())
       .then(data => setUsers(data.slice(0, 4)))
       .catch(err => console.error("Users API error:", err));

@@ -87,5 +87,6 @@ ADD COLUMN zonal_partnership_details TEXT DEFAULT NULL;
 ALTER TABLE loveworld_reports.outreach_reports 
 ADD COLUMN submitted_by VARCHAR(255) DEFAULT NULL;
 
--- Added for admin notification
-ALTER TABLE loveworld_reports.users ADD COLUMN admin_approval_notification_sent BOOLEAN DEFAULT FALSE;
+-- Added for admin notification and report count tracking
+ALTER TABLE loveworld_reports.users ADD COLUMN IF NOT EXISTS admin_approval_notification_sent BOOLEAN DEFAULT FALSE;
+ALTER TABLE loveworld_reports.users ADD COLUMN IF NOT EXISTS report_count INT DEFAULT 0;

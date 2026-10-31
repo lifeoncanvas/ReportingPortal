@@ -1,8 +1,9 @@
 // SubmitReport.jsx – Kingsforms weekly report form with upload/download
 import React, { useState } from "react";
 import { useAuth } from "../../auth/AuthContext";
+import { getApiUrl } from "../../utils/apiConfig";
 
-const API = `${process.env.REACT_APP_API_URL}/api/reports`;
+const getApi = () => `${getApiUrl()}/api/reports`;
 const ATTENDANCE_OPTIONS = ["Yes", "No", "Officially Excused"];
 
 const initialForm = {
@@ -78,7 +79,7 @@ export default function SubmitReport() {
         submittedTime: new Date().toISOString().split('T')[1].split('.')[0],
         weekStartDate: new Date().toISOString().split('T')[0],
       };
-      const res = await fetch(API, {
+      const res = await fetch(getApi(), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload)
@@ -93,11 +94,11 @@ export default function SubmitReport() {
   };
 
   const downloadTemplate = () => {
-    window.open(`${API}/template`, "_blank");
+    window.open(`${getApi()}/template`, "_blank");
   };
 
   const exportExcel = () => {
-    window.open(`${API}/export`, "_blank");
+    window.open(`${getApi()}/export`, "_blank");
   };
 
   const handleUpload = async e => {
@@ -109,7 +110,7 @@ export default function SubmitReport() {
     formData.append("file", file);
     try {
       const xhr = new XMLHttpRequest();
-      xhr.open("POST", `${API}/upload`, true);
+      xhr.open("POST", `${getApi()}/upload`, true);
       xhr.upload.onprogress = ev => {
         if (ev.lengthComputable) {
           const percent = Math.round((ev.loaded / ev.total) * 100);
