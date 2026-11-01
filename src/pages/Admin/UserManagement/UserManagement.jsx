@@ -4,22 +4,24 @@ import { getApiUrl } from '../../../utils/apiConfig';
 import './styles.css';
 
 const ROLE_COLORS = {
-  zonal:   { bg: '#ede9fe', color: '#5b21b6' },
-  admin:   { bg: '#fef3c7', color: '#d97706' },
+  user: { bg: '#f3f4f6', color: '#4b5563' },
+  zonal: { bg: '#dbeafe', color: '#1d4ed8' },
+  admin: { bg: '#fef9c3', color: '#a16207' },
+  global: { bg: '#e0e7ff', color: '#4f46e5' },
 };
 
 const EMPTY_FORM = {
   firstName: '', lastName: '', email: '',
-  role: 'zonal', region: 'Global', status: 'active',
+  role: 'user', region: '', status: 'inactive',
 };
 
 export default function UserManagement() {
-  const [users, setUsers]         = useState([]);
-  const [search, setSearch]       = useState('');
+  const [users, setUsers] = useState([]);
+  const [search, setSearch] = useState('');
   const [showModal, setShowModal] = useState(false);
-  const [editUser, setEditUser]   = useState(null);
-  const [form, setForm]           = useState(EMPTY_FORM);
-  const [deleteId, setDeleteId]   = useState(null);
+  const [editUser, setEditUser] = useState(null);
+  const [form, setForm] = useState(EMPTY_FORM);
+  const [deleteId, setDeleteId] = useState(null);
 
   React.useEffect(() => {
     fetchUsers();
@@ -30,7 +32,7 @@ export default function UserManagement() {
       const res = await fetch(`${getApiUrl()}/api/users`);
       const data = await res.json();
       setUsers(data || []);
-    } catch(err) { console.log("Failed to load users", err); }
+    } catch (err) { console.log("Failed to load users", err); }
   };
 
   const filtered = users.filter(u =>
@@ -48,7 +50,10 @@ export default function UserManagement() {
   const handleSave = async () => {
     if (!form.email || !editUser) return;
 
-    const finalRole = form.role?.toLowerCase() === 'admin' ? 'admin' : 'zonal';
+    let finalRole = form.role;
+    if (form.role !== 'admin') {
+      finalRole = form.status === 'active' ? 'zonal' : 'user';
+    }
     const payload = { ...form, role: finalRole };
 
     await fetch(`${getApiUrl()}/api/users/${editUser.id}`, {
@@ -56,7 +61,7 @@ export default function UserManagement() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
     });
-    
+
     setShowModal(false);
     fetchUsers();
   };
@@ -70,10 +75,10 @@ export default function UserManagement() {
   const inlineChangeRole = async (id, newRole) => {
     const user = users.find(u => u.id === id);
     if (!user || user.role === newRole) return;
-    
+
     // Optimistic UI update
     setUsers(prev => prev.map(u => u.id === id ? { ...u, role: newRole } : u));
-    
+
     try {
       await fetch(`${getApiUrl()}/api/users/${id}`, {
         method: 'PUT',
@@ -91,16 +96,19 @@ export default function UserManagement() {
     const user = users.find(u => u.id === id);
     if (!user) return;
     const newStatus = user.status === 'active' ? 'inactive' : 'active';
-    const currentRole = user.role?.toLowerCase() === 'admin' ? 'admin' : 'zonal';
-    
+    let newRole = user.role;
+    if (user.role !== 'admin') {
+      newRole = newStatus === 'active' ? 'zonal' : 'user';
+    }
+
     // Optimistic UI update
-    setUsers(prev => prev.map(u => u.id === id ? { ...u, status: newStatus, role: currentRole } : u));
+    setUsers(prev => prev.map(u => u.id === id ? { ...u, status: newStatus, role: newRole } : u));
 
     try {
       await fetch(`${getApiUrl()}/api/users/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...user, status: newStatus, role: currentRole })
+        body: JSON.stringify({ ...user, status: newStatus, role: newRole })
       });
       fetchUsers();
     } catch (err) {
@@ -120,7 +128,16 @@ export default function UserManagement() {
     }
   };
 
-
+  const handleMakeAdmin = async (u) => {
+    if (!window.confirm(`Promote ${u.firstName} ${u.lastName || ''} to Admin? This will grant full system access.`)) return;
+    await fetch(`${getApiUrl()}/api/users/${u.id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ...u, role: 'admin', status: 'active' })
+    });
+    showToast(`✅ ${u.firstName} is now an Admin!`);
+    fetchUsers();
+  };
 
   const [umToast, setUmToast] = useState('');
   const showToast = (msg) => { setUmToast(msg); setTimeout(() => setUmToast(''), 3500); };
@@ -128,8 +145,10 @@ export default function UserManagement() {
   return (
     <div className="um-page">
       {umToast && (
-        <div style={{ position:'fixed', top:20, right:20, background:'#1e293b', color:'#fff', padding:'12px 20px',
-          borderRadius:10, zIndex:9999, fontSize:14, fontWeight:500 }}>
+        <div style={{
+          position: 'fixed', top: 20, right: 20, background: '#1e293b', color: '#fff', padding: '12px 20px',
+          borderRadius: 10, zIndex: 9999, fontSize: 14, fontWeight: 500
+        }}>
           {umToast}
         </div>
       )}
@@ -143,10 +162,10 @@ export default function UserManagement() {
       {/* Stats */}
       <div className="um-stats">
         {[
-          { label: 'Total Users',    value: users.length,                               bg: '#ede9fe', color: '#5b21b6' },
-          { label: 'Active',         value: users.filter(u => u.status === 'active').length,   bg: '#dcfce7', color: '#16a34a' },
-          { label: 'Inactive',       value: users.filter(u => u.status === 'inactive').length, bg: '#fee2e2', color: '#dc2626' },
-          { label: 'Total Reports',  value: users.reduce((acc, u) => acc + (u.reportCount || 0), 0), bg: '#e0f2fe', color: '#0369a1' },
+          { label: 'Total Users', value: users.length, bg: '#ede9fe', color: '#5b21b6' },
+          { label: 'Active', value: users.filter(u => u.status === 'active').length, bg: '#dcfce7', color: '#16a34a' },
+          { label: 'Inactive', value: users.filter(u => u.status === 'inactive').length, bg: '#fee2e2', color: '#dc2626' },
+          { label: 'Total Reports', value: users.reduce((acc, u) => acc + (u.reportCount || 0), 0), bg: '#e0f2fe', color: '#0369a1' },
         ].map(s => (
           <div className="um-stat-card" key={s.label}>
             <div className="um-stat-value" style={{ color: s.color }}>{s.value}</div>
@@ -203,26 +222,28 @@ export default function UserManagement() {
                     <td>{u.email}</td>
                     <td>{u.phone || '—'}</td>
                     <td>
-                      <select 
-                        value={u.role?.toLowerCase() === 'admin' ? 'admin' : 'zonal'} 
+                      <select
+                        value={u.role.toLowerCase()}
                         onChange={(e) => inlineChangeRole(u.id, e.target.value)}
                         className="um-role-select"
-                        style={{ 
-                          background: u.role?.toLowerCase() === 'admin' ? '#fef3c7' : '#ede9fe', 
-                          color: u.role?.toLowerCase() === 'admin' ? '#d97706' : '#5b21b6', 
-                          border: 'none', 
-                          borderRadius: '12px', 
-                          padding: '4px 8px', 
-                          fontSize: '12px', 
-                          fontWeight: '600', 
-                          cursor: 'pointer', 
+                        style={{
+                          background: rc.bg,
+                          color: rc.color,
+                          border: 'none',
+                          borderRadius: '12px',
+                          padding: '4px 8px',
+                          fontSize: '12px',
+                          fontWeight: '600',
+                          cursor: 'pointer',
                           outline: 'none',
                           WebkitAppearance: 'none',
                           textTransform: 'capitalize'
                         }}
                       >
-                        <option value="admin">Admin</option>
+                        <option value="user">User</option>
                         <option value="zonal">Zonal</option>
+                        <option value="global">Global</option>
+                        <option value="admin">Admin</option>
                       </select>
                     </td>
                     <td>{u.region}</td>
@@ -253,24 +274,34 @@ export default function UserManagement() {
                       <div className="um-actions">
                         {/* Approve */}
                         {u.status === 'inactive' && (
-                          <button 
-                            className="um-icon-btn" 
-                            style={{ color: '#16a34a', borderColor: '#16a34a', background: '#dcfce7' }} 
-                            onClick={() => handleApprove(u.id)} 
+                          <button
+                            className="um-icon-btn"
+                            style={{ color: '#16a34a', borderColor: '#16a34a', background: '#dcfce7' }}
+                            onClick={() => handleApprove(u.id)}
                             title="Approve User"
                           >
                             <Check size={14} />
                           </button>
                         )}
-
+                        {/* Make Admin */}
+                        {u.role !== 'admin' && (
+                          <button
+                            className="um-icon-btn"
+                            style={{ color: '#7c3aed', borderColor: '#c4b5fd', background: '#ede9fe' }}
+                            onClick={() => handleMakeAdmin(u)}
+                            title="Make Admin"
+                          >
+                            <Shield size={14} />
+                          </button>
+                        )}
                         {u.status === 'inactive' && u.inviteToken && (
-                          <button 
-                            className="um-icon-btn copy" 
+                          <button
+                            className="um-icon-btn copy"
                             onClick={() => {
                               const link = `${window.location.origin}/invite?token=${u.inviteToken}`;
                               navigator.clipboard.writeText(link);
                               alert('Invite link copied to clipboard!');
-                            }} 
+                            }}
                             title="Copy Invite Link"
                           >
                             <Plus size={14} style={{ transform: 'rotate(45deg)' }} />
@@ -325,17 +356,18 @@ export default function UserManagement() {
                 </div>
                 <div className="um-field">
                   <label>Role</label>
-                  <select value={form.role?.toLowerCase() === 'admin' ? 'admin' : 'zonal'}
+                  <select value={form.role || (form.status === 'active' ? 'zonal' : 'user')}
                     onChange={e => setForm(p => ({ ...p, role: e.target.value }))}>
-                    <option value="admin">Admin</option>
-                    <option value="zonal">Zonal</option>
+                    {form.status !== 'active' && <option value="user">User (Inactive)</option>}
+                    <option value="zonal">Zonal Manager</option>
+                    <option value="admin">System Administrator</option>
                   </select>
                 </div>
                 <div className="um-field">
                   <label>Region</label>
                   <select value={form.region || 'Global'}
                     onChange={e => setForm(p => ({ ...p, region: e.target.value }))}>
-                    {['Global','North America','South America','Europe','Africa','Asia Pacific'].map(r => (
+                    {['Global', 'North America', 'South America', 'Europe', 'Africa', 'Asia Pacific'].map(r => (
                       <option key={r}>{r}</option>
                     ))}
                   </select>
