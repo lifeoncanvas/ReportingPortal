@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Search, Filter, Plus, Edit2, Trash2, X, Check, Shield } from 'lucide-react';
+import { Search, Filter, Plus, Edit2, Trash2, X, Check } from 'lucide-react';
 import { getApiUrl } from '../../../utils/apiConfig';
 import './styles.css';
 
@@ -120,16 +120,7 @@ export default function UserManagement() {
     }
   };
 
-  const handleMakeAdmin = async (u) => {
-    if (!window.confirm(`Promote ${u.firstName} ${u.lastName || ''} to Admin? This will grant full system access.`)) return;
-    await fetch(`${getApiUrl()}/api/users/${u.id}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ...u, role: 'admin', status: 'active' })
-    });
-    showToast(`✅ ${u.firstName} is now an Admin!`);
-    fetchUsers();
-  };
+
 
   const [umToast, setUmToast] = useState('');
   const showToast = (msg) => { setUmToast(msg); setTimeout(() => setUmToast(''), 3500); };
@@ -271,17 +262,7 @@ export default function UserManagement() {
                             <Check size={14} />
                           </button>
                         )}
-                        {/* Make Admin */}
-                        {u.role !== 'admin' && (
-                          <button
-                            className="um-icon-btn"
-                            style={{ color: '#7c3aed', borderColor: '#c4b5fd', background: '#ede9fe' }}
-                            onClick={() => handleMakeAdmin(u)}
-                            title="Make Admin"
-                          >
-                            <Shield size={14} />
-                          </button>
-                        )}
+
                         {u.status === 'inactive' && u.inviteToken && (
                           <button 
                             className="um-icon-btn copy" 
