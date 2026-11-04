@@ -81,7 +81,7 @@ function MediaUploader({ files, onAdd, onRemove, label = "Upload Images / Files"
 function ClarificationModal({ report, endpoint, onClose, onDone }) {
   const [note, setNote] = useState('');
   const [loading, setLoading] = useState(false);
-  const baseUrl = window.ENV?.API_PATH || process.env.REACT_APP_API_URL;
+  const baseUrl = getApiUrl();
 
   const send = async () => {
     if (!note.trim()) return;
@@ -1649,15 +1649,15 @@ export default function ReportingPortal() {
           partners: r.newPartnersRecruited,
           status: r.status
         })),
-        partnership: otherData.partnership.map(r => ({ ...r, id: `PR-${String(r.id).padStart(3, '0')}`, rawDate: r.submittedDate })),
-        testimonials: otherData.testimonials.map(r => ({ ...r, id: `TS-${String(r.id).padStart(3, '0')}`, rawDate: r.submittedDate })),
+        partnership: otherData.partnership.map(r => ({ ...r, id: `PR-${String(r.id).padStart(3, '0')}`, rawDate: r.submittedDate || r.createdAt, submittedBy: r.submittedBy || r.submitterEmail || 'User' })),
+        testimonials: otherData.testimonials.map(r => ({ ...r, id: `TS-${String(r.id).padStart(3, '0')}`, rawDate: r.submittedDate || r.createdAt, submittedBy: r.submittedBy || r.submitterEmail || 'User' })),
         magazine: otherData.magazine.map(r => ({
           ...r,
           id: `MG-${String(r.id).padStart(3, '0')}`,
           rawDate: r.submittedDate,
           magazineType: [r.isAdult && 'Adult', r.isTeevolution && 'Teevolution', r.isKidsMagazine && 'Kids'].filter(Boolean).join(', ') || 'N/A'
         })),
-        outreach: otherData.outreach.map(r => ({ ...r, id: `OR-${String(r.id).padStart(3, '0')}`, rawDate: r.submittedDate })),
+        outreach: otherData.outreach.map(r => ({ ...r, id: `OR-${String(r.id).padStart(3, '0')}`, rawDate: r.submittedDate || r.createdAt, submittedBy: r.submittedBy || r.submitterEmail || 'User' })),
       });
     } catch (err) {
       console.error("Failed to fetch reports", err);

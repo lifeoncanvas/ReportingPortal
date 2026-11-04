@@ -4,19 +4,18 @@ import { getApiUrl } from '../../../utils/apiConfig';
 import './styles.css';
 
 const ROLE_COLORS = {
-  user: { bg: '#f3f4f6', color: '#4b5563' },
   zonal: { bg: '#dbeafe', color: '#1d4ed8' },
   admin: { bg: '#fef9c3', color: '#a16207' },
-  global: { bg: '#e0e7ff', color: '#4f46e5' },
 };
 
 const EMPTY_FORM = {
   firstName: '', lastName: '', email: '',
-  role: 'user', region: '', status: 'inactive',
+  role: 'zonal', region: 'Global', status: 'inactive',
 };
 
 export default function UserManagement() {
   const [users, setUsers] = useState([]);
+  const [totalReportsStat, setTotalReportsStat] = useState(0);
   const [search, setSearch] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [editUser, setEditUser] = useState(null);
@@ -32,6 +31,17 @@ export default function UserManagement() {
       const res = await fetch(`${getApiUrl()}/api/users`);
       const data = await res.json();
       setUsers(data || []);
+
+      // Also fetch dashboard stats for accurate total report count
+      try {
+        const statsRes = await fetch(`${getApiUrl()}/api/dashboard/stats`);
+        if (statsRes.ok) {
+          const statsData = await statsRes.json();
+          if (statsData?.totalReports !== undefined) {
+            setTotalReportsStat(statsData.totalReports);
+          }
+        }
+      } catch (e) {}
     } catch (err) { console.log("Failed to load users", err); }
   };
 
@@ -43,17 +53,22 @@ export default function UserManagement() {
 
   const openEdit = (u) => {
     setEditUser(u);
-    setForm({ firstName: u.firstName, lastName: u.lastName, email: u.email, phone: u.phone, role: u.role, region: u.region, status: u.status });
+    setForm({
+      firstName: u.firstName || '',
+      lastName: u.lastName || '',
+      email: u.email || '',
+      phone: u.phone || '',
+      role: u.role === 'admin' ? 'admin' : 'zonal',
+      region: u.region || 'Global',
+      status: u.status || 'inactive'
+    });
     setShowModal(true);
   };
 
   const handleSave = async () => {
     if (!form.email || !editUser) return;
 
-    let finalRole = form.role;
-    if (form.role !== 'admin') {
-      finalRole = form.status === 'active' ? 'zonal' : 'user';
-    }
+    const finalRole = form.role === 'admin' ? 'admin' : 'zonal';
     const payload = { ...form, role: finalRole };
 
     await fetch(`${getApiUrl()}/api/users/${editUser.id}`, {
@@ -76,14 +91,16 @@ export default function UserManagement() {
     const user = users.find(u => u.id === id);
     if (!user || user.role === newRole) return;
 
+    const targetRole = newRole === 'admin' ? 'admin' : 'zonal';
+
     // Optimistic UI update
-    setUsers(prev => prev.map(u => u.id === id ? { ...u, role: newRole } : u));
+    setUsers(prev => prev.map(u => u.id === id ? { ...u, role: targetRole } : u));
 
     try {
       await fetch(`${getApiUrl()}/api/users/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...user, role: newRole })
+        body: JSON.stringify({ ...user, role: targetRole })
       });
       fetchUsers();
     } catch (err) {
@@ -96,19 +113,16 @@ export default function UserManagement() {
     const user = users.find(u => u.id === id);
     if (!user) return;
     const newStatus = user.status === 'active' ? 'inactive' : 'active';
-    let newRole = user.role;
-    if (user.role !== 'admin') {
-      newRole = newStatus === 'active' ? 'zonal' : 'user';
-    }
+    const currentRole = user.role === 'admin' ? 'admin' : 'zonal';
 
-    // Optimistic UI update
-    setUsers(prev => prev.map(u => u.id === id ? { ...u, status: newStatus, role: newRole } : u));
+    // Optimistic UI update - strictly preserve the existing role
+    setUsers(prev => prev.map(u => u.id === id ? { ...u, status: newStatus, role: currentRole } : u));
 
     try {
       await fetch(`${getApiUrl()}/api/users/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...user, status: newStatus, role: newRole })
+        body: JSON.stringify({ ...user, status: newStatus, role: currentRole })
       });
       fetchUsers();
     } catch (err) {
@@ -128,9 +142,13 @@ export default function UserManagement() {
     }
   };
 
-
   const [umToast, setUmToast] = useState('');
   const showToast = (msg) => { setUmToast(msg); setTimeout(() => setUmToast(''), 3500); };
+
+  const totalCalculatedReports = Math.max(
+    totalReportsStat,
+    users.reduce((acc, u) => acc + (u.reportCount || 0), 0)
+  );
 
   return (
     <div className="um-page">
@@ -155,7 +173,7 @@ export default function UserManagement() {
           { label: 'Total Users', value: users.length, bg: '#ede9fe', color: '#5b21b6' },
           { label: 'Active', value: users.filter(u => u.status === 'active').length, bg: '#dcfce7', color: '#16a34a' },
           { label: 'Inactive', value: users.filter(u => u.status === 'inactive').length, bg: '#fee2e2', color: '#dc2626' },
-          { label: 'Total Reports', value: users.reduce((acc, u) => acc + (u.reportCount || 0), 0), bg: '#e0f2fe', color: '#0369a1' },
+          { label: 'Total Reports', value: totalCalculatedReports, bg: '#e0f2fe', color: '#0369a1' },
         ].map(s => (
           <div className="um-stat-card" key={s.label}>
             <div className="um-stat-value" style={{ color: s.color }}>{s.value}</div>
@@ -198,7 +216,8 @@ export default function UserManagement() {
             </thead>
             <tbody>
               {filtered.map(u => {
-                const rc = ROLE_COLORS[u.role] ?? { bg: '#f3f4f6', color: '#374151' };
+                const normalizedRole = u.role === 'admin' ? 'admin' : 'zonal';
+                const rc = ROLE_COLORS[normalizedRole] ?? { bg: '#dbeafe', color: '#1d4ed8' };
                 return (
                   <tr key={u.id}>
                     <td>
@@ -206,14 +225,15 @@ export default function UserManagement() {
                         <div className="um-av" style={{ background: rc.bg, color: rc.color }}>
                           {(u.firstName?.[0] || u.email?.[0] || '?').toUpperCase()}
                         </div>
-                        <span className="um-name">{u.firstName ? `${u.firstName} ${u.lastName || ''}` : 'Pending Invite'}</span>
+                        <span className="um-name">{u.firstName ? `${u.firstName} ${u.lastName || ''}`.trim() : (u.name || 'Pending Invite')}</span>
                       </div>
                     </td>
                     <td>{u.email}</td>
                     <td>{u.phone || '—'}</td>
                     <td>
                       <select
-                        value={u.role.toLowerCase()}
+                        value={normalizedRole}
+                        disabled={u.email === 'admin@loveworld.com'}
                         onChange={(e) => inlineChangeRole(u.id, e.target.value)}
                         className="um-role-select"
                         style={{
@@ -224,19 +244,17 @@ export default function UserManagement() {
                           padding: '4px 8px',
                           fontSize: '12px',
                           fontWeight: '600',
-                          cursor: 'pointer',
+                          cursor: u.email === 'admin@loveworld.com' ? 'not-allowed' : 'pointer',
                           outline: 'none',
                           WebkitAppearance: 'none',
                           textTransform: 'capitalize'
                         }}
                       >
-                        <option value="user">User</option>
                         <option value="zonal">Zonal</option>
-                        <option value="global">Global</option>
                         <option value="admin">Admin</option>
                       </select>
                     </td>
-                    <td>{u.region}</td>
+                    <td>{u.region || 'Global'}</td>
                     <td>
                       <span style={{
                         background: '#e0f2fe',
@@ -253,16 +271,18 @@ export default function UserManagement() {
                     <td>
                       <button
                         className={`um-status-badge ${u.status}`}
+                        disabled={u.email === 'admin@loveworld.com'}
                         onClick={() => toggleStatus(u.id)}
-                        title="Click to toggle"
+                        title={u.email === 'admin@loveworld.com' ? 'Root admin is always active' : 'Click to toggle status'}
+                        style={u.email === 'admin@loveworld.com' ? { cursor: 'default' } : {}}
                       >
                         {u.status}
                       </button>
                     </td>
-                    <td>{u.joined}</td>
+                    <td>{u.joined || '—'}</td>
                     <td>
                       <div className="um-actions">
-                        {/* Approve */}
+                        {/* Approve button for inactive users */}
                         {u.status === 'inactive' && (
                           <button
                             className="um-icon-btn"
@@ -289,9 +309,11 @@ export default function UserManagement() {
                         <button className="um-icon-btn edit" onClick={() => openEdit(u)} title="Edit">
                           <Edit2 size={14} />
                         </button>
-                        <button className="um-icon-btn del" onClick={() => setDeleteId(u.id)} title="Delete">
-                          <Trash2 size={14} />
-                        </button>
+                        {u.email !== 'admin@loveworld.com' && (
+                          <button className="um-icon-btn del" onClick={() => setDeleteId(u.id)} title="Delete">
+                            <Trash2 size={14} />
+                          </button>
+                        )}
                       </div>
                     </td>
                   </tr>
@@ -335,9 +357,9 @@ export default function UserManagement() {
                 </div>
                 <div className="um-field">
                   <label>Role</label>
-                  <select value={form.role || (form.status === 'active' ? 'zonal' : 'user')}
+                  <select value={form.role === 'admin' ? 'admin' : 'zonal'}
+                    disabled={form.email === 'admin@loveworld.com'}
                     onChange={e => setForm(p => ({ ...p, role: e.target.value }))}>
-                    {form.status !== 'active' && <option value="user">User (Inactive)</option>}
                     <option value="zonal">Zonal Manager</option>
                     <option value="admin">System Administrator</option>
                   </select>
@@ -360,6 +382,7 @@ export default function UserManagement() {
                 <div className="um-field">
                   <label>Status</label>
                   <select value={form.status}
+                    disabled={form.email === 'admin@loveworld.com'}
                     onChange={e => setForm(p => ({ ...p, status: e.target.value }))}>
                     <option value="active">Active</option>
                     <option value="inactive">Inactive</option>

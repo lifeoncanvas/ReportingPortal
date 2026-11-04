@@ -1,7 +1,8 @@
+import { getApiUrl } from '../../utils/apiConfig';
 import React, { useState } from 'react';
 
 const getApiBase = () => {
-    return (window.ENV?.API_PATH || process.env.REACT_APP_API_URL ) + '/api/auth';
+    return getApiUrl() + '/api/auth';
 };
 
 const API_BASE = getApiBase();

@@ -1,3 +1,4 @@
+import { getApiUrl } from '../../utils/apiConfig';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../AuthContext';
@@ -94,7 +95,7 @@ export default function Signup({ onSwitch }) {
     };
 
     try {
-        const apiUrl = window.ENV?.API_PATH || process.env.REACT_APP_API_URL ;
+        const apiUrl = getApiUrl();
         const res = await fetch(`${apiUrl}/api/auth/signup`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },

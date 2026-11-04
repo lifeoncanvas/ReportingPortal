@@ -1,3 +1,4 @@
+import { getApiUrl } from '../../../utils/apiConfig';
 import React, { useState } from 'react';
 import { Search, Filter, Download, Eye, X, ChevronDown } from 'lucide-react';
 import { useSettings } from '../../../context/SettingsContext';
@@ -147,7 +148,7 @@ export default function AuditLogs() {
 
   const fetchLogs = async () => {
     try {
-      const res = await fetch(`${process.env.REACT_APP_API_URL}/api/audit-logs`);
+      const res = await fetch(`${getApiUrl()}/api/audit-logs`);
       const data = await res.json();
       setLogs(data || []);
     } catch(err) { console.error("Failed to load audit logs", err); }

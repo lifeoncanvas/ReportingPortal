@@ -1,3 +1,4 @@
+import { getApiUrl } from '../../../utils/apiConfig';
 import React, { useState } from 'react';
 import { ShoppingCart, Package, Bell, CheckCircle, ChevronRight, CreditCard, Upload, AlertCircle, X } from 'lucide-react';
 import { useSettings } from '../../../context/SettingsContext';
@@ -252,7 +253,7 @@ export default function Magazine() {
 
   const fetchOrders = () => {
     if (!user) return;
-    const url = `${process.env.REACT_APP_API_URL}/api/magazine/orders?role=${user.role}&zone=${user.zone || ''}`;
+    const url = `${getApiUrl()}/api/magazine/orders?role=${user.role}&zone=${user.zone || ''}`;
     fetch(url)
       .then(res => res.json())
       .then(data => setOrders(data))
@@ -317,7 +318,7 @@ export default function Magazine() {
       contactPhone: shipping.contactPhone
     };
 
-    fetch(`${process.env.REACT_APP_API_URL}/api/magazine/orders`, {
+    fetch(`${getApiUrl()}/api/magazine/orders`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
@@ -363,7 +364,7 @@ export default function Magazine() {
   };
 
   const handleOrderAction = (orderId, action) => {
-    fetch(`${process.env.REACT_APP_API_URL}/api/magazine/orders/${orderId}/${action}`, { method: 'POST' })
+    fetch(`${getApiUrl()}/api/magazine/orders/${orderId}/${action}`, { method: 'POST' })
       .then(res => {
         if (!res.ok) throw new Error();
         showToast({ title: 'Success', message: `Order status updated to ${action}.` });

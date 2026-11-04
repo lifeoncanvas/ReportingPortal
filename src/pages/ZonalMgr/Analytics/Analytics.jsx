@@ -1,3 +1,4 @@
+import { getApiUrl } from '../../../utils/apiConfig';
 import React, { useState, useEffect, useCallback } from 'react';
 import {
   LineChart, Line, BarChart, Bar, PieChart, Pie, Cell,
@@ -90,7 +91,7 @@ const ALL_ZONES = [
   'GRAND TOTAL (CAMPUS ZONES)',
 ];
 
-const API = window.ENV?.API_PATH || process.env.REACT_APP_API_URL ;
+const API = getApiUrl();
 
 // ── Data ─────────────────────────────────────────────
 const DATA = {

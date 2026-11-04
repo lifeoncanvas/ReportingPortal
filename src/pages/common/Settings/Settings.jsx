@@ -1,3 +1,4 @@
+import { getApiUrl } from '../../../utils/apiConfig';
 import React, { useState, useEffect, useRef } from 'react';
 import { User, Lock, Bell, Globe, Shield, ChevronRight, Eye, EyeOff, Check } from 'lucide-react';
 import { useSettings } from '../../../context/SettingsContext';
@@ -131,7 +132,7 @@ export default function Settings() {
 
     useEffect(() => {
         if (tab === 'security' && user?.email) {
-            const apiUrl = process.env.REACT_APP_API_URL ;
+            const apiUrl = getApiUrl();
             fetch(`${apiUrl}/api/auth/security-question?email=${encodeURIComponent(user.email)}`)
                 .then(res => res.json())
                 .then(data => {
@@ -149,7 +150,7 @@ export default function Settings() {
 
         setPwLoading(true);
         try {
-            const apiUrl = process.env.REACT_APP_API_URL ;
+            const apiUrl = getApiUrl();
             const res = await fetch(`${apiUrl}/api/auth/change-password`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -180,7 +181,7 @@ export default function Settings() {
         }
         setSecLoading(true);
         try {
-            const apiUrl = process.env.REACT_APP_API_URL ;
+            const apiUrl = getApiUrl();
             const res = await fetch(`${apiUrl}/api/auth/update-security-settings`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
