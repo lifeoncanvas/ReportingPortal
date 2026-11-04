@@ -29,8 +29,17 @@ export default function UserManagement() {
   const fetchUsers = async () => {
     try {
       const res = await fetch(`${getApiUrl()}/api/users`);
+      if (!res.ok) {
+        console.error("Failed to load users: HTTP", res.status);
+        return;
+      }
       const data = await res.json();
-      setUsers(data || []);
+      if (Array.isArray(data)) {
+        setUsers(data);
+      } else {
+        console.error("Unexpected users response:", data);
+        setUsers([]);
+      }
 
       // Also fetch dashboard stats for accurate total report count
       try {
@@ -42,7 +51,7 @@ export default function UserManagement() {
           }
         }
       } catch (e) {}
-    } catch (err) { console.log("Failed to load users", err); }
+    } catch (err) { console.error("Failed to load users", err); }
   };
 
   const filtered = users.filter(u =>
