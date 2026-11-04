@@ -78,22 +78,46 @@ export default function UserManagement() {
     if (!form.email || !editUser) return;
 
     const finalRole = form.role === 'admin' ? 'admin' : 'zonal';
-    const payload = { ...form, role: finalRole };
+    const updatedUser = {
+      ...editUser,
+      ...form,
+      role: finalRole,
+    };
 
-    await fetch(`${getApiUrl()}/api/users/${editUser.id}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    });
-
+    // Instant optimistic UI update so changes reflect immediately
+    setUsers(prev => prev.map(u => u.id === editUser.id ? updatedUser : u));
     setShowModal(false);
-    fetchUsers();
+    showToast('User updated successfully!');
+
+    try {
+      const res = await fetch(`${getApiUrl()}/api/users/${editUser.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updatedUser)
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setUsers(prev => prev.map(u => u.id === editUser.id ? { ...u, ...data } : u));
+      }
+    } catch (err) {
+      console.error('Failed to update user:', err);
+      showToast('Error saving changes to server');
+      fetchUsers();
+    }
   };
 
   const handleDelete = async (id) => {
-    await fetch(`${getApiUrl()}/api/users/${id}`, { method: 'DELETE' });
+    // Instant optimistic UI update
+    setUsers(prev => prev.filter(u => u.id !== id));
     setDeleteId(null);
-    fetchUsers();
+    showToast('User deleted successfully');
+
+    try {
+      await fetch(`${getApiUrl()}/api/users/${id}`, { method: 'DELETE' });
+    } catch (err) {
+      console.error('Failed to delete user:', err);
+      fetchUsers();
+    }
   };
 
   const inlineChangeRole = async (id, newRole) => {
@@ -104,6 +128,7 @@ export default function UserManagement() {
 
     // Optimistic UI update
     setUsers(prev => prev.map(u => u.id === id ? { ...u, role: targetRole } : u));
+    showToast(`Role updated to ${targetRole === 'admin' ? 'Admin' : 'Zonal'}`);
 
     try {
       await fetch(`${getApiUrl()}/api/users/${id}`, {
@@ -126,6 +151,7 @@ export default function UserManagement() {
 
     // Optimistic UI update - strictly preserve the existing role
     setUsers(prev => prev.map(u => u.id === id ? { ...u, status: newStatus, role: currentRole } : u));
+    showToast(`User status set to ${newStatus}`);
 
     try {
       await fetch(`${getApiUrl()}/api/users/${id}`, {
